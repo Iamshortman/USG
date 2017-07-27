@@ -22,6 +22,13 @@ uniform int spotCount = 0;
 
 void main(void) 
 {
-	//fragmentColor = vec4(abs(out_Normal), 1.0f);
-	fragmentColor = texture(texture1, out_TexCoord);
+	vec4 result = vec4(0.0f, 0.0f, 0.0f, 0.0f);
+
+	for(int i = 0; i < directinalCount; i++)
+	{
+		result += CalcDirectionalLight(directinalLights[0], out_Normal, vec3(0.0f, 0.0f, 0.0f));
+	}
+	
+
+	fragmentColor = result;
 }

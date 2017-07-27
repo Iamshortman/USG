@@ -47,16 +47,14 @@ void RenderingManager::RenderWorld(World* world, Camera* cam)
 	}
 
 	//Render the larger world first
-	Entity* parent = world->getParent();
-	if (parent != nullptr)
-	{
+	//Entity* parent = world->getParent();
+	//if (parent != nullptr)
+	//{
 		//this->RenderWorld(parent->getWorld(), cam);
-	}
+	//}
 
 	//Now render world
 	auto entities = world->getEntitiesInWorld();
-
-	vector3F ambientLight = world->ambientLight;
 
 	for (auto it = entities->begin(); it != entities->end(); it++)
 	{
@@ -66,7 +64,7 @@ void RenderingManager::RenderWorld(World* world, Camera* cam)
 		{
 			if (entity->hasComponent("model"))
 			{
-				this->RenderMesh(&((ComponentModel*)entity->getComponent("model"))->model, entity->getRenderTransform(), cam, ambientLight);
+				this->RenderMesh(&((ComponentModel*)entity->getComponent("model"))->model, entity->getRenderTransform(), cam, world);
 			}
 		}
 
@@ -84,11 +82,12 @@ void RenderingManager::RenderWorld(World* world, Camera* cam)
 
 }
 
-void RenderingManager::RenderMesh(Model* model, Transform globalPos, Camera* cam, vector3F ambientLight)
+void RenderingManager::RenderMesh(Model* model, Transform globalPos, Camera* cam, World* world)
 {
 	ShaderProgram* program = model->getShader();
 	Mesh* mesh = model->getMesh();
 	RenderController* controller = model->getController();
+	vector3F ambientLight = world->ambientLight;
 
 	if (mesh == nullptr || program == nullptr)
 	{
@@ -102,7 +101,7 @@ void RenderingManager::RenderMesh(Model* model, Transform globalPos, Camera* cam
 	program->setActiveProgram();
 	program->setUniform("MVP", mvp);
 	program->setUniform("normalMatrix", globalPos.getNormalMatrix());
-	program->setUniform("ambientLight", vector3F(1.0f));//ambientLight);
+	program->setUniform("ambientLight", ambientLight);
 
 	GLuint texture = model->getTexture(0);
 	glBindTexture(GL_TEXTURE_2D, texture);
@@ -141,34 +140,68 @@ void RenderingManager::RenderMesh(Model* model, Transform globalPos, Camera* cam
 	program->deactivateProgram();
 
 	//Switch to lighting Shading
-	//program = model->getLightingShader();
-	//if (false && lights != nullptr && program != nullptr)
-	//{
-	//	glEnable(GL_BLEND);
-	//	glBlendFunc(GL_ONE, GL_ONE);
-	//	glDepthMask(false);
-	//	glDepthFunc(GL_EQUAL);
+	LightSet* lights = LightManager::instance->getLightsForWorld(world->worldId);
+	program = model->getLightingShader();
+	if (lights != nullptr && program != nullptr)
+	{
+		glEnable(GL_BLEND);
+		glBlendFunc(GL_ONE, GL_ONE);
+		glDepthMask(false);
+		glDepthFunc(GL_EQUAL);
 
-	//	program->setActiveProgram();
+		program->setActiveProgram();
 
-	//	int count = 0;
-	//	for (DirectionalLight* light : lights->directionalLights)
-	//	{
-	//		setDirectionalLight("directinalLights[0]", program, light);
-	//	}
+		int directionalCount = lights->directionalLights.size();
+		int pointCount = lights->pointLights.size();
+		int spotCount = lights->spotLights.size();
 
-	//	if (controller != nullptr)
-	//	{
-	//		controller->setGLSLUniform(program);
-	//	}
+		while (directionalCount > 0 || pointCount > 0 || spotCount > 0)
+		{
+			int count = 0;
 
-	//	mesh->draw(program);
+			for (count = 0; (count < 8) && (directionalCount > 0); count++)
+			{
+				setDirectionalLight("directinalLights[0]", program, lights->directionalLights[directionalCount - 1]);
+				directionalCount--;
+			}
+			program->setUniform("directinalCount", count);
 
-	//	program->deactivateProgram();
+			for (count = 0; (count < 8) && (pointCount > 0); count++)
+			{
+				setPointLight("pointLights[0]", program, lights->pointLights[pointCount - 1], cam->getPosition());
+				pointCount--;
+			}
+			program->setUniform("pointCount", count);
 
-	//	glDepthFunc(GL_LESS);
-	//	glDepthMask(true);
-	//	glDisable(GL_BLEND);
-	//}
+
+			for (count = 0; (count < 8) && (spotCount > 0); count++)
+			{
+				setSpotLight("spotLights[0]", program, lights->spotLights[spotCount - 1], cam->getPosition());
+				spotCount--;
+			}
+			program->setUniform("spotCount", count);
+
+			program->setActiveProgram();
+			program->setUniform("MVP", mvp);
+			program->setUniform("normalMatrix", globalPos.getNormalMatrix());
+			program->setUniform("ambientLight", ambientLight);
+
+			GLuint texture = model->getTexture(0);
+			glBindTexture(GL_TEXTURE_2D, texture);
+
+			if (controller != nullptr)
+			{
+				controller->setGLSLUniform(program);
+			}
+
+			mesh->draw(program);
+		}
+
+		program->deactivateProgram();
+
+		glDepthFunc(GL_LESS);
+		glDepthMask(true);
+		glDisable(GL_BLEND);
+	}
 
 }

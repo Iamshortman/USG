@@ -69,3 +69,4 @@ target_link_libraries (Client assimp-vc120-mt)
 target_link_libraries (Client zlibstaticd)
 target_link_libraries (Server assimp-vc120-mt)
 target_link_libraries (Server zlibstaticd)
+

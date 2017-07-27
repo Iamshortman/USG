@@ -3,6 +3,13 @@
 
 #include "Common/GLM_Include.hpp"
 
+enum LightType
+{
+	Directional,
+	Point,
+	Spot,
+};
+
 class BaseLight
 {
 public:

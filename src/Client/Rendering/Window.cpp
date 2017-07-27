@@ -62,7 +62,7 @@ void Window::set3dRendering()
 	glDepthFunc(GL_LEQUAL);
 
 	/*glEnable(GL_CULL_FACE);
-	glFrontFace(GL_CCW);
+	glFrontFace(GL_CW);
 	glCullFace(GL_BACK);*/
 }
 

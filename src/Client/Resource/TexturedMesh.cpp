@@ -1,6 +1,8 @@
 #include "Client/Resource/TexturedMesh.hpp"
 #include "Client/Rendering/ShaderProgram.hpp"
 
+#include "Common/Resource/Assimp_Include.hpp"
+
 TexturedMesh::TexturedMesh(std::vector<TexturedVertex>& vertices, std::vector<unsigned int>& indices)
 {
 	size = (int)indices.size();
@@ -80,81 +82,68 @@ void TexturedMesh::draw(ShaderProgram* program)
 	glDisableVertexAttribArray(2);
 }
 
-TexturedMesh* TexturedMesh::loadObj(std::string filename)
+TexturedMesh* TexturedMesh::loadObj(std::string fileName)
 {
-	FILE* file;
-	errno_t err = fopen_s(&file, filename.c_str(), "r");
-	if (file == NULL || err != 0)
+	TexturedMesh* textMesh = nullptr;
+
+	Assimp::Importer import;
+	const aiScene *scene = import.ReadFile(fileName, aiProcess_Triangulate | aiProcess_FlipUVs);
+
+	if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode)
 	{
-		printf("Cannot Open File: %s \n", filename.c_str());
-		return nullptr;
+		cout << "ERROR::ASSIMP::" << import.GetErrorString() << endl;
+		return textMesh;
 	}
 
-	std::vector< vector3F > temp_vertices;
-	std::vector< vector2F > temp_uvs;
-	std::vector< vector3F > temp_normals;
-
-	//Push Back the zero pos since we use 1 as the start point
-	temp_vertices.push_back(vector3F(0.0));
-	temp_uvs.push_back(vector2F(0.0));
-	temp_normals.push_back(vector3F(0.0));
-
-	std::vector<TexturedVertex> vertices;
-	std::vector<unsigned int> indices;
-
-	while (1)
+	if (scene->HasMeshes())
 	{
-		char lineHeader[128];
-		// read the first word of the line
-		int res = fscanf_s(file, "%s", lineHeader, _countof(lineHeader));
-		if (res == EOF)
-			break; // EOF = End Of File. Quit the loop.
+		vector<TexturedVertex> vertices;
+		vector<unsigned int> indices;
 
-		// else : parse lineHeader
+		for (int i = 0; i < scene->mNumMeshes; i++)
+		{
+			aiMesh* mesh = scene->mMeshes[i];
 
-		if (strcmp(lineHeader, "v") == 0)
-		{
-			vector3F vertex;
-			fscanf_s(file, "%f %f %f\n", &vertex.x, &vertex.y, &vertex.z);
-			temp_vertices.push_back(vertex);
-		}
-		else if (strcmp(lineHeader, "vt") == 0)
-		{
-			vector2F uv;
-			fscanf_s(file, "%f %f\n", &uv.x, &uv.y);
-			temp_uvs.push_back(uv);
-		}
-		else if (strcmp(lineHeader, "vn") == 0)
-		{
-			vector3F normal;
-			fscanf_s(file, "%f %f %f\n", &normal.x, &normal.y, &normal.z);
-			temp_normals.push_back(normal);
-		}
-		else if (strcmp(lineHeader, "f") == 0)
-		{
-			unsigned int vertexIndex[3], uvIndex[3], normalIndex[3];
-			int matches = fscanf_s(file, "%d/%d/%d %d/%d/%d %d/%d/%d\n", &vertexIndex[0], &uvIndex[0], &normalIndex[0], &vertexIndex[1], &uvIndex[1], &normalIndex[1], &vertexIndex[2], &uvIndex[2], &normalIndex[2]);
-			if (matches != 9)
+			for (unsigned int i = 0; i < mesh->mNumVertices; i++)
 			{
-				printf("Error: unsupported .obj file\n");
-				printf("File: %s\n\n", filename.c_str());
+				TexturedVertex vertex;
+
+				//Need to swap Y and Z while loading
+				vertex.pos.x = mesh->mVertices[i].x;
+				vertex.pos.y = mesh->mVertices[i].y;
+				vertex.pos.z = mesh->mVertices[i].z;
+
+				vertex.normal.x = mesh->mNormals[i].x;
+				vertex.normal.y = mesh->mNormals[i].y;
+				vertex.normal.z = mesh->mNormals[i].z;
+
+				if (mesh->mTextureCoords[0]) // does the mesh contain texture coordinates?
+				{
+					vertex.uv.x = mesh->mTextureCoords[0][i].x;
+					vertex.uv.y = mesh->mTextureCoords[0][i].y;
+				}
+				else
+				{
+					vertex.uv = vector2F(0.0f);
+				}
+
+				vertices.push_back(vertex);
 			}
 
-			vertices.push_back({ temp_vertices[vertexIndex[0]], temp_normals[normalIndex[0]], temp_uvs[uvIndex[0]] });
-			vertices.push_back({ temp_vertices[vertexIndex[1]], temp_normals[normalIndex[1]], temp_uvs[uvIndex[1]] });
-			vertices.push_back({ temp_vertices[vertexIndex[2]], temp_normals[normalIndex[2]], temp_uvs[uvIndex[2]] });
-			indices.push_back((unsigned int)indices.size());
-			indices.push_back((unsigned int)indices.size());
-			indices.push_back((unsigned int)indices.size());
-		}
-		else
-		{
-			// Probably a comment, eat up the rest of the line
-			char stupidBuffer[1000];
-			fgets(stupidBuffer, 1000, file);
+			int indicesOffset = indices.size();
+
+			for (unsigned int i = 0; i < mesh->mNumFaces; i++)
+			{
+				aiFace face = mesh->mFaces[i];
+				for (unsigned int j = 0; j < face.mNumIndices; j++)
+					indices.push_back(indicesOffset + face.mIndices[j]);
+			}
 		}
 
+		textMesh = new TexturedMesh(vertices, indices);
 	}
 
-	return new TexturedMesh(vertices, indices);
+	import.FreeScene();
+
+	return textMesh;
 }

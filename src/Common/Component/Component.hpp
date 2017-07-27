@@ -3,6 +3,7 @@
 
 //Prototype class
 class Entity;
+class World;
 
 class Component
 {
@@ -14,6 +15,9 @@ public:
 	virtual ~Component();
 
 	virtual void update(double deltaTime);
+
+	virtual void addToWorld(World* world);
+	virtual void removeFromWorld(World* world);
 
 	Entity* getParent();
 	void setParent(Entity* entity);

@@ -25,7 +25,7 @@ public:
 	void Render(Camera* cam);
 	void RenderWorld(World* world, Camera* cam);
 
-	void RenderMesh(Model* model, Transform globalPos, Camera* cam, vector3F ambientLight);
+	void RenderMesh(Model* model, Transform globalPos, Camera* cam, World* world);
 
 protected:
 

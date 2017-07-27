@@ -10,11 +10,20 @@ Entity::Entity(EntityId id)
 
 Entity::~Entity()
 {
+	if (rigidBody != nullptr)
+	{
+		delete rigidBody;
+	}
 	//delete RigidBody;
 
 	//Remove from the current world
 	if (world != nullptr)
 	{
+		for (auto iterator : components)
+		{
+			iterator.second->removeFromWorld(world);
+		}
+
 		world->removeEntityFromWorld(this);
 	}
 
@@ -46,6 +55,11 @@ void Entity::addToWorld(World* world)
 	//Remove from the current world
 	if (this->world != nullptr)
 	{
+		for (auto iterator : components)
+		{
+			iterator.second->removeFromWorld(world);
+		}
+
 		this->world->removeEntityFromWorld(this);
 	
 		if (this->subWorld != nullptr)
@@ -61,6 +75,11 @@ void Entity::addToWorld(World* world)
 	if (this->world != nullptr)
 	{
 		this->world->addEntityToWorld(this);
+
+		for (auto iterator : components)
+		{
+			iterator.second->addToWorld(world);
+		}
 
 		if (this->subWorld != nullptr)
 		{
@@ -107,24 +126,37 @@ void Entity::setTransform(Transform transform)
 
 bool Entity::hasComponent(std::string componentName)
 {
-	return components.find(componentName) != components.end();
+	return this->components.find(componentName) != this->components.end();
 }
 
 Component* Entity::getComponent(std::string componentName)
 {
-	return components[componentName];
+	return this->components[componentName];
 }
 
 void Entity::addComponent(std::string componentName, Component* component)
 {
-	components[componentName] = component;
+	this->components[componentName] = component;
 	component->setParent(this);
+
+	if (this->world != nullptr)
+	{
+		component->addToWorld(this->world);
+	}
 }
 
 void Entity::removeComponent(std::string componentName)
 {
-	delete components[componentName];
-	components.erase(componentName);
+	if (this->hasComponent(componentName))
+	{
+		if (this->world != nullptr)
+		{
+			components[componentName]->removeFromWorld(this->world);
+		}
+
+		delete components[componentName];
+		components.erase(componentName);
+	}
 }
 
 Transform Entity::getRenderTransform()

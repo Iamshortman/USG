@@ -86,7 +86,7 @@ Client::Client()
 	model1->model.setLightingShader("TexturedLighting");
 	model1->model.addTexture("res/textures/1K_Grid.png", 0);
 
-	//LightManager::instance->addDirectionalLight(this->tempWorld->worldId, new DirectionalLight(vector3F(0.0f, -1.0f, 0.0f), vector3F(4.0f, 0.0f, 6.0f), 0.4f));
+	LightManager::instance->addDirectionalLight(ship->getSubWorld()->worldId, new DirectionalLight(vector3F(0.0f, -1.0f, 0.0f), vector3F(4.0f, 0.0f, 6.0f), 0.4f));
 	
 	ship->getSubWorld()->setGravity(vector3D(0.0, -9.8, 0.0));
 
