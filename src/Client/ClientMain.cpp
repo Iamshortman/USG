@@ -57,10 +57,10 @@ int main()
 		deltaTime = ((double)delta) / 1000.0;
 		//cout << "Update delta: " << deltaTime << endl;
 
-		if (deltaTime > (1.0 / 45.0))
+		/*if (deltaTime > (1.0 / 45.0))
 		{
 			printf("Error: frame took too long: %f seconds\n", deltaTime);
-		}
+		}*/
 
 		game->update(deltaTime);
 	}

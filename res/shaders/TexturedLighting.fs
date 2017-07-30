@@ -4,6 +4,7 @@
 
 in vec3 out_Normal;
 in vec2 out_TexCoord;
+in vec3 out_worldPos;
 
 //Because gl_FragColor is no longer used.
 out vec4 fragmentColor;
@@ -26,9 +27,19 @@ void main(void)
 
 	for(int i = 0; i < directinalCount; i++)
 	{
-		result += CalcDirectionalLight(directinalLights[0], out_Normal, vec3(0.0f, 0.0f, 0.0f));
+		result += CalcDirectionalLight(directinalLights[i], out_Normal, out_worldPos);
 	}
 	
-
-	fragmentColor = result;
+	for(int i = 0; i < pointCount; i++)
+	{
+		result += CalcPointLight(pointLights[i], out_Normal, out_worldPos);
+	}
+	
+	for(int i = 0; i < spotCount; i++)
+	{
+		result += CalcSpotLight(spotLights[i], out_Normal, out_worldPos);
+	}
+	
+	vec4 trueColor = texture(texture1, out_TexCoord);
+	fragmentColor = trueColor * result;
 }

@@ -96,10 +96,12 @@ void RenderingManager::RenderMesh(Model* model, Transform globalPos, Camera* cam
 
 	matrix4 projection = cam->getProjectionMatrix(this->window);
 	matrix4 view = cam->getOriginViewMatrix();
-	matrix4 mvp = projection * view * globalPos.getModleMatrix(cam->getPosition());
+	matrix4 modelMatrix = globalPos.getModleMatrix(cam->getPosition());
+	matrix4 mvp = projection * view * modelMatrix;
 
 	program->setActiveProgram();
 	program->setUniform("MVP", mvp);
+	program->setUniform("modelMatrix", modelMatrix);
 	program->setUniform("normalMatrix", globalPos.getNormalMatrix());
 	program->setUniform("ambientLight", ambientLight);
 
@@ -111,9 +113,10 @@ void RenderingManager::RenderMesh(Model* model, Transform globalPos, Camera* cam
 		controller->setGLSLUniform(program);
 	}
 
-	/*if (model->skeleton != nullptr)
+	if (model->skeleton != nullptr)
 	{
-		AnimatedMesh* animMesh = (AnimatedMesh*)mesh;
+		//program->setUniform("boneTransforms[0]", model->skeleton->rootBone->animatedTransform);
+		/*AnimatedMesh* animMesh = (AnimatedMesh*)mesh;
 		std::stack<Bone*> bones;
 		bones.push(model->skeleton->rootBone);
 
@@ -132,8 +135,8 @@ void RenderingManager::RenderMesh(Model* model, Transform globalPos, Camera* cam
 			{
 				bones.push(bone->children[i]);
 			}
-		}
-	}*/
+		}*/
+	}
 
 	mesh->draw(program);
 
@@ -144,6 +147,8 @@ void RenderingManager::RenderMesh(Model* model, Transform globalPos, Camera* cam
 	program = model->getLightingShader();
 	if (lights != nullptr && program != nullptr)
 	{
+		Transform worldOffset = world->getWorldOffsetMatrix();
+
 		glEnable(GL_BLEND);
 		glBlendFunc(GL_ONE, GL_ONE);
 		glDepthMask(false);
@@ -161,14 +166,14 @@ void RenderingManager::RenderMesh(Model* model, Transform globalPos, Camera* cam
 
 			for (count = 0; (count < 8) && (directionalCount > 0); count++)
 			{
-				setDirectionalLight("directinalLights[0]", program, lights->directionalLights[directionalCount - 1]);
+				setDirectionalLight("directinalLights[" + std::to_string(count) + "]", program, lights->directionalLights[directionalCount - 1], worldOffset);
 				directionalCount--;
 			}
 			program->setUniform("directinalCount", count);
 
 			for (count = 0; (count < 8) && (pointCount > 0); count++)
 			{
-				setPointLight("pointLights[0]", program, lights->pointLights[pointCount - 1], cam->getPosition());
+				setPointLight("pointLights[" + std::to_string(count) + "]", program, lights->pointLights[pointCount - 1], worldOffset, cam->getPosition());
 				pointCount--;
 			}
 			program->setUniform("pointCount", count);
@@ -176,13 +181,14 @@ void RenderingManager::RenderMesh(Model* model, Transform globalPos, Camera* cam
 
 			for (count = 0; (count < 8) && (spotCount > 0); count++)
 			{
-				setSpotLight("spotLights[0]", program, lights->spotLights[spotCount - 1], cam->getPosition());
+				setSpotLight("spotLights[" + std::to_string(count) + "]", program, lights->spotLights[spotCount - 1], worldOffset, cam->getPosition());
 				spotCount--;
 			}
 			program->setUniform("spotCount", count);
 
 			program->setActiveProgram();
 			program->setUniform("MVP", mvp);
+			program->setUniform("modelMatrix", modelMatrix);
 			program->setUniform("normalMatrix", globalPos.getNormalMatrix());
 			program->setUniform("ambientLight", ambientLight);
 

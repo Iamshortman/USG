@@ -6,8 +6,10 @@ in vec2 in_TexCoord;
 
 out vec3 out_Normal;
 out vec2 out_TexCoord;
+out vec3 out_worldPos;
 
 uniform mat4 MVP;
+uniform mat4 modelMatrix;
 uniform mat3 normalMatrix; 
 uniform mat4 localOffset = mat4(1.0); 
  
@@ -17,4 +19,5 @@ void main(void)
 	gl_Position = MVP * offsetPosition;
 	out_Normal = normalMatrix * in_Normal;
 	out_TexCoord = in_TexCoord;
+	out_worldPos = (modelMatrix * offsetPosition).xyz;
 }

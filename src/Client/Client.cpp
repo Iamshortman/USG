@@ -32,15 +32,17 @@ Client::Client()
 
 	//Load Test Shaders
 	ShaderPool::instance->loadShader("Textured", "res/shaders/Textured.vs", "res/shaders/Textured.fs", { { 0, "in_Position" }, { 1, "in_Normal" }, { 2, "in_TexCoord" } });
-	//ShaderPool::instance->loadShader("TexturedAnimated", "res/shaders/TexturedAnimated.vs", "res/shaders/Textured.fs", { { 0, "in_Position" }, { 1, "in_Normal" }, { 2, "in_TexCoord" } });
 	ShaderPool::instance->loadShader("TexturedLighting", "res/shaders/Textured.vs", "res/shaders/TexturedLighting.fs", { { 0, "in_Position" }, { 1, "in_Normal" }, { 2, "in_TexCoord" } });
 	
+	ShaderPool::instance->loadShader("TexturedAnimated", "res/shaders/TexturedAnimated.vs", "res/shaders/Textured.fs", { { 0, "in_Position" }, { 1, "in_Normal" }, { 2, "in_TexCoord" } });
+
+
 	MeshPool::instance->loadModel("Ship", "res/models/LargeBlockShip.obj", true);
 	MeshPool::instance->loadModel("SmallCube", "res/models/Cube.obj", true);
-	MeshPool::instance->loadModel("TestChar", "res/models/TestChar/TestChar.dae", false);
+	//MeshPool::instance->loadModel("Ship_Inside", "res/models/Ship_Inside.obj", true);
+	//MeshPool::instance->loadModel("Ship_Outside", "res/models/Ship_Outside.obj", true);
 
 	TexturePool::instance->loadTexture("res/textures/1K_Grid.png");
-	TexturePool::instance->loadTexture("res/models/TestChar/diffuse.png");
 
 	this->tempWorld = WorldManager::instance->createNewWorld();
 	//this->tempWorld->setGravity(vector3D(0.0, -9.8, 0.0));
@@ -51,7 +53,7 @@ Client::Client()
 	Entity* cube = EntityManager::instance->createNewEntity();
 	cube->createRigidBody();
 	//cube->addToWorld(this->tempWorld);
-	//cube->setTransform(Transform(vector3D(0.0, 0.0, 20.0), quaternionD(0.924, 0.0, 0.383, 0.0)));
+	cube->setTransform(Transform(vector3D(0.0, 0.0, -20.0)));
 
 	cube->getRigidBody()->addChildShape(new BoxShape(vector3D(2.0)), Transform());
 
@@ -74,53 +76,91 @@ Client::Client()
 
 	ship->getRigidBody()->addChildShape(new BoxShape(vector3D(30.0, 16.0, 100.0)), Transform());
 
-	ship->getRigidBody()->setMass(1000.0);
+	ship->getRigidBody()->setMass(100000.0);
 	ship->getRigidBody()->setDampening(0.0, 0.0);
 
-	ship->setSubWorld(WorldManager::instance->createNewWorld());
+	//ship->getRigidBody()->setLinearVelocity(vector3D(0.0, 0.0, 2.0));
+	//ship->getRigidBody()->setAngularVelocity(vector3D(0.0, 1.0, 0.0));
 
+	ship->setSubWorld(WorldManager::instance->createNewWorld());
 	ComponentModel* model1 = new ComponentModel();
-	ship->addComponent("model", model1);
+	//ship->addComponent("model", model1);
 	model1->model.setMesh("Ship");
 	model1->model.setShader("Textured");
 	model1->model.setLightingShader("TexturedLighting");
 	model1->model.addTexture("res/textures/1K_Grid.png", 0);
-
-	LightManager::instance->addDirectionalLight(ship->getSubWorld()->worldId, new DirectionalLight(vector3F(0.0f, -1.0f, 0.0f), vector3F(4.0f, 0.0f, 6.0f), 0.4f));
 	
 	ship->getSubWorld()->setGravity(vector3D(0.0, -9.8, 0.0));
-
-	Entity* actor = EntityManager::instance->createNewEntity();
-	actor->addToWorld(ship->getSubWorld());
-	actor->setTransform(Transform(vector3D(-24.0, -1.0, 0.0)));
-	actor->createRigidBody();
-
-	actor->getRigidBody()->addChildShape(new BoxShape(vector3D(0.5, 1.0, 0.5)), Transform(vector3D(0.0, 1.0, 0.0)));
-	actor->getRigidBody()->setMass(1.0);
-
-	ComponentModel* model2 = new ComponentModel();
-	actor->addComponent("model", model2);
-	model2->model.setMesh("TestChar");
-	model2->model.setShader("Textured");
-	model2->model.setLightingShader("TexturedLighting");
-	model2->model.addTexture("res/models/TestChar/diffuse.png", 0);
-
-	//Skeleton* skeleton = Skeleton::loadSkeleton("res/models/TestChar/TestChar.dae");
-	//model2->model.skeleton = skeleton;
 
 	//Ship Inside
 	Entity* interior = EntityManager::instance->createNewEntity();
 	interior->addToWorld(ship->getSubWorld());
 	interior->createRigidBody(0.0, new ConcaveMeshShape("res/models/LargeBlockShip.obj"));
 
+	interior->addComponent("model", model1);
+
 	cube->addToWorld(ship->getSubWorld());
+
+	LightManager::instance->addPointLight(ship->getSubWorld()->worldId, new PointLight(vector3D(0.0), 300.0f, vector3F(0.2f, 0.001f, 0.0f), vector3F(1.0f), 0.2f));
+	LightManager::instance->addPointLight(ship->getSubWorld()->worldId, new PointLight(vector3D(0.0, 0.0, 50.0), 200.0f, vector3F(0.2f, 0.01f, 0.0f), vector3F(0.01f, 0.4f, 0.7f), 0.7f));
+
+	LightManager::instance->addDirectionalLight(this->tempWorld->worldId, new DirectionalLight(glm::normalize(vector3F(0.4f, 1.0f, -0.2f)), vector3F(1.0f), 0.4f));
+
+	//SmallShip
+	/*Entity* smallShip = EntityManager::instance->createNewEntity();
+	smallShip->createRigidBody();
+	smallShip->addToWorld(ship->getSubWorld());
+	smallShip->getRigidBody()->addChildShape(new BoxShape(vector3D(4.5, 2.0, 7.5)), Transform(vector3D(0.0, 0.0, -1.5)));
+	smallShip->getRigidBody()->addChildShape(new BoxShape(vector3D(1.5, 2.0, 1.75)), Transform(vector3D(0.0, 0.0, 6.75)));
+	smallShip->getRigidBody()->setMass(1000.0);
+	smallShip->getRigidBody()->setDampening(0.0, 0.0);
+	smallShip->setSubWorld(WorldManager::instance->createNewWorld());
+
+	smallShip->setTransform(Transform(vector3D(0.0, 0.0, -20.0)));
+
+	ComponentModel* outside = new ComponentModel();
+	smallShip->addComponent("model", outside);
+	outside->model.setMesh("Ship_Outside");
+	outside->model.setShader("Textured");
+	outside->model.setLightingShader("TexturedLighting");
+	outside->model.addTexture("res/textures/1K_Grid.png", 0);
+
+	Entity* smallShipInterior = EntityManager::instance->createNewEntity();
+	smallShipInterior->addToWorld(smallShip->getSubWorld());
+	smallShipInterior->createRigidBody(0.0, new ConcaveMeshShape("res/models/Ship_Inside_Phys.obj"));
+
+	ComponentModel* inside = new ComponentModel();
+	smallShipInterior->addComponent("model", inside);
+	inside->model.setMesh("Ship_Inside");
+	inside->model.setShader("Textured");
+	inside->model.setLightingShader("TexturedLighting");
+	inside->model.addTexture("res/textures/1K_Grid.png", 0);*/
+
+
+	if (true)
+	{
+		MeshPool::instance->loadModel("AnimTest", "res/models/AnimTest.dae", false);
+		Entity* cube2 = EntityManager::instance->createNewEntity();
+		cube2->createRigidBody(10.0, new BoxShape(vector3D(1.0)));
+
+		ComponentModel* componetModel = new ComponentModel();
+		Model* cubeModel = &componetModel->model;
+		cubeModel->setMesh("AnimTest");
+		cubeModel->addTexture("res/textures/1K_Grid.png", 0);
+		cubeModel->setShader("TexturedAnimated");
+		//cubeModel->setLightingShader("TexturedLighting");
+		cubeModel->skeleton = Skeleton::loadSkeleton("res/models/AnimTest.dae");
+		cube2->addComponent("model", componetModel);
+
+		cube2->addToWorld(ship->getSubWorld());
+	}
 
 
 	//Debug Camera
 	this->debugCamera = EntityManager::instance->createNewEntity();
 	this->debugCamera->addToWorld(this->tempWorld);
 	this->debugCamera->addComponent("DebugCamera", new DebugCameraComponent(5.0, 0.5));
-
+	//this->debugCamera->addToWorld(smallShip->getSubWorld());
 }
 
 Client::~Client()

@@ -76,7 +76,7 @@ void AnimatedMesh::draw(ShaderProgram* program)
 	//JointIndices
 	glVertexAttribPointer(
 		3,                  // jointIndices attribute location
-		3,					// uv is a vec2
+		3,					// jointIndices is a vec3
 		GL_INT,           // type
 		GL_FALSE,           // normalized?
 		sizeof(AnimatedVertex),     // stride
@@ -88,7 +88,7 @@ void AnimatedMesh::draw(ShaderProgram* program)
 		1,                  // jointWeights attribute location
 		3,					// size
 		GL_FLOAT,           // type
-		GL_TRUE,           // normalized?
+		GL_FALSE,           // normalized?
 		sizeof(AnimatedVertex),     // stride
 		(void*)offsetof(AnimatedVertex, boneWeights) // array buffer offset
 		);
@@ -150,7 +150,7 @@ AnimatedMesh* AnimatedMesh::loadMesh(string fileName)
 
 			//Setup default values
 			vertex.boneIndices = vector3I(-1);
-			vertex.boneWeights = vector3F(-1.0f);
+			vertex.boneWeights = vector3F(0.0f);
 
 			vertices.push_back(vertex);
 		}
@@ -171,7 +171,9 @@ AnimatedMesh* AnimatedMesh::loadMesh(string fileName)
 					float weight = bone->mWeights[j].mWeight;
 					AnimatedVertex* vertex = &vertices[index];
 					
-					if (weight > vertex->boneWeights.x)
+					vertex->boneIndices.x = i;
+					vertex->boneWeights.x = 1.0f;
+					/*if (weight > vertex->boneWeights.x)
 					{
 						//Shift y to z
 						vertex->boneIndices.z = vertex->boneIndices.y;
@@ -200,7 +202,7 @@ AnimatedMesh* AnimatedMesh::loadMesh(string fileName)
 						//Insert new into weight into z
 						vertex->boneIndices.z = i;
 						vertex->boneWeights.z = weight;
-					}
+					}*/
 
 				}
 			}

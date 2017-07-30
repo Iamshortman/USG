@@ -12,6 +12,8 @@ Bone* generateSkeleton(aiNode* node, std::hash_map<string, Bone*>* map)
 
 	Bone* bone = map->at(node->mName.data);
 
+	bone->animatedTransform = glm::translate(matrix4(), vector3F(0.0f, 2.0f, 0.0f));
+
 	for (unsigned int i = 0; i < node->mNumChildren; i++)
 	{
 		Bone* child = generateSkeleton(node->mChildren[i], map);
@@ -77,7 +79,7 @@ Skeleton* Skeleton::loadSkeleton(std::string filename)
 			return nullptr;
 		}
 
-		Bone* root = generateSkeleton(armature->mChildren[0]->mChildren[0], &map);
+		Bone* root = generateSkeleton(armature->mChildren[0], &map);
 
 		skeleton = new Skeleton(root, map.size());
 	}

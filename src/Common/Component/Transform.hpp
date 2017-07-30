@@ -70,6 +70,17 @@ public:
 	{
 		return glm::toMat3((quaternionF)this->orientation);
 	};
+
+
+	Transform transformBy(const Transform&  transform1) const
+	{
+		Transform result;
+		result.setOrientation(transform1.getOrientation() * this->getOrientation());
+		result.setPosition(transform1.getPosition() + (transform1.getOrientation() * this->getPosition()));
+
+		return result;
+	};
+
 };
 
 #endif //TRANSFORM_HPP

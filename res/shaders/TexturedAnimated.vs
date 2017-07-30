@@ -1,21 +1,22 @@
 #version 130
 
-const int MAX_JOINTS = 50;//max joints allowed in a skeleton
-const int MAX_WEIGHTS = 3;//max number of joints that can affect a vertex
-
 in vec3 in_Position;
 in vec3 in_Normal;
-in vec2 in_TexCoord; 
+in vec2 in_TexCoord;
 in ivec3 in_boneIndices;
 in vec3 in_weights;
 
 out vec3 out_Normal;
 out vec2 out_TexCoord;
+out vec3 out_worldPos;
 
 uniform mat4 MVP;
+uniform mat4 modelMatrix;
 uniform mat3 normalMatrix; 
 uniform mat4 localOffset = mat4(1.0); 
- 
+
+const int MAX_JOINTS = 50;//max joints allowed in a skeleton
+const int MAX_WEIGHTS = 3;//max number of joints that can affect a vertex
 uniform mat4 boneTransforms[MAX_JOINTS];
  
 void main(void) 

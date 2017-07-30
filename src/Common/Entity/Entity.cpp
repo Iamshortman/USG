@@ -164,10 +164,10 @@ Transform Entity::getRenderTransform()
 	Transform worldTransform = world->getWorldOffsetMatrix();
 	Transform transform = getTransform();
 
-	transform.setOrientation(worldTransform.getOrientation() * transform.getOrientation());
-	transform.setPosition(worldTransform.getPosition() + (worldTransform.getOrientation() * transform.getPosition()));
+	//transform.setOrientation(worldTransform.getOrientation() * transform.getOrientation());
+	//transform.setPosition(worldTransform.getPosition() + (worldTransform.getOrientation() * transform.getPosition()));
 
-	return transform;
+	return transform.transformBy(worldTransform);
 }
 
 bool Entity::hasSubWorld()
