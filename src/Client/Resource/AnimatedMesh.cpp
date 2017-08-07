@@ -39,6 +39,8 @@ void AnimatedMesh::draw(ShaderProgram* program)
 	glEnableVertexAttribArray(0); //Position
 	glEnableVertexAttribArray(1); //Normal
 	glEnableVertexAttribArray(2); //UV
+	glEnableVertexAttribArray(3); //Bone Indices
+	glEnableVertexAttribArray(4); //Bone Weight
 
 	//Bind the buffer to begin drawing
 	glBindBuffer(GL_ARRAY_BUFFER, vbo);
@@ -85,14 +87,13 @@ void AnimatedMesh::draw(ShaderProgram* program)
 
 	//JointWeights
 	glVertexAttribPointer(
-		1,                  // jointWeights attribute location
+		4,                  // jointWeights attribute location
 		3,					// size
 		GL_FLOAT,           // type
 		GL_FALSE,           // normalized?
 		sizeof(AnimatedVertex),     // stride
 		(void*)offsetof(AnimatedVertex, boneWeights) // array buffer offset
 		);
-
 
 	//Draw the mesh
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
@@ -102,6 +103,8 @@ void AnimatedMesh::draw(ShaderProgram* program)
 	glDisableVertexAttribArray(0);
 	glDisableVertexAttribArray(1);
 	glDisableVertexAttribArray(2);
+	glDisableVertexAttribArray(3);
+	glDisableVertexAttribArray(4);
 }
 
 AnimatedMesh* AnimatedMesh::loadMesh(string fileName)
@@ -149,12 +152,11 @@ AnimatedMesh* AnimatedMesh::loadMesh(string fileName)
 			}
 
 			//Setup default values
-			vertex.boneIndices = vector3I(-1);
+			vertex.boneIndices = vector3I(0);
 			vertex.boneWeights = vector3F(0.0f);
 
 			vertices.push_back(vertex);
 		}
-
 		std::hash_map<string, unsigned int> boneMap;
 
 		if (mesh->HasBones())
@@ -171,9 +173,7 @@ AnimatedMesh* AnimatedMesh::loadMesh(string fileName)
 					float weight = bone->mWeights[j].mWeight;
 					AnimatedVertex* vertex = &vertices[index];
 					
-					vertex->boneIndices.x = i;
-					vertex->boneWeights.x = 1.0f;
-					/*if (weight > vertex->boneWeights.x)
+					if (weight > vertex->boneWeights.x)
 					{
 						//Shift y to z
 						vertex->boneIndices.z = vertex->boneIndices.y;
@@ -202,7 +202,7 @@ AnimatedMesh* AnimatedMesh::loadMesh(string fileName)
 						//Insert new into weight into z
 						vertex->boneIndices.z = i;
 						vertex->boneWeights.z = weight;
-					}*/
+					}
 
 				}
 			}

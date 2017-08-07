@@ -17,7 +17,7 @@ void main(void)
 {	
 	vec4 offsetPosition = localOffset * vec4(in_Position, 1.0f);
 	gl_Position = MVP * offsetPosition;
-	out_Normal = normalMatrix * in_Normal;
+	out_Normal = normalMatrix * (localOffset * vec4(in_Normal, 1.0f)).xyz;
 	out_TexCoord = in_TexCoord;
 	out_worldPos = (modelMatrix * offsetPosition).xyz;
 }

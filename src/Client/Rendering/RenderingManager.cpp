@@ -115,7 +115,8 @@ void RenderingManager::RenderMesh(Model* model, Transform globalPos, Camera* cam
 
 	if (model->skeleton != nullptr)
 	{
-		//program->setUniform("boneTransforms[0]", model->skeleton->rootBone->animatedTransform);
+		matrix4 transform = glm::translate(matrix4(1.0f), vector3F(0.0f, 10.0f, 0.0f));
+		program->setUniform("boneTransforms[0]", transform);
 		/*AnimatedMesh* animMesh = (AnimatedMesh*)mesh;
 		std::stack<Bone*> bones;
 		bones.push(model->skeleton->rootBone);

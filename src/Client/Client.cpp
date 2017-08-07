@@ -34,8 +34,7 @@ Client::Client()
 	ShaderPool::instance->loadShader("Textured", "res/shaders/Textured.vs", "res/shaders/Textured.fs", { { 0, "in_Position" }, { 1, "in_Normal" }, { 2, "in_TexCoord" } });
 	ShaderPool::instance->loadShader("TexturedLighting", "res/shaders/Textured.vs", "res/shaders/TexturedLighting.fs", { { 0, "in_Position" }, { 1, "in_Normal" }, { 2, "in_TexCoord" } });
 	
-	ShaderPool::instance->loadShader("TexturedAnimated", "res/shaders/TexturedAnimated.vs", "res/shaders/Textured.fs", { { 0, "in_Position" }, { 1, "in_Normal" }, { 2, "in_TexCoord" } });
-
+	ShaderPool::instance->loadShader("TexturedAnimated", "res/shaders/TexturedAnimated.vs", "res/shaders/Textured - Copy.fs", { { 0, "in_Position" }, { 1, "in_Normal" }, { 2, "in_TexCoord" }, { 3, "in_boneIndices" }, { 4, "in_weights" } });
 
 	MeshPool::instance->loadModel("Ship", "res/models/LargeBlockShip.obj", true);
 	MeshPool::instance->loadModel("SmallCube", "res/models/Cube.obj", true);
@@ -154,7 +153,6 @@ Client::Client()
 
 		cube2->addToWorld(ship->getSubWorld());
 	}
-
 
 	//Debug Camera
 	this->debugCamera = EntityManager::instance->createNewEntity();
