@@ -2,7 +2,7 @@
 #define LIGHTMANAGER_HPP
 
 #include <vector>
-#include <hash_map>
+#include <unordered_map>
 #include <algorithm>
 #include "Common/World/World.hpp"
 #include "Client/Rendering/Lights.hpp"
@@ -40,7 +40,7 @@ public:
 	void destroyWorld(WorldId id);
 
 private:
-	std::hash_map<WorldId, LightSet*> worlds;
+	std::unordered_map<WorldId, LightSet*> worlds;
 };
 
 #endif //LIGHTMANAGER_HPP

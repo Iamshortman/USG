@@ -44,7 +44,7 @@ double ButtonAxis::getAxis()
 
 void ButtonAxis::setDeadzone(double deadzone)
 {
-	this->range = abs(deadzone);
+	this->range = fabs(deadzone);
 }
 
 void ButtonAxis::setInverted(bool inverted)

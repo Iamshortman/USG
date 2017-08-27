@@ -37,7 +37,7 @@ GLclampf alpha);
         bool keyboardFocus;
 		SDL_GLContext glcontext;
 		void initGL();
-
+		GLuint fbo;
 };
 
 #endif

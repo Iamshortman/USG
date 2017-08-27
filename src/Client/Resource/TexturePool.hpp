@@ -1,7 +1,7 @@
 #ifndef TEXTUREPOOL_HPP
 #define TEXTUREPOOL_HPP
 
-#include <hash_map>
+#include <unordered_map>
 #include <string>
 #include <iostream>
 
@@ -23,7 +23,7 @@ public:
 	bool bindTexture(int activeTexture, string fileLoc);
 
 private:
-	std::hash_map<string, GLuint> textures;
+	std::unordered_map<string, GLuint> textures;
 };*/
 
 struct TextureResource
@@ -50,7 +50,7 @@ public:
 	GLuint getTexture(string name);
 
 private:
-	std::hash_map<string, TextureResource> textures;
+	std::unordered_map<string, TextureResource> textures;
 };
 
 #endif //TEXTUREPOOL_HPP

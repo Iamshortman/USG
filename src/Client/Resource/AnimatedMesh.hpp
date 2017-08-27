@@ -6,7 +6,7 @@
 #include "Common/GLM_Include.hpp"
 #include "Common/Resource/Mesh.hpp"
 #include <vector>
-#include <hash_map>
+#include <unordered_map>
 
 struct AnimatedVertex
 {
@@ -20,14 +20,14 @@ struct AnimatedVertex
 class AnimatedMesh : public Mesh
 {
 public:
-	AnimatedMesh(std::vector<AnimatedVertex>& vertices, std::vector<unsigned int>& indices, std::hash_map<string, unsigned int> map);
+	AnimatedMesh(std::vector<AnimatedVertex>& vertices, std::vector<unsigned int>& indices, std::unordered_map<string, unsigned int> map);
 	virtual ~AnimatedMesh();
 
 	virtual void draw(ShaderProgram* program);
 
 	static AnimatedMesh* loadMesh(string fileName);
 
-	std::hash_map<string, unsigned int> boneMap;
+	std::unordered_map<string, unsigned int> boneMap;
 
 private:
 

@@ -9,7 +9,7 @@ WorldManager::WorldManager()
 
 WorldManager::~WorldManager()
 {
-	std::hash_map<WorldId, World*>::iterator iter = this->worlds.begin();
+	std::unordered_map<WorldId, World*>::iterator iter = this->worlds.begin();
 	for (iter = this->worlds.begin(); iter != this->worlds.end(); iter++)
 	{
 		this->destroyWorld(iter->first);
@@ -20,7 +20,7 @@ void WorldManager::update(double deltaTime)
 {
 	//TODO muiltiThreadUpdate
 
-	std::hash_map<WorldId, World*>::iterator iter;
+	std::unordered_map<WorldId, World*>::iterator iter;
 	for (iter = this->worlds.begin(); iter != this->worlds.end(); iter++)
 	{
 		iter->second->update(deltaTime);
@@ -49,7 +49,7 @@ World* WorldManager::getWorld(WorldId id)
 	return worlds[id];
 }
 
-std::hash_map<WorldId, World*>::iterator WorldManager::getAllWorlds()
+std::unordered_map<WorldId, World*>::iterator WorldManager::getAllWorlds()
 {
 	return this->worlds.begin();
 }

@@ -2,7 +2,7 @@
 #define WORLDMANAGER_HPP
 
 #include <vector>
-#include <hash_map>
+#include <unordered_map>
 #include <algorithm>
 #include "Common/World/World.hpp"
 
@@ -22,10 +22,10 @@ public:
 	void destroyWorld(WorldId id);
 
 	World* getWorld(WorldId id);
-	std::hash_map<WorldId, World*>::iterator getAllWorlds();
+	std::unordered_map<WorldId, World*>::iterator getAllWorlds();
 
 private:
-	std::hash_map<WorldId, World*> worlds;
+	std::unordered_map<WorldId, World*> worlds;
 	WorldId nextId = 1;
 
 };

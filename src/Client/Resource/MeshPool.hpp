@@ -1,7 +1,7 @@
 #ifndef MODELPOOL_HPP
 #define MODELPOOL_HPP
 
-#include <hash_map>
+#include <unordered_map>
 #include <string>
 #include "Common/Resource/Mesh.hpp"
 
@@ -43,8 +43,8 @@ public:
 	Mesh* getModel(string name);
 
 private:
-	std::hash_map<string, StaticMeshResource> staticMeshes;
-	std::hash_map<string, AnimatedMeshResource> animatedMesh;
+	std::unordered_map<string, StaticMeshResource> staticMeshes;
+	std::unordered_map<string, AnimatedMeshResource> animatedMesh;
 };
 
 

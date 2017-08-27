@@ -29,7 +29,7 @@ Entity* EntityManager::getEntity(EntityId id)
 	return entities[id];
 }
 
-std::hash_map<EntityId, Entity*>::iterator EntityManager::getAllEntities()
+std::unordered_map<EntityId, Entity*>::iterator EntityManager::getAllEntities()
 {
 	return this->entities.begin();
 }

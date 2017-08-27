@@ -23,10 +23,10 @@ double JoystickAxis::getAxis()
 	double value = ((double)this->axisValue) / 32767.0;
 
 	//apply deadzone
-	if (abs(value) > this->deadzone)
+	if (fabs(value) > this->deadzone)
 	{
-		double sign = value / abs(value);
-		value = abs(value) - this->deadzone;
+		double sign = value / fabs(value);
+		value = fabs(value) - this->deadzone;
 		value /= range;
 
 		value *= sign;

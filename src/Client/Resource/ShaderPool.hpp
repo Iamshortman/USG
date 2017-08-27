@@ -1,7 +1,7 @@
 #ifndef SHADERPOOL_HPP
 #define SHADERPOOL_HPP
 
-#include <hash_map>
+#include <unordered_map>
 #include <string>
 
 #include "Client/Rendering/ShaderProgram.hpp"
@@ -32,7 +32,7 @@ public:
 	ShaderProgram* getShader(string name);
 
 private:
-	std::hash_map<string, ShaderResource> shaders;
+	std::unordered_map<string, ShaderResource> shaders;
 };
 
 

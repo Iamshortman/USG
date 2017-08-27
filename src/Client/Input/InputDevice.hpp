@@ -5,10 +5,10 @@
 #include "InputButton.hpp"
 
 #include <string>
-#include <hash_map>
+#include <unordered_map>
 
 using std::string;
-using std::hash_map;
+using std::unordered_map;
 
 enum InputType
 {
@@ -42,8 +42,8 @@ public:
 	bool getButtonDoublePressed(string name);
 
 private:
-	hash_map<string, InputAxis*> m_axis;
-	hash_map<string, InputButton*> m_buttons;
+	unordered_map<string, InputAxis*> m_axis;
+	unordered_map<string, InputButton*> m_buttons;
 };
 
 #endif //INPUTDEVICE_HPP

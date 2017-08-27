@@ -1,7 +1,7 @@
 #ifndef ENTITY_HPP
 #define ENTITY_HPP
 
-#include <hash_map>
+#include <unordered_map>
 #include <string>
 #include <vector>
 
@@ -58,7 +58,7 @@ public:
 
 private:
 	World* world = nullptr;
-	std::hash_map<std::string, Component*> components;
+	std::unordered_map<std::string, Component*> components;
 	bool alive = true;
 
 	Transform transform;

@@ -65,8 +65,8 @@ target_link_libraries (Client glew32)
 
 #ASSIMP
 include_directories(lib/assimp-3.3.1/include/)
-target_link_libraries (Client assimp-vc120-mt)
+target_link_libraries (Client assimp-vc140-mt)
 target_link_libraries (Client zlibstaticd)
-target_link_libraries (Server assimp-vc120-mt)
+target_link_libraries (Server assimp-vc140-mt)
 target_link_libraries (Server zlibstaticd)
 

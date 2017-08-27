@@ -115,28 +115,37 @@ void RenderingManager::RenderMesh(Model* model, Transform globalPos, Camera* cam
 
 	if (model->skeleton != nullptr)
 	{
-		matrix4 transform = glm::translate(matrix4(1.0f), vector3F(0.0f, 10.0f, 0.0f));
-		program->setUniform("boneTransforms[0]", transform);
-		/*AnimatedMesh* animMesh = (AnimatedMesh*)mesh;
+		//matrix4 transform = glm::translate(matrix4(1.0f), vector3F(0.0f, 10.0f, 0.0f));
+		//program->setUniform("boneTransforms[0]", transform);
+		AnimatedMesh* animMesh = (AnimatedMesh*)mesh;
 		std::stack<Bone*> bones;
 		bones.push(model->skeleton->rootBone);
+
+		for (int i = 0; i < 50; i++)
+		{
+			string name = "boneTransforms[" + std::to_string(i) + "]";
+			program->setUniform(name, matrix4(1.0f));
+		}
 
 		while (!bones.empty())
 		{
 			Bone* bone = bones.top();
 			bones.pop();
 
-			string index = std::to_string(animMesh->boneMap[bone->name]);
+			if (animMesh->boneMap.find(bone->name) != animMesh->boneMap.end())
+			{
+				string index = std::to_string(animMesh->boneMap[bone->name]);
 
-			string name = "boneTransforms[" + index + "]";
+				string name = "boneTransforms[" + index + "]";
 
-			program->setUniform(name, bone->animatedTransform);
+				program->setUniform(name, bone->getAnimatedMatrix());
+			}
 
 			for (int i = 0; i < bone->children.size(); i++)
 			{
 				bones.push(bone->children[i]);
 			}
-		}*/
+		}
 	}
 
 	mesh->draw(program);

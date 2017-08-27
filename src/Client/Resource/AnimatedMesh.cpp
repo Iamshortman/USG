@@ -3,7 +3,7 @@
 
 #include "Common/Resource/Assimp_Include.hpp"
 
-AnimatedMesh::AnimatedMesh(std::vector<AnimatedVertex>& vertices, std::vector<unsigned int>& indices, std::hash_map<string, unsigned int> map)
+AnimatedMesh::AnimatedMesh(std::vector<AnimatedVertex>& vertices, std::vector<unsigned int>& indices, std::unordered_map<string, unsigned int> map)
 {
 	size = (int)indices.size();
 
@@ -90,7 +90,7 @@ void AnimatedMesh::draw(ShaderProgram* program)
 		4,                  // jointWeights attribute location
 		3,					// size
 		GL_FLOAT,           // type
-		GL_FALSE,           // normalized?
+		GL_TRUE,           // normalized?
 		sizeof(AnimatedVertex),     // stride
 		(void*)offsetof(AnimatedVertex, boneWeights) // array buffer offset
 		);
@@ -157,7 +157,7 @@ AnimatedMesh* AnimatedMesh::loadMesh(string fileName)
 
 			vertices.push_back(vertex);
 		}
-		std::hash_map<string, unsigned int> boneMap;
+		std::unordered_map<string, unsigned int> boneMap;
 
 		if (mesh->HasBones())
 		{

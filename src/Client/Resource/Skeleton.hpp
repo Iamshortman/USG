@@ -12,27 +12,25 @@ public:
 	Bone* parent_bone;    //A pointer to this bone's parent bone.
 	std::vector<Bone*> children;
 
-	matrix4 animatedTransform;
-	matrix4 localBindTransform;
-	matrix4 inverseBindTransform;
+	matrix4 offsetTransform;
 
 	Bone::Bone(std::string in_name, matrix4 transform)
 	{
 		this->name = in_name;
-		this->localBindTransform = transform;
+		this->offsetTransform = transform;
 		parent_bone = nullptr;
 	};
 
-	void calcInverseBindTransform(matrix4 parentBindTransform) 
-	{
-		matrix4 bindTransform = parentBindTransform * localBindTransform;
-		matrix4 inverseBindTransform = glm::inverse(bindTransform);
-		for (Bone* child : children) 
-		{
-			child->calcInverseBindTransform(bindTransform);
-		}
-	}
 
+	matrix4 getAnimatedMatrix()
+	{
+		if (this->parent_bone != nullptr)
+		{
+			return this->parent_bone->getAnimatedMatrix() * this->offsetTransform;
+		}
+
+		return this->offsetTransform;
+	}
 };
 
 class Skeleton

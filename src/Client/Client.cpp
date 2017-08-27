@@ -34,7 +34,7 @@ Client::Client()
 	ShaderPool::instance->loadShader("Textured", "res/shaders/Textured.vs", "res/shaders/Textured.fs", { { 0, "in_Position" }, { 1, "in_Normal" }, { 2, "in_TexCoord" } });
 	ShaderPool::instance->loadShader("TexturedLighting", "res/shaders/Textured.vs", "res/shaders/TexturedLighting.fs", { { 0, "in_Position" }, { 1, "in_Normal" }, { 2, "in_TexCoord" } });
 	
-	ShaderPool::instance->loadShader("TexturedAnimated", "res/shaders/TexturedAnimated.vs", "res/shaders/Textured - Copy.fs", { { 0, "in_Position" }, { 1, "in_Normal" }, { 2, "in_TexCoord" }, { 3, "in_boneIndices" }, { 4, "in_weights" } });
+	ShaderPool::instance->loadShader("TexturedAnimated", "res/shaders/TexturedAnimated.vs", "res/shaders/Textured.fs", { { 0, "in_Position" }, { 1, "in_Normal" }, { 2, "in_TexCoord" }, { 3, "in_boneIndices" }, { 4, "in_weights" } });
 
 	MeshPool::instance->loadModel("Ship", "res/models/LargeBlockShip.obj", true);
 	MeshPool::instance->loadModel("SmallCube", "res/models/Cube.obj", true);
@@ -52,7 +52,7 @@ Client::Client()
 	Entity* cube = EntityManager::instance->createNewEntity();
 	cube->createRigidBody();
 	//cube->addToWorld(this->tempWorld);
-	cube->setTransform(Transform(vector3D(0.0, 0.0, -20.0)));
+	cube->setTransform(Transform(vector3D(0.0, 0.0, -30.0)));
 
 	cube->getRigidBody()->addChildShape(new BoxShape(vector3D(2.0)), Transform());
 
@@ -139,6 +139,7 @@ Client::Client()
 	if (true)
 	{
 		MeshPool::instance->loadModel("AnimTest", "res/models/AnimTest.dae", false);
+
 		Entity* cube2 = EntityManager::instance->createNewEntity();
 		cube2->createRigidBody(10.0, new BoxShape(vector3D(1.0)));
 
@@ -146,13 +147,37 @@ Client::Client()
 		Model* cubeModel = &componetModel->model;
 		cubeModel->setMesh("AnimTest");
 		cubeModel->addTexture("res/textures/1K_Grid.png", 0);
+
 		cubeModel->setShader("TexturedAnimated");
 		//cubeModel->setLightingShader("TexturedLighting");
 		cubeModel->skeleton = Skeleton::loadSkeleton("res/models/AnimTest.dae");
+		Skeleton::loadSkeleton("res/models/AnimTest1.dae");
 		cube2->addComponent("model", componetModel);
 
 		cube2->addToWorld(ship->getSubWorld());
 	}
+
+	if (true)
+	{
+		MeshPool::instance->loadModel("TestChar", "res/models/TestChar1/model.dae", false);
+
+		Entity* testChar = EntityManager::instance->createNewEntity();
+		testChar->createRigidBody(10.0, new BoxShape(vector3D(1.0)));
+
+		ComponentModel* componetModel = new ComponentModel();
+		Model* cubeModel = &componetModel->model;
+		cubeModel->setMesh("TestChar");
+		cubeModel->addTexture("res/textures/1K_Grid.png", 0);
+
+		cubeModel->setShader("TexturedAnimated");
+		//cubeModel->setLightingShader("TexturedLighting");
+		cubeModel->skeleton = Skeleton::loadSkeleton("res/models/TestChar1/model.dae");
+		testChar->addComponent("model", componetModel);
+
+		testChar->addToWorld(ship->getSubWorld());
+		testChar->setTransform(Transform(vector3D(0.0, 0.0, -10.0f)));
+	}
+
 
 	//Debug Camera
 	this->debugCamera = EntityManager::instance->createNewEntity();

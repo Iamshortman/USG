@@ -98,6 +98,13 @@ matrix4 Camera::getProjectionMatrix(int screenWidth, int screenHeight)
 	//float fovY = abs((frameOfView * (float)height) / ((float)width));
 
 	return glm::tweakedInfinitePerspective(this->frameOfView, aspectRatio, this->nearClipping);
+
+	/*float f = 1.0f / tan(this->frameOfView / 2.0f);
+	return glm::mat4(
+		f / aspectRatio, 0.0f, 0.0f, 0.0f,
+		0.0f, f, 0.0f, 0.0f,
+		0.0f, 0.0f, 0.0f, -1.0f,
+		0.0f, 0.0f, this->nearClipping, 0.0f);*/
 }
 
 matrix4 Camera::getProjectionMatrix(Window* window)
