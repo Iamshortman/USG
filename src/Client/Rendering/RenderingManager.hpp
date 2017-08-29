@@ -33,8 +33,6 @@ private:
 	Window* window = nullptr;
 
 	bool useLighting = true;
-
-
 };
 
 #endif //RENDERINGMANAGER_HPP

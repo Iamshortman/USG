@@ -139,6 +139,8 @@ Client::Client()
 	if (true)
 	{
 		MeshPool::instance->loadModel("AnimTest", "res/models/AnimTest.dae", false);
+		MeshPool::instance->loadModel("IsoSphere", "res/models/Arrow.obj", true);
+
 
 		Entity* cube2 = EntityManager::instance->createNewEntity();
 		cube2->createRigidBody(10.0, new BoxShape(vector3D(1.0)));
@@ -148,18 +150,18 @@ Client::Client()
 		cubeModel->setMesh("AnimTest");
 		cubeModel->addTexture("res/textures/1K_Grid.png", 0);
 
-		cubeModel->setShader("TexturedAnimated");
+		cubeModel->setShader("Textured");
 		//cubeModel->setLightingShader("TexturedLighting");
-		cubeModel->skeleton = Skeleton::loadSkeleton("res/models/AnimTest.dae");
+		cubeModel->skeleton = Skeleton::loadSkeleton("res/models/AnimTest1.dae");
 		Skeleton::loadSkeleton("res/models/AnimTest1.dae");
 		cube2->addComponent("model", componetModel);
 
 		cube2->addToWorld(ship->getSubWorld());
 	}
 
-	if (true)
+	if (false)
 	{
-		MeshPool::instance->loadModel("TestChar", "res/models/TestChar1/model.dae", false);
+		MeshPool::instance->loadModel("TestChar", "res/models/TestChar/TestChar.dae", true);
 
 		Entity* testChar = EntityManager::instance->createNewEntity();
 		testChar->createRigidBody(10.0, new BoxShape(vector3D(1.0)));
@@ -169,9 +171,9 @@ Client::Client()
 		cubeModel->setMesh("TestChar");
 		cubeModel->addTexture("res/textures/1K_Grid.png", 0);
 
-		cubeModel->setShader("TexturedAnimated");
+		cubeModel->setShader("Textured");
 		//cubeModel->setLightingShader("TexturedLighting");
-		cubeModel->skeleton = Skeleton::loadSkeleton("res/models/TestChar1/model.dae");
+		cubeModel->skeleton = Skeleton::loadSkeleton("res/models/TestChar/TestChar.dae");
 		testChar->addComponent("model", componetModel);
 
 		testChar->addToWorld(ship->getSubWorld());

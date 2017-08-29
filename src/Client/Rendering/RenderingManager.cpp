@@ -1,14 +1,14 @@
 #include "RenderingManager.hpp"
 
+#include <stack>
+
 #include "Common/Entity/EntityManager.hpp"
 #include "Client/Rendering/LightShaderUtil.hpp"
-
 #include "Client/Component/ComponentModel.hpp"
-
 #include "Client/Rendering/LightManager.hpp"
-
-#include <stack>
 #include "Client/Resource/AnimatedMesh.hpp"
+
+#include "Client/Resource/MeshPool.hpp"
 
 RenderingManager::RenderingManager()
 {
@@ -127,19 +127,25 @@ void RenderingManager::RenderMesh(Model* model, Transform globalPos, Camera* cam
 			program->setUniform(name, matrix4(1.0f));
 		}
 
+		Mesh* temp = MeshPool::instance->getModel("IsoSphere");
+
 		while (!bones.empty())
 		{
 			Bone* bone = bones.top();
 			bones.pop();
 
-			if (animMesh->boneMap.find(bone->name) != animMesh->boneMap.end())
+			/*if (animMesh->boneMap.find(bone->name) != animMesh->boneMap.end())
 			{
 				string index = std::to_string(animMesh->boneMap[bone->name]);
 
 				string name = "boneTransforms[" + index + "]";
 
 				program->setUniform(name, bone->getAnimatedMatrix());
-			}
+			}*/
+
+			program->setUniform("localOffset", bone->getAnimatedMatrix());
+			temp->draw(program);
+			program->setUniform("localOffset", matrix4(1.0f));
 
 			for (int i = 0; i < bone->children.size(); i++)
 			{

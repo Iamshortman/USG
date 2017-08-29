@@ -74,9 +74,9 @@ Skeleton* Skeleton::loadSkeleton(std::string filename)
 					return nullptr;
 				}
 
-				matrix4 offset = glm::inverse(toMat4(bone->mOffsetMatrix));
+				matrix4 offset = toMat4(bone->mOffsetMatrix);
 
-				offset = matrix4(1.0f);
+				//offset = glm::translate(matrix4(1.0f), vector3F(0.0f, 2.0f, 0.0f));
 
 				map[name] = new Bone(name, offset);
 			}
@@ -102,8 +102,11 @@ Skeleton* Skeleton::loadSkeleton(std::string filename)
 
 					childBone = map[child->mName.data];
 
-					bone.second->children.push_back(childBone);
-					childBone->parent_bone = bone.second;
+					if (childBone != nullptr)
+					{
+						bone.second->children.push_back(childBone);
+						childBone->parent_bone = bone.second;
+					}
 
 					//childBone->offsetTransform = toMat4(child->mTransformation);
 				}
