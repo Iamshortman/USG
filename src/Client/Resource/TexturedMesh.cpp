@@ -56,7 +56,7 @@ void TexturedMesh::draw(ShaderProgram* program)
 		1,                  // Normal attribute location
 		3,					// size
 		GL_FLOAT,           // type
-		GL_FALSE,           // normalized?
+		GL_TRUE,           // normalized?
 		sizeof(TexturedVertex),     // stride
 		(void*)offsetof(TexturedVertex, normal) // array buffer offset
 		);

@@ -134,16 +134,20 @@ void RenderingManager::RenderMesh(Model* model, Transform globalPos, Camera* cam
 			Bone* bone = bones.top();
 			bones.pop();
 
-			/*if (animMesh->boneMap.find(bone->name) != animMesh->boneMap.end())
+			if (animMesh->boneMap.find(bone->name) != animMesh->boneMap.end())
 			{
 				string index = std::to_string(animMesh->boneMap[bone->name]);
 
 				string name = "boneTransforms[" + index + "]";
 
 				program->setUniform(name, bone->getAnimatedMatrix());
-			}*/
+			}
 
-			program->setUniform("localOffset", bone->getAnimatedMatrix());
+
+			matrix4 transform = bone->getAnimatedMatrix();
+			vector4F temp1 = transform * vector4F(0.0f, 0.0f, 0.0f, 1.0f);
+			
+			program->setUniform("localOffset", transform);
 			temp->draw(program);
 			program->setUniform("localOffset", matrix4(1.0f));
 

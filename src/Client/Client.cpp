@@ -33,7 +33,6 @@ Client::Client()
 	//Load Test Shaders
 	ShaderPool::instance->loadShader("Textured", "res/shaders/Textured.vs", "res/shaders/Textured.fs", { { 0, "in_Position" }, { 1, "in_Normal" }, { 2, "in_TexCoord" } });
 	ShaderPool::instance->loadShader("TexturedLighting", "res/shaders/Textured.vs", "res/shaders/TexturedLighting.fs", { { 0, "in_Position" }, { 1, "in_Normal" }, { 2, "in_TexCoord" } });
-	
 	ShaderPool::instance->loadShader("TexturedAnimated", "res/shaders/TexturedAnimated.vs", "res/shaders/Textured.fs", { { 0, "in_Position" }, { 1, "in_Normal" }, { 2, "in_TexCoord" }, { 3, "in_boneIndices" }, { 4, "in_weights" } });
 
 	MeshPool::instance->loadModel("Ship", "res/models/LargeBlockShip.obj", true);
@@ -90,6 +89,7 @@ Client::Client()
 	model1->model.addTexture("res/textures/1K_Grid.png", 0);
 	
 	ship->getSubWorld()->setGravity(vector3D(0.0, -9.8, 0.0));
+	ship->getSubWorld()->ambientLight = vector3F(0.75f);
 
 	//Ship Inside
 	Entity* interior = EntityManager::instance->createNewEntity();
@@ -150,13 +150,32 @@ Client::Client()
 		cubeModel->setMesh("AnimTest");
 		cubeModel->addTexture("res/textures/1K_Grid.png", 0);
 
-		cubeModel->setShader("Textured");
+		cubeModel->setShader("TexturedAnimated");
 		//cubeModel->setLightingShader("TexturedLighting");
 		cubeModel->skeleton = Skeleton::loadSkeleton("res/models/AnimTest1.dae");
-		Skeleton::loadSkeleton("res/models/AnimTest1.dae");
 		cube2->addComponent("model", componetModel);
 
 		cube2->addToWorld(ship->getSubWorld());
+
+		/*matrix4 matrix = glm::translate(matrix4(1.0f), vector3F(0.0f, 2.0f, 0.0f));
+		matrix = glm::rotate(matrix, 3.1414926f / 2.0f, vector3F(1.0f, 0.0f, 0.0f));
+
+		matrix4 up = glm::translate(matrix4(1.0f), vector3F(0.0f, 0.0f, 2.0f));
+		Bone* bone1 = new Bone("TestBone", matrix);
+		Bone* bone2 = new Bone("TestBone2", up);
+		Bone* bone3 = new Bone("TestBone3", glm::rotate(up, 3.14f / 4, vector3F(1.0f, 0.0f, 0.0f)));
+		Bone* bone4 = new Bone("TestBone4", up);
+
+		bone1->children.push_back(bone2);
+		bone2->parent_bone = bone1;
+
+		bone2->children.push_back(bone3);
+		bone3->parent_bone = bone2;
+
+		bone3->children.push_back(bone4);
+		bone4->parent_bone = bone3;
+
+		cubeModel->skeleton = new Skeleton(bone1, 4);*/
 	}
 
 	if (false)

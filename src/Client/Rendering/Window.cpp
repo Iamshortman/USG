@@ -83,9 +83,9 @@ void Window::set3dRendering()
 	//glEnable(GL_DEPTH_TEST);
 	//glDepthFunc(GL_GREATER);
 
-	/*glEnable(GL_CULL_FACE);
-	glFrontFace(GL_CW);
-	glCullFace(GL_BACK);*/
+	//glEnable(GL_CULL_FACE);
+	//glFrontFace(GL_CW);
+	//glCullFace(GL_BACK);
 }
 
 void Window::set2dRendering()

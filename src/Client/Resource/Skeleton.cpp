@@ -68,18 +68,40 @@ Skeleton* Skeleton::loadSkeleton(std::string filename)
 			{
 				aiBone* bone = mesh->mBones[i];
 				string name = string(bone->mName.data);
-				aiNode* node = scene->mRootNode->FindNode(bone->mName);
-				if (node == nullptr)
+
+				if (name == "" || bone == nullptr)
 				{
+					printf("Error: Can't load bone!\n");
 					return nullptr;
 				}
 
 				matrix4 offset = toMat4(bone->mOffsetMatrix);
 
+				offset = glm::inverse(offset);
+
+				for (int i = 0; i < 4; i++)
+				{
+					printf("[");
+					for (int j = 0; j < 4; j++)
+					{
+						printf(" %f", offset[i][j]);
+					}
+					printf(" ]\n");
+				}
+				printf("\n");
+
+				//offset = glm::transpose(offset);
+				//offset = glm::inverse(offset);
+
 				//offset = glm::translate(matrix4(1.0f), vector3F(0.0f, 2.0f, 0.0f));
 
 				map[name] = new Bone(name, offset);
 			}
+		}
+
+		if (map.size() == 0)
+		{
+			return nullptr;
 		}
 
 		//Hierarchy Loading
@@ -100,10 +122,9 @@ Skeleton* Skeleton::loadSkeleton(std::string filename)
 						printf("Error: Bone not found!!!!\n");
 					}
 
-					childBone = map[child->mName.data];
-
-					if (childBone != nullptr)
+					if (map.find(child->mName.data) != map.end())
 					{
+						childBone = map[child->mName.data];
 						bone.second->children.push_back(childBone);
 						childBone->parent_bone = bone.second;
 					}
