@@ -1,6 +1,5 @@
 #include "ShaderProgram.hpp"
 
-
 ShaderProgram::ShaderProgram()
 {
 	//Do nothing until real constructor is called.
@@ -40,13 +39,11 @@ ShaderProgram::ShaderProgram(string VertexShader, string FragmentShader, vector<
 		glGetProgramInfoLog(programID, InfoLogLength, NULL, &ProgramErrorMessage[0]);
 		if (ProgramErrorMessage.size() > 2)
 		{
-			printf("%s\n", &ProgramErrorMessage[0]);
+			printf("Error: %s\n", &ProgramErrorMessage[0]);
 		}
 	}
 	glDeleteShader(vertexID);
 	glDeleteShader(fragmentID);
-
-	printf("Shader building is finished!!!\n");
 }
 
 void ShaderProgram::setActiveProgram()
@@ -124,7 +121,6 @@ GLuint ShaderProgram::buildShader(string location, GLuint type)
 	int InfoLogLength;
 
 	// Compile  Shader
-	printf("Compiling shader : %s\n", location.c_str());
 	char const * SourcePointer = ShaderCode.c_str();
 	glShaderSource(ShaderID, 1, &SourcePointer, NULL);
 	glCompileShader(ShaderID);
@@ -138,7 +134,7 @@ GLuint ShaderProgram::buildShader(string location, GLuint type)
 		glGetShaderInfoLog(ShaderID, InfoLogLength, NULL, &ShaderErrorMessage[0]);
 		if (ShaderErrorMessage.size() > 2)
 		{
-			printf("%s\n", &ShaderErrorMessage[0]);
+			printf("Error: %s\n", &ShaderErrorMessage[0]);
 		}
 	}
 
@@ -178,7 +174,7 @@ string ShaderProgram::loadShaderFile(string location)
 	}
 	else
 	{
-		printf("Error %s File not found\n", file_path);
+		printf("Error: %s Shader File not found\n", file_path);
 		ShaderCode = "";
 	}
 

@@ -1,8 +1,8 @@
-#include "Window.hpp"
+#include "Client/Rendering/Window.hpp"
 
 Window::Window(int width, int height, string windowTitle)
 {
-	SDL_Init(SDL_INIT_VIDEO);
+	//SDL_InitSubSystem(SDL_INIT_VIDEO);
 
 	//Anti Aliasing
 	SDL_GL_SetAttribute(SDL_GL_MULTISAMPLEBUFFERS, 1);
@@ -31,7 +31,7 @@ Window::Window(int width, int height, string windowTitle)
 
 	if (glcontext == NULL)
 	{
-		fprintf(stderr, "Failed to initialize OpenGL\n");
+		printf("Error: Failed to initialize OpenGL\n");
 		exit(1);
 	}
 
@@ -40,7 +40,7 @@ Window::Window(int width, int height, string windowTitle)
     // Initialize GLEW
 	if (glewInit() != GLEW_OK)
 	{
-		fprintf(stderr, "Failed to initialize GLEW\n");
+		printf("Error: Failed to initialize GLEW\n");
 		exit(1);
 	}
 
@@ -83,9 +83,9 @@ void Window::set3dRendering()
 	//glEnable(GL_DEPTH_TEST);
 	//glDepthFunc(GL_GREATER);
 
-	//glEnable(GL_CULL_FACE);
-	//glFrontFace(GL_CW);
-	//glCullFace(GL_BACK);
+	glEnable(GL_CULL_FACE);
+	glFrontFace(GL_CCW);
+	glCullFace(GL_BACK);
 }
 
 void Window::set2dRendering()
@@ -123,7 +123,7 @@ void Window::resizeWindow(int width, int height)
 	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, depth, 0);
 	GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
 	if (status != GL_FRAMEBUFFER_COMPLETE) {
-		fprintf(stderr, "glCheckFramebufferStatus: %x\n", status);
+		printf("Error: glCheckFramebufferStatus: %x\n", status);
 	}
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
@@ -204,7 +204,9 @@ bool Window::isWindowActive()
 
 void Window::setMousePos(int x, int y)
 {
+	SDL_EventState(SDL_MOUSEMOTION, SDL_IGNORE);
     SDL_WarpMouseInWindow(window, x, y);
+	SDL_EventState(SDL_MOUSEMOTION, SDL_ENABLE);
 }
 
 void Window::getMousePos(int &x, int &y)
@@ -212,7 +214,7 @@ void Window::getMousePos(int &x, int &y)
      SDL_GetMouseState(&x, &y);
 }
 
-void Window::getCenteredMousePos(double &x, double &y)
+void Window::getCenteredMousePos(int &x, int &y)
 {
 	int xPos, yPos;
 	int width, height;
@@ -220,11 +222,10 @@ void Window::getCenteredMousePos(double &x, double &y)
 
 	SDL_GetMouseState(&xPos, &yPos);
 
-	x = (double)(xPos) / (double)(width);
-	y = (double)(yPos) / (double)(height);
-
-	x = (x * 2.0) - 1.0;
-	y = (y * 2.0) - 1.0;
+	x = xPos - (width / 2);
+	y = yPos - (height / 2);
+	//x = (double)(xPos) / (double)(width);
+	//y = (double)(yPos) / (double)(height);
 }
 
 void Window::closeWindow()

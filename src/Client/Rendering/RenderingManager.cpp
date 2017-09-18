@@ -176,9 +176,9 @@ void RenderingManager::RenderMesh(Model* model, Transform globalPos, Camera* cam
 
 		program->setActiveProgram();
 
-		int directionalCount = lights->directionalLights.size();
-		int pointCount = lights->pointLights.size();
-		int spotCount = lights->spotLights.size();
+		size_t directionalCount = lights->directionalLights.size();
+		size_t pointCount = lights->pointLights.size();
+		size_t spotCount = lights->spotLights.size();
 
 		while (directionalCount > 0 || pointCount > 0 || spotCount > 0)
 		{

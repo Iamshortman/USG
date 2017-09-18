@@ -1,17 +1,16 @@
 #ifndef INPUTMANAGER_HPP
 #define INPUTMANAGER_HPP
 
-#include "InputDevice.hpp"
+#include "Client/Input/InputDevice.hpp"
+#include "Client/Input/KeyboardMouseDevice.hpp"
 
 #include <string>
-#include <vector>
-#include <list>
+#include <unordered_map>
 #include <SDL2/SDL_gamecontroller.h>
 #include <SDL2/SDL_events.h>
 
 using std::string;
-using std::vector;
-using std::list;
+using std::unordered_map;
 
 class InputManager
 {
@@ -22,16 +21,15 @@ public:
 	InputManager();
 	~InputManager();
 	void update(double deltaTime);
-
-	void addDevice(string name, InputDevice* device);
-	void removeDevice(string name);
+	void resetPreviousValues();
 
 	bool hasAxis(string name);
 	double getAxis(string name);
 
 	bool getButtonDown(string name);
 	bool getButtonPressed(string name);
-	bool getButtonDoublePressed(string name);
+
+	double getButtonAxisCombo(string axis_name, string pos_button_name, string neg_button_name);
 
 	void processEvent(SDL_Event event);
 	void loadController(SDL_GameController* controller);
@@ -45,7 +43,8 @@ public:
 	bool getMouseLock();
 
 private:
-	list<InputDevice*> devices;
+	KeyboardMouseDevice* keyboardMouse = nullptr;
+	unordered_map<void*, InputDevice*> device_map;
 
 	bool mouseLocked = false;
 };

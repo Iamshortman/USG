@@ -37,7 +37,7 @@ Bone* generateSkeleton(aiNode* node, std::unordered_map<string, Bone*>* map)
 	return nullptr;
 }
 
-Skeleton::Skeleton(Bone* root, int count)
+Skeleton::Skeleton(Bone* root, size_t count)
 	: rootBone(root), boneCount(count)
 {
 }
@@ -77,19 +77,6 @@ Skeleton* Skeleton::loadSkeleton(std::string filename)
 
 				matrix4 offset = toMat4(bone->mOffsetMatrix);
 
-				offset = glm::inverse(offset);
-
-				for (int i = 0; i < 4; i++)
-				{
-					printf("[");
-					for (int j = 0; j < 4; j++)
-					{
-						printf(" %f", offset[i][j]);
-					}
-					printf(" ]\n");
-				}
-				printf("\n");
-
 				//offset = glm::transpose(offset);
 				//offset = glm::inverse(offset);
 
@@ -113,13 +100,13 @@ Skeleton* Skeleton::loadSkeleton(std::string filename)
 			{
 				aiNode* child;
 				Bone* childBone;
-				for (int i = 0; i < node->mNumChildren; i++)
+				for (unsigned int i = 0; i < node->mNumChildren; i++)
 				{
 					child = node->mChildren[i];
 
 					if (child == nullptr)
 					{
-						printf("Error: Bone not found!!!!\n");
+						//printf("Error: Bone not found!!!!\n");
 					}
 
 					if (map.find(child->mName.data) != map.end())
@@ -145,7 +132,6 @@ Skeleton* Skeleton::loadSkeleton(std::string filename)
 		}
 
 		Bone* root;
-
 		//Create a new root if there is more then 1 root;
 		if (rootBones.size() > 1)
 		{

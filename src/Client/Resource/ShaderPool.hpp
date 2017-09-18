@@ -10,8 +10,11 @@ using std::string;
 
 struct ShaderResource
 {
-	int usingCount = 0;
+	unsigned short usingCount = 0;
 	ShaderProgram* program;
+	string vertexPath;
+	string fragmentPath;
+	vector<AttributeLocation> attributeLocation;
 };
 
 //Loads and stores all shaders using in game.
@@ -27,7 +30,7 @@ public:
 	void unloadShader(string name);
 
 	void setUsing(string name);
-	int getUsing(string name);
+	unsigned short getUsing(string name);
 	void releaseUsing(string name);
 	ShaderProgram* getShader(string name);
 

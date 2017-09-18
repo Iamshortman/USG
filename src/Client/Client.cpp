@@ -15,6 +15,7 @@
 
 #include "Common/Physics/CollisionShapes/BoxShape.hpp"
 #include "Common/Physics/CollisionShapes/ConcaveMeshShape.hpp"
+#include "Common/Physics/CollisionShapes/CapsuleShape.hpp"
 
 #include "Client/Component/DebugCameraComponent.hpp"
 
@@ -33,7 +34,7 @@ Client::Client()
 	//Load Test Shaders
 	ShaderPool::instance->loadShader("Textured", "res/shaders/Textured.vs", "res/shaders/Textured.fs", { { 0, "in_Position" }, { 1, "in_Normal" }, { 2, "in_TexCoord" } });
 	ShaderPool::instance->loadShader("TexturedLighting", "res/shaders/Textured.vs", "res/shaders/TexturedLighting.fs", { { 0, "in_Position" }, { 1, "in_Normal" }, { 2, "in_TexCoord" } });
-	ShaderPool::instance->loadShader("TexturedAnimated", "res/shaders/TexturedAnimated.vs", "res/shaders/Textured.fs", { { 0, "in_Position" }, { 1, "in_Normal" }, { 2, "in_TexCoord" }, { 3, "in_boneIndices" }, { 4, "in_weights" } });
+	//ShaderPool::instance->loadShader("TexturedAnimated", "res/shaders/TexturedAnimated.vs", "res/shaders/Textured.fs", { { 0, "in_Position" }, { 1, "in_Normal" }, { 2, "in_TexCoord" }, { 3, "in_boneIndices" }, { 4, "in_weights" } });
 
 	MeshPool::instance->loadModel("Ship", "res/models/LargeBlockShip.obj", true);
 	MeshPool::instance->loadModel("SmallCube", "res/models/Cube.obj", true);
@@ -135,8 +136,28 @@ Client::Client()
 	inside->model.setLightingShader("TexturedLighting");
 	inside->model.addTexture("res/textures/1K_Grid.png", 0);*/
 
-
 	if (true)
+	{
+		MeshPool::instance->loadModel("Capsule", "res/models/Capsule.obj", true);
+		Entity* player = EntityManager::instance->createNewEntity();
+		player->createRigidBody(10.0, new CapsuleShape(0.4, 0.8));
+		player->getRigidBody()->setInertiaTensor(vector3D(0.0));
+
+		ComponentModel* componetModel = new ComponentModel();
+		Model* model = &componetModel->model;
+		model->setMesh("Capsule");
+		model->addTexture("res/textures/1K_Grid.png", 0);
+
+		model->setShader("Textured");
+		model->setLightingShader("TexturedLighting");
+
+		player->addComponent("model", componetModel);
+		player->addToWorld(ship->getSubWorld());
+
+
+	}
+
+	if (false)
 	{
 		MeshPool::instance->loadModel("AnimTest", "res/models/AnimTest.dae", false);
 		MeshPool::instance->loadModel("IsoSphere", "res/models/Arrow.obj", true);
@@ -199,7 +220,6 @@ Client::Client()
 		testChar->setTransform(Transform(vector3D(0.0, 0.0, -10.0f)));
 	}
 
-
 	//Debug Camera
 	this->debugCamera = EntityManager::instance->createNewEntity();
 	this->debugCamera->addToWorld(this->tempWorld);
@@ -215,6 +235,8 @@ Client::~Client()
 
 void Client::update(double deltaTime)
 {
+	InputManager::instance->resetPreviousValues();
+
 	SDL_Event event;
 	while (SDL_PollEvent(&event))
 	{
@@ -223,7 +245,6 @@ void Client::update(double deltaTime)
 			InputManager::instance->setMouseLock(!InputManager::instance->getMouseLock());
 			continue;
 		}
-
 
 		if (event.type == SDL_WINDOWEVENT && event.window.event == SDL_WINDOWEVENT_CLOSE)
 		{
@@ -238,7 +259,6 @@ void Client::update(double deltaTime)
 
 	InputManager::instance->update(deltaTime);
 	WorldManager::instance->update(deltaTime);
-
 
 	//Debug Camera for now
 	this->tempCamera->setCameraTransform(this->debugCamera->getRenderTransform());

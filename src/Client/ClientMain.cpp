@@ -1,5 +1,3 @@
-using namespace std;
-
 #include "Client/Client.hpp"
 
 //Singletons
@@ -14,6 +12,8 @@ using namespace std;
 
 int main()
 {
+	SDL_Init(SDL_INIT_EVERYTHING);
+
 	//Create Singletons
 	TexturePool* texturePool = new TexturePool();
 	ShaderPool* shaderPool = new ShaderPool();
@@ -23,7 +23,6 @@ int main()
 	WorldManager* worldManager = new WorldManager();
 	InputManager* inputManager = new InputManager();
 	LightManager* lightManager = new LightManager();
-
 
 	Client* game = new Client();
 
@@ -47,7 +46,6 @@ int main()
 		if (currentTime - lastTime > 1000)
 		{
 			game->window->setTitleString("USG FPS: " + std::to_string(frames));
-			//cout << "FPS: " << frames << endl;
 			lastTime = currentTime;
 			frames = 0;
 		}
@@ -55,12 +53,6 @@ int main()
 		lastFrameTime = currentTime;
 
 		deltaTime = ((double)delta) / 1000.0;
-		//cout << "Update delta: " << deltaTime << endl;
-
-		/*if (deltaTime > (1.0 / 45.0))
-		{
-			printf("Error: frame took too long: %f seconds\n", deltaTime);
-		}*/
 
 		game->update(deltaTime);
 	}

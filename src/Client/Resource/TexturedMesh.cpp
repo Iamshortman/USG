@@ -100,7 +100,7 @@ TexturedMesh* TexturedMesh::loadObj(std::string fileName)
 		vector<TexturedVertex> vertices;
 		vector<unsigned int> indices;
 
-		for (int i = 0; i < scene->mNumMeshes; i++)
+		for (unsigned int i = 0; i < scene->mNumMeshes; i++)
 		{
 			aiMesh* mesh = scene->mMeshes[i];
 
@@ -130,7 +130,7 @@ TexturedMesh* TexturedMesh::loadObj(std::string fileName)
 				vertices.push_back(vertex);
 			}
 
-			int indicesOffset = indices.size();
+			unsigned int indicesOffset = (unsigned int) indices.size();
 
 			for (unsigned int i = 0; i < mesh->mNumFaces; i++)
 			{

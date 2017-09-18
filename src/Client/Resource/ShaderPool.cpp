@@ -25,8 +25,11 @@ void ShaderPool::loadShader(string name, string vertex, string fragment, vector<
 	}
 
 	ShaderResource shader;
-	shader.program = new ShaderProgram(vertex, fragment, attributeLocation);
+	shader.program = nullptr;
 	shader.usingCount = 0;
+	shader.vertexPath = vertex;
+	shader.fragmentPath = fragment;
+	shader.attributeLocation = attributeLocation;
 
 	this->shaders[name] = shader;
 }
@@ -41,10 +44,15 @@ void ShaderPool::setUsing(string name)
 		return;
 	}
 	
+	if (this->shaders[name].usingCount <= 0)
+	{
+		this->shaders[name].program = new ShaderProgram(this->shaders[name].vertexPath, this->shaders[name].fragmentPath, this->shaders[name].attributeLocation);
+	}
+
 	this->shaders[name].usingCount++;
 }
 
-int ShaderPool::getUsing(string name)
+unsigned short ShaderPool::getUsing(string name)
 {
 	//Return -1 if it is not loaded
 	//Does not contain
@@ -64,7 +72,10 @@ void ShaderPool::releaseUsing(string name)
 		return;
 	}
 
-	this->shaders[name].usingCount--;
+	if (this->shaders[name].usingCount > 0)
+	{
+		this->shaders[name].usingCount--;
+	}
 
 	//If no one is using it, unload it
 	if (this->shaders[name].usingCount <= 0)
@@ -79,7 +90,7 @@ void ShaderPool::unloadShader(string name)
 	if (this->shaders.count(name))
 	{
 		delete this->shaders[name].program;
-		this->shaders.erase(name);
+		this->shaders[name].program = nullptr;
 	}
 }
 

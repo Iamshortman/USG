@@ -118,3 +118,8 @@ Entity* World::getParent()
 {
 	return this->parent;
 }
+
+WORLDTYPE World::getWorldType() const
+{
+	return WORLDTYPE::BASE;
+}

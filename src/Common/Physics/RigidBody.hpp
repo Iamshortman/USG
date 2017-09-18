@@ -34,6 +34,9 @@ public:
 	void setMass(double massToAdd);
 	double getMass();
 
+	void setInertiaTensor(vector3D inertia);
+	vector3D getInertiaTensor();
+
 	/*void addToPhysicsWorld(PhysicsWorld* physicsWorld, Entity* entity, Transform worldTransform);
 	void removeFromPhysicsWorld();
 	bool isInPhysicsWorld();*/
@@ -72,6 +75,7 @@ private:
 	btCompoundShape* compoundShape = nullptr;
 
 	double mass = 1.0;
+	vector3D inertia = vector3D(1.0);
 
 	PhysicsWorld* world = nullptr;
 

@@ -29,8 +29,6 @@ public:
 
 	void setProjection(float frameOfView, float nearClipping, float farClipping);
 
-	vector2F getScreenSize();
-
 private:
     vector3D forward;
 	vector3D up;

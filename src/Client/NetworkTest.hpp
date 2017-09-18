@@ -13,17 +13,16 @@ enum GameMessages
 	ID_GAME_MESSAGE_1 = ID_USER_PACKET_ENUM + 1
 };
 
-int main()
+int run()
 {
 	RakNet::RakPeerInterface *peer = RakNet::RakPeerInterface::GetInstance();
 	RakNet::Packet *packet;
 
-	RakNet::SocketDescriptor sd(SERVER_PORT, 0);
-	peer->Startup(MAX_CLIENTS, &sd, 1);
+	RakNet::SocketDescriptor sd;
+	peer->Startup(1, &sd, 1);
 
-	printf("Starting the server.\n");
-	// We need to let the server accept incoming connections from the clients
-	peer->SetMaximumIncomingConnections(MAX_CLIENTS);
+	printf("Starting the client.\n");
+	peer->Connect("127.0.0.1", SERVER_PORT, 0, 0);
 
 	while (1)
 	{
@@ -59,11 +58,10 @@ int main()
 				printf("The server is full.\n");
 				break;
 			case ID_DISCONNECTION_NOTIFICATION:
-					printf("A client has disconnected.\n");
-
+				printf("We have been disconnected.\n");
 				break;
 			case ID_CONNECTION_LOST:
-					printf("A client lost the connection.\n");
+				printf("Connection lost.\n");
 				break;
 
 			case ID_GAME_MESSAGE_1:

@@ -106,23 +106,23 @@ void RigidBody::setMass(double massToAdd)
 {
 	this->mass = massToAdd;
 
-	if (this->rigidBody->getCollisionShape() == this->compoundShape)
-	{
-		btVector3 vector;
-		this->compoundShape->calculateLocalInertia(this->mass, vector);
-
-		this->rigidBody->setMassProps(this->mass, vector);
-	}
-	else
-	{
-		this->rigidBody->setMassProps(this->mass, btVector3(1.0, 1.0, 1.0));
-	}
-
+	this->rigidBody->setMassProps(this->mass, toBtVec3(this->inertia));
 }
 
 double RigidBody::getMass()
 {
 	return this->mass;
+}
+
+void RigidBody::setInertiaTensor(vector3D inertiaToSet)
+{
+	this->inertia = inertiaToSet;
+	this->rigidBody->setMassProps(this->mass, toBtVec3(this->inertia));
+}
+
+vector3D RigidBody::getInertiaTensor()
+{
+	return this->inertia;
 }
 
 void RigidBody::Activate(bool activate)

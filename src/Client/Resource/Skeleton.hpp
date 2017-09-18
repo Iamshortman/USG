@@ -37,9 +37,9 @@ class Skeleton
 {
 public:
 	Bone* rootBone = nullptr;
-	int boneCount = 0;
+	size_t boneCount = 0;
 
-	Skeleton(Bone* root, int count);
+	Skeleton(Bone* root, size_t count);
 
 	static Skeleton* loadSkeleton(std::string filename);
 

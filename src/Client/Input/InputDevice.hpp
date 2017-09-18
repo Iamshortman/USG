@@ -1,49 +1,37 @@
 #ifndef INPUTDEVICE_HPP
 #define INPUTDEVICE_HPP
 
-#include "InputAxis.hpp"
-#include "InputButton.hpp"
-
+#include "Client/SDL2_Include.hpp"
 #include <string>
-#include <unordered_map>
-
 using std::string;
-using std::unordered_map;
 
-enum InputType
+struct AxisReturn
 {
-	KEYBOARD_MOUSE,
-	JOYSTICK,
-	GAMEPAD
+	AxisReturn() {}
+	AxisReturn(double value, Uint32 timestamp)
+	{
+		this->value = value;
+		this->timestamp = timestamp;
+	}
+	double value = 0.0;
+	Uint32 timestamp = 0;
 };
 
 class InputDevice
 {
 public:
-	string m_name;
-	InputType m_deviceType;
-	void* m_devicePtr  = nullptr;
+	string name;
 
+	virtual void processEvent(SDL_Event event) = 0;
+	virtual void update(double deltaTime) {};
+	virtual void resetPreviousValues() = 0;
+	
+	virtual bool hasAxis(string name) = 0;
+	virtual AxisReturn getAxis(string name) = 0;
 
-	InputDevice(string name, InputType type, void* devicePtr);
-	~InputDevice();
-
-	void update(double deltaTime);
-
-	void addAxis(string name, InputAxis* axis);
-	void addButton(string name, InputButton* button);
-
-	bool hasAxis(string name);
-	double getAxis(string name);
-
-	bool hasButton(string name);
-	bool getButtonDown(string name);
-	bool getButtonPressed(string name);
-	bool getButtonDoublePressed(string name);
-
-private:
-	unordered_map<string, InputAxis*> m_axis;
-	unordered_map<string, InputButton*> m_buttons;
+	virtual bool hasButton(string name) = 0;
+	virtual bool getButtonDown(string name) = 0;
+	virtual bool getButtonPressed(string name) = 0;
 };
 
 #endif //INPUTDEVICE_HPP

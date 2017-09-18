@@ -1,0 +1,9 @@
+#ifndef CLIENTNETWORKMANAGER_HPP
+#define CLIENTNETWORKMANAGER_HPP
+
+class ClientNetworkManger
+{
+
+};
+
+#endif //CLIENTNETWORKMANAGER_HPP

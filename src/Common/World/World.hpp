@@ -13,6 +13,14 @@ class World;
 
 typedef uint32_t WorldId;
 
+enum WORLDTYPE
+{
+	BASE,
+	SOLAR,
+	WARP,
+};
+
+
 class World
 {
 private:
@@ -51,6 +59,7 @@ public:
 
 	Transform getWorldOffsetMatrix();
 
+	virtual WORLDTYPE getWorldType() const;
 };
 
 #endif //WORLD_HPP

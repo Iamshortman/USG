@@ -23,9 +23,9 @@ void DebugCameraComponent::update(double deltaTime)
 		return;
 	}
 
-	double forward_backward = InputManager::instance->getAxis("DebugForwardBackward");
-	double left_right = InputManager::instance->getAxis("DebugLeftRight");
-	double up_down = InputManager::instance->getAxis("DebugUpDown");
+	double forward_backward = InputManager::instance->getButtonAxisCombo("DebugForwardBackward", "DebugForward", "DebugBackward");
+	double left_right = InputManager::instance->getButtonAxisCombo("DebugLeftRight", "DebugLeft", "DebugRight");
+	double up_down = InputManager::instance->getButtonAxisCombo("DebugUpDown", "DebugUp", "DebugDown");
 
 	Transform trans = parent->getTransform();
 
@@ -37,15 +37,16 @@ void DebugCameraComponent::update(double deltaTime)
 
 	trans.setPosition(trans.getPosition() + finalMove);
 
-	double pitch = InputManager::instance->getAxis("DebugPitch");
-	double yaw = InputManager::instance->getAxis("DebugYaw");
-	double roll = InputManager::instance->getAxis("DebugRoll");
+	double pitch = InputManager::instance->getButtonAxisCombo("DebugPitch", "DebugPitchUp", "DebugPitchDown");
+
+	double yaw = InputManager::instance->getButtonAxisCombo("DebugYaw", "DebugYawLeft", "DebugYawRight");
+	//double roll = InputManager::instance->getButtonAxisCombo("DebugRoll", "DebugRollRight", "DebugRollLeft");
 
 	quaternionD rotation = trans.getOrientation();
 
 	rotation = glm::angleAxis(pitch * angularSpeed * (M_PI * 2.0) * deltaTime, trans.getLeft()) * rotation;
-	rotation = glm::angleAxis(yaw * angularSpeed * (M_PI * 2.0) * deltaTime, trans.getUp()) * rotation;
-	rotation = glm::angleAxis(roll * (angularSpeed * 0.5) * (M_PI * 2.0) * deltaTime, trans.getForward()) * rotation;
+	rotation = glm::angleAxis(yaw * angularSpeed * (M_PI * 2.0) * deltaTime, vector3D(0, 1, 0)) * rotation;
+	//rotation = glm::angleAxis(roll * (angularSpeed * 0.5) * (M_PI * 2.0) * deltaTime, trans.getForward()) * rotation;
 
 	trans.setOrientation(rotation);
 

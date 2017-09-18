@@ -27,7 +27,7 @@ GLclampf alpha);
         bool isWindowActive();
         void setMousePos(int x, int y);
         void getMousePos(int &x, int &y);
-		void getCenteredMousePos(double &x, double &y);
+		void getCenteredMousePos(int &x, int &y);
 		void setVsync(int syncRate);
 		int getVsync();
 		void set3dRendering();

@@ -1,18 +1,10 @@
-#include "InputManager.hpp"
+#include "Client/Input/InputManager.hpp"
 
 #include "Client/Client.hpp"
 #include "Client/SDL2_Include.hpp"
 
-#include "Client/Input/ButtonAxis.hpp"
-
-#include "Client/Input/MouseAxis.hpp"
-#include "Client/Input/KeyboardButton.hpp"
-
-#include "Client/Input/JoystickAxis.hpp"
-#include "Client/Input/JoystickButton.hpp"
-#include "Client/Input/GamepadAxis.hpp"
-#include "Client/Input/GamepadButton.hpp"
-
+#include "Client/Input/InputDevice.hpp"
+#include "Client/Input/JoystickDevice.hpp"
 
 InputManager* InputManager::instance = nullptr;
 
@@ -20,47 +12,66 @@ InputManager::InputManager()
 {
 	InputManager::instance = this;
 
-	SDL_Init(SDL_INIT_GAMECONTROLLER && SDL_INIT_JOYSTICK && SDL_INIT_HAPTIC);
-	
-	this->devices = list<InputDevice*>();
+	this->device_map = unordered_map<void*, InputDevice*>();
 
-	this->devices.push_back(new InputDevice("Keyboard", KEYBOARD_MOUSE, nullptr));
-	InputDevice* keyboard = this->devices.front();
+	keyboardMouse = new KeyboardMouseDevice();
+	keyboardMouse->addButton("DebugForward", KeyboardMouseButton(KEYBOARD, SDL_SCANCODE_W));
+	keyboardMouse->addButton("DebugBackward", KeyboardMouseButton(KEYBOARD, SDL_SCANCODE_S));
+	keyboardMouse->addButton("DebugLeft", KeyboardMouseButton(KEYBOARD, SDL_SCANCODE_A));
+	keyboardMouse->addButton("DebugRight", KeyboardMouseButton(KEYBOARD, SDL_SCANCODE_D));
+	keyboardMouse->addButton("DebugUp", KeyboardMouseButton(KEYBOARD, SDL_SCANCODE_SPACE));
+	keyboardMouse->addButton("DebugDown", KeyboardMouseButton(KEYBOARD, SDL_SCANCODE_LSHIFT));
 
-	keyboard->addButton("DebugForward", new KeyboardButton(SDL_SCANCODE_W));
-	keyboard->addAxis("DebugForwardBackward", new ButtonAxis(new KeyboardButton(SDL_SCANCODE_W), new KeyboardButton(SDL_SCANCODE_S)));
-	keyboard->addAxis("DebugLeftRight", new ButtonAxis(new KeyboardButton(SDL_SCANCODE_A), new KeyboardButton(SDL_SCANCODE_D)));
-	keyboard->addAxis("DebugUpDown", new ButtonAxis(new KeyboardButton(SDL_SCANCODE_SPACE), new KeyboardButton(SDL_SCANCODE_LSHIFT)));
+	keyboardMouse->addButton("DebugRollLeft", KeyboardMouseButton(KEYBOARD, SDL_SCANCODE_Q));
+	keyboardMouse->addButton("DebugRollRight", KeyboardMouseButton(KEYBOARD, SDL_SCANCODE_E));
 
-	keyboard->addAxis("DebugPitch", new MouseAxis(MouseDirection::Mouse_Y, 10.0, 0.01, false));
-	keyboard->addAxis("DebugYaw", new MouseAxis(MouseDirection::Mouse_X, 10.0, 0.01, true));
-	keyboard->addAxis("DebugRoll", new ButtonAxis(new KeyboardButton(SDL_SCANCODE_E), new KeyboardButton(SDL_SCANCODE_Q)));
+	keyboardMouse->addAxis("DebugPitch", MouseAxis(MouseDirection::Mouse_Y, 0.1, 0.01, false));
+	keyboardMouse->addAxis("DebugYaw", MouseAxis(MouseDirection::Mouse_X, 0.1, 0.01, false));
+
+	/*keyboardMouse->addAxis("DebugPitch", new MouseAxis(MouseDirection::Mouse_Y, 10.0, 0.01, false));
+	keyboardMouse->addAxis("DebugYaw", new MouseAxis(MouseDirection::Mouse_X, 10.0, 0.01, true));
+	keyboardMouse->addAxis("DebugRoll", new ButtonAxis(new KeyboardButton(SDL_SCANCODE_E), new KeyboardButton(SDL_SCANCODE_Q)));*/
 }
 
 InputManager::~InputManager()
 {
-	for (InputDevice* device : this->devices)
+	/*if (this->keyboardMouse)
 	{
-		delete device;
+		delete this->keyboardMouse;
+	}*/
+
+	for (std::pair<void*, InputDevice*> it : this->device_map)
+	{
+		delete it.second;
 	}
-	this->devices.clear();
+	this->device_map.clear();
 }
 
 void InputManager::update(double deltaTime)
 {
-	for (InputDevice* device : this->devices)
-	{
-		device->update(deltaTime);
-	}
-
 	this->centerMouse();
+}
+
+void InputManager::resetPreviousValues()
+{
+	this->keyboardMouse->resetPreviousValues();
+
+	for (std::pair<void*, InputDevice*> it : this->device_map)
+	{
+		it.second->resetPreviousValues();
+	}
 }
 
 bool InputManager::hasAxis(string name)
 {
-	for (InputDevice* device : this->devices)
+	/*if (keyboardMouse->hasAxis(name))
 	{
-		if (device->hasAxis(name))
+		return true;
+	}*/
+
+	for (std::pair<void*, InputDevice*> it : this->device_map)
+	{
+		if (it.second->hasAxis(name))
 		{
 			return true;
 		}
@@ -76,22 +87,33 @@ bool InputManager::hasAxis(string name)
 */
 double InputManager::getAxis(string name)
 {
-	double axisValue = 0.0;
-	double tempAxisValue = 0.0;
+	AxisReturn axisValue;
+	AxisReturn tempAxisValue;
 
-	for (InputDevice* device : this->devices)
+	if (this->keyboardMouse->hasAxis(name))
 	{
+		tempAxisValue = this->keyboardMouse->getAxis(name);
+		axisValue = tempAxisValue;
+	}
+
+	//axisValue = keyboardMouse->getAxis(name);
+
+	for (std::pair<void*, InputDevice*> it : this->device_map)
+	{
+		InputDevice* device = it.second;
 		if (device->hasAxis(name))
 		{
 			tempAxisValue = device->getAxis(name);
-			if (abs(axisValue) < abs(tempAxisValue))
+
+			if (tempAxisValue.timestamp > axisValue.timestamp)
 			{
 				axisValue = tempAxisValue;
 			}
+
 		}
 	}
 
-	return axisValue;
+	return axisValue.value;
 }
 
 /*
@@ -100,8 +122,17 @@ double InputManager::getAxis(string name)
 */
 bool InputManager::getButtonDown(string name)
 {
-	for (InputDevice* device : this->devices)
+	if (this->keyboardMouse->hasButton(name))
 	{
+		if (this->keyboardMouse->getButtonDown(name))
+		{
+			return true;
+		}
+	}
+
+	for (std::pair<void*, InputDevice*> it : this->device_map)
+	{
+		InputDevice* device = it.second;
 		if (device->hasButton(name) && device->getButtonDown(name))
 		{
 			return true;
@@ -117,8 +148,17 @@ bool InputManager::getButtonDown(string name)
 */
 bool InputManager::getButtonPressed(string name)
 {
-	for (InputDevice* device : this->devices)
+	if (this->keyboardMouse->hasButton(name))
 	{
+		if (this->keyboardMouse->getButtonPressed(name))
+		{
+			return true;
+		}
+	}
+
+	for (std::pair<void*, InputDevice*> it : this->device_map)
+	{
+		InputDevice* device = it.second;
 		if (device->hasButton(name) && device->getButtonPressed(name))
 		{
 			return true;
@@ -128,76 +168,104 @@ bool InputManager::getButtonPressed(string name)
 	return false;
 }
 
+
 /*
-	name: the button name;
-	return: true if any devices have the button double pressed;
+	Mixes the inputs of an axis with 2 buttons emulating an axis;
+	axis_name: the name of the axis;
+	pos_button_name: the name of the positive button;
+	neg_button_name: the name of the negitive button;
+	return: a double clampled between 1 and -1;
 */
-bool InputManager::getButtonDoublePressed(string name)
+double InputManager::getButtonAxisCombo(string axis_name, string pos_button_name, string neg_button_name)
 {
-	for (InputDevice* device : this->devices)
+	double axis_Value = 0.0;
+
+	axis_Value = this->getAxis(axis_name);
+
+	if (this->getButtonDown(pos_button_name))
 	{
-		if (device->hasButton(name) && device->getButtonDoublePressed(name))
-		{
-			return true;
-		}
+		axis_Value += 1.0;
 	}
 
-	return false;
+	if (this->getButtonDown(neg_button_name))
+	{
+		axis_Value -= 1.0;
+	}
+
+	//Clamp value
+	if (axis_Value > 1.0)
+	{
+		axis_Value = 1.0;
+	}
+	else if (axis_Value < -1.0)
+	{
+		axis_Value = -1.0;
+	}
+
+	return axis_Value;
 }
 
 void InputManager::processEvent(SDL_Event event)
 {
-	if (event.type == SDL_CONTROLLERDEVICEADDED)
+	if(event.type == SDL_JOYDEVICEADDED)
+	{
+		int i = event.jdevice.which;
+		SDL_Joystick* joystick = SDL_JoystickOpen(i);
+		this->loadJoystick(joystick);
+	}
+	else if(event.type == SDL_JOYDEVICEREMOVED)
+	{
+		int i = event.jdevice.which;
+		SDL_Joystick* joystick = SDL_JoystickFromInstanceID(i);
+		this->unloadJoystick(joystick);
+		SDL_JoystickClose(joystick);
+	}
+	else if(event.type == SDL_CONTROLLERDEVICEADDED)
 	{
 		int i = event.cdevice.which;
-
-		if (SDL_IsGameController(i))
-		{
-			SDL_GameController* controller = SDL_GameControllerOpen(i);
-			this->loadController(controller);
-		}
-		else
-		{
-			SDL_Joystick* joystick = SDL_JoystickOpen(i);
-			this->loadJoystick(joystick); 
-		}
-
-		return;
+		SDL_GameController* controller = SDL_GameControllerOpen(i);
+		this->loadController(controller);
 	}
 	else if(event.type == SDL_CONTROLLERDEVICEREMOVED)
 	{
-		int i = event.cbutton.which;
-
-		if (SDL_IsGameController(i))
-		{
-			SDL_GameController* controller = SDL_GameControllerFromInstanceID(i);
-			this->unloadController(controller);
-			SDL_GameControllerClose(controller);
-		}
-		else
-		{
-			SDL_Joystick* joystick = SDL_JoystickFromInstanceID(i);
-			this->unloadJoystick(joystick);
-			SDL_JoystickClose(joystick);
-		}
-
-		return;
+		int i = event.cdevice.which;
+		SDL_GameController* controller = SDL_GameControllerFromInstanceID(i);
+		this->unloadController(controller);
+		SDL_GameControllerClose(controller);
 	}
-
+	else if (event.type == SDL_JOYAXISMOTION)
+	{
+		SDL_Joystick* joystick = SDL_JoystickFromInstanceID(event.jaxis.which);
+		this->device_map[joystick]->processEvent(event);
+	}
+	else if (event.type == SDL_JOYBUTTONDOWN || event.type == SDL_JOYBUTTONUP)
+	{
+		SDL_Joystick* joystick = SDL_JoystickFromInstanceID(event.jbutton.which);
+		this->device_map[joystick]->processEvent(event);
+	}
+	else if (event.type == SDL_KEYDOWN || event.type == SDL_KEYUP || event.type == SDL_MOUSEBUTTONDOWN || event.type == SDL_MOUSEBUTTONUP)
+	{
+		this->keyboardMouse->processEvent(event);
+	}
+	else if (event.type == SDL_MOUSEMOTION && this->mouseLocked == true)
+	{
+		this->keyboardMouse->processEvent(event);
+	}
 }
 
 void InputManager::loadController(SDL_GameController* controller)
 {
-	InputDevice* device = new InputDevice(SDL_GameControllerName(controller), InputType::GAMEPAD, controller);
+	//InputDevice* device = new InputDevice(SDL_GameControllerName(controller), InputType::GAMEPAD, controller);
 
 	//Load Config
 
-	this->devices.push_back(device);
+	//this->devices.push_back(device);
+	//this->device_map[controller] = device;
 }
 
 void InputManager::unloadController(SDL_GameController* controller)
 {
-	InputDevice* device = nullptr;
+	/*InputDevice* device = nullptr;
 
 	for (InputDevice* dev : this->devices)
 	{
@@ -211,34 +279,47 @@ void InputManager::unloadController(SDL_GameController* controller)
 	if (device != nullptr)
 	{
 		this->devices.remove(device);
+	}*/
+
+	if (this->device_map.find(controller) != this->device_map.end())
+	{
+		delete this->device_map[controller];
+		this->device_map.erase(controller);
 	}
 }
 
 void InputManager::loadJoystick(SDL_Joystick* joystick)
 {
-	InputDevice* device = new InputDevice(SDL_JoystickName(joystick), InputType::JOYSTICK, joystick);
+	JoystickDevice* device = new JoystickDevice(SDL_JoystickName(joystick), joystick);
 
 	//Load Config
+	printf("Loaded Joystick: %s\n", SDL_JoystickName(joystick));
+	if (device->name == "CH PRO THROTTLE USB ")
+	{
+		JoystickButton axis;
+		axis.buttonIndex = 0;
+		//axis.deadzone = 0.0;
+		//axis.inverted = false;
+		device->addButton("Throttle", axis);
+	}
+	else if (device->name == "Logitech Extreme 3D")
+	{
+		JoystickButton axis;
+		axis.buttonIndex = 0;
+		//axis.deadzone = 0.0;
+		//axis.inverted = false;
+		device->addButton("Throttle", axis);
+	}
 
-	this->devices.push_back(device);
+	this->device_map[joystick] = device;
 }
 
 void InputManager::unloadJoystick(SDL_Joystick* joystick)
 {
-	InputDevice* device = nullptr;
-
-	for (InputDevice* dev : this->devices)
+	if (this->device_map.find(joystick) != this->device_map.end())
 	{
-		if (dev->m_devicePtr == joystick)
-		{
-			device = dev;
-			break;
-		}
-	}
-
-	if (device != nullptr)
-	{
-		this->devices.remove(device);
+		delete this->device_map[joystick];
+		this->device_map.erase(joystick);
 	}
 }
 
