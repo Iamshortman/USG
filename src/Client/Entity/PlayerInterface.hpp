@@ -1,7 +1,7 @@
 #ifndef PLAYERINTERFACE_HPP
 #define PLAYERINTERFACE_HPP
 
-#include "Common/Component/Transform.hpp"
+#include "Common/Transform.hpp"
 #include "Common/Entity/Entity.hpp"
 
 class PlayerInterface

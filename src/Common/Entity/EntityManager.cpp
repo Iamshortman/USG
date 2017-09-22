@@ -7,11 +7,18 @@ EntityManager::EntityManager()
 	instance = this;
 }
 
-Entity* EntityManager::createNewEntity()
+EntityId EntityManager::getNextId()
 {
-	Entity* entity = new Entity(nextId);
-	entities[nextId] = entity;
+	EntityId entityId = nextId;
 	nextId++;
+	return entityId;
+}
+
+EntityGridSystem* EntityManager::createNewGridSystem()
+{
+
+	EntityGridSystem* entity = new EntityGridSystem(this->getNextId());
+	entities[entity->entityId] = entity;
 	return entity;
 }
 

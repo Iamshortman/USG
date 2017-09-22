@@ -22,12 +22,10 @@ public:
 	void setWindow(Window* win);
 	Window* getWindow();
 
-	void Render(Camera* cam);
 	void RenderWorld(World* world, Camera* cam);
+	void Render(World* baseWorld, Camera* cam);
 
-	void RenderMesh(Model* model, Transform globalPos, Camera* cam, World* world);
-
-protected:
+	//void RenderMesh(Model* model, Transform globalPos, Camera* cam, World* world);
 
 private:
 	Window* window = nullptr;

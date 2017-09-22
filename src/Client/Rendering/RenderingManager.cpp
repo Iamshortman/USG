@@ -1,14 +1,6 @@
 #include "RenderingManager.hpp"
 
-#include <stack>
-
-#include "Common/Entity/EntityManager.hpp"
-#include "Client/Rendering/LightShaderUtil.hpp"
-#include "Client/Component/ComponentModel.hpp"
-#include "Client/Rendering/LightManager.hpp"
-#include "Client/Resource/AnimatedMesh.hpp"
-
-#include "Client/Resource/MeshPool.hpp"
+#include "Common/World/WorldSolarSystem.hpp"
 
 RenderingManager::RenderingManager()
 {
@@ -30,13 +22,9 @@ Window* RenderingManager::getWindow()
 	return this->window;
 }
 
-void RenderingManager::Render(Camera* cam)
+void RenderingManager::Render(World* baseWorld, Camera* cam)
 {
-	this->window->clearBuffer();
-
-
-
-	this->window->updateBuffer();
+	this->RenderWorld(baseWorld, cam);
 }
 
 void RenderingManager::RenderWorld(World* world, Camera* cam)
@@ -46,12 +34,25 @@ void RenderingManager::RenderWorld(World* world, Camera* cam)
 		return;
 	}
 
-	//Render the larger world first
-	//Entity* parent = world->getParent();
-	//if (parent != nullptr)
-	//{
-		//this->RenderWorld(parent->getWorld(), cam);
-	//}
+
+	if (world->getWorldType() == WORLDTYPE::SOLAR)
+	{
+		WorldSolarSystem* solarSystem = (WorldSolarSystem*)world;
+
+		/*for (Star* star : solarSystem->stars)
+		{
+			//TODO Render Stars
+		}
+
+		for (Planet* planet : solarSystem->planets)
+		{
+			//TODO Render Planets
+		}*/
+	}
+	else if (world->getWorldType() == WORLDTYPE::WARP)
+	{
+
+	}
 
 	//Now render world
 	auto entities = world->getEntitiesInWorld();
@@ -62,9 +63,14 @@ void RenderingManager::RenderWorld(World* world, Camera* cam)
 
 		if (entity != nullptr)
 		{
-			if (entity->hasComponent("model"))
+			switch (entity->getEntityType())
 			{
-				this->RenderMesh(&((ComponentModel*)entity->getComponent("model"))->model, entity->getRenderTransform(), cam, world);
+			case ENTITYTYPE::GRIDSYSTEM:
+				break;
+			case ENTITYTYPE::CHARACTOR:
+				break;
+			case ENTITYTYPE::PROP:
+				break;
 			}
 		}
 
@@ -82,7 +88,7 @@ void RenderingManager::RenderWorld(World* world, Camera* cam)
 
 }
 
-void RenderingManager::RenderMesh(Model* model, Transform globalPos, Camera* cam, World* world)
+/*void RenderingManager::RenderMesh(Model* model, Transform globalPos, Camera* cam, World* world)
 {
 	ShaderProgram* program = model->getShader();
 	Mesh* mesh = model->getMesh();
@@ -230,4 +236,4 @@ void RenderingManager::RenderMesh(Model* model, Transform globalPos, Camera* cam
 		glDisable(GL_BLEND);
 	}
 
-}
+}*/

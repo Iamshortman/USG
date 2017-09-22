@@ -3,10 +3,12 @@
 
 #include "Client/Rendering/RenderingManager.hpp"
 #include "Client/Rendering/Window.hpp"
+#include "Client/Networking/ClientNetworkManager.hpp"
+
+#include "Client/GameState/GameState.hpp"
 
 class Client
 {
-
 public:
 	//Instance for the Singleton design pattern;
 	static Client* instance;
@@ -18,18 +20,16 @@ public:
 	void exitGame();
 	const bool getShouldClose();
 
+	void setGameState(GameState* state);
+
 	Window* window;
 	RenderingManager* renderingManager;
-
-	World* tempWorld = nullptr;
-	Camera* tempCamera = nullptr;
-
-protected:
 
 private:
 	bool shouldClose = false;
 
-	Entity* debugCamera;
+	GameState* currentState = nullptr;
+	GameState* previousState = nullptr;
 };
 
 #endif //CLIENT_HPP

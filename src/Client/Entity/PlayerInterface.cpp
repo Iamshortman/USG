@@ -22,6 +22,10 @@ Transform PlayerInterface::getCameraTransform()
 
 void PlayerInterface::bindCharacter(Entity* character)
 {
-
+	this->character = character;
 }
 
+void PlayerInterface::unbindCharacter()
+{
+	this->character = nullptr;
+}

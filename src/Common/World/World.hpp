@@ -23,14 +23,6 @@ enum WORLDTYPE
 
 class World
 {
-private:
-	PhysicsWorld* physicsWorld = nullptr;
-
-	Entity* parent = nullptr;
-
-	std::set<Entity*> entitiesInWorld;
-	std::set<World*> subWorlds;
-
 public:
 	//TODO Figure out where better to put this
 	vector3F ambientLight = vector3F(0.4f);
@@ -44,8 +36,8 @@ public:
 	void removeEntityFromWorld(Entity* entity);
 	std::set<Entity*>* getEntitiesInWorld();
 
-	void addEntityRigidBody(Entity* entity);
-	void removeEntityRigidBody(Entity* entity);
+	void addRigidBody(RigidBody* rigidBody);
+	void removeRigidBody(RigidBody* entity);
 
 	void addSubWorld(World* world);
 	void removeSubWorld(World* world);
@@ -60,6 +52,14 @@ public:
 	Transform getWorldOffsetMatrix();
 
 	virtual WORLDTYPE getWorldType() const;
+
+private:
+	PhysicsWorld* physicsWorld = nullptr;
+
+	Entity* parent = nullptr;
+
+	std::set<Entity*> entitiesInWorld;
+	std::set<World*> subWorlds;
 };
 
 #endif //WORLD_HPP

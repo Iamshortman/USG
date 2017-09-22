@@ -34,7 +34,6 @@ int main()
 	Uint32 lastFrameTime = SDL_GetTicks();
 	Uint32 currentTime = SDL_GetTicks();
 	Uint32 frames = 0;
-	int i = 0;
 
 	bool mouseCaptured = false;
 

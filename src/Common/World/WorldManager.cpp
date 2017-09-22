@@ -16,10 +16,16 @@ WorldManager::~WorldManager()
 	}
 }
 
+WorldId WorldManager::getNextId()
+{
+	WorldId worldId = nextId;
+	nextId++;
+	return worldId;
+}
+
 void WorldManager::update(double deltaTime)
 {
 	//TODO muiltiThreadUpdate
-
 	std::unordered_map<WorldId, World*>::iterator iter;
 	for (iter = this->worlds.begin(); iter != this->worlds.end(); iter++)
 	{
@@ -29,9 +35,15 @@ void WorldManager::update(double deltaTime)
 
 World* WorldManager::createNewWorld()
 {
-	World* world = new World(nextId);
-	worlds[nextId] = world;
-	nextId++;
+	World* world = new World(this->getNextId());
+	worlds[world->worldId] = world;
+	return world;
+}
+
+WorldSolarSystem* WorldManager::createNewWorldSolarSystem()
+{
+	WorldSolarSystem* world = new WorldSolarSystem(this->getNextId());
+	worlds[world->worldId] = world;
 	return world;
 }
 

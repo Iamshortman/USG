@@ -5,6 +5,7 @@
 #include <unordered_map>
 #include <algorithm>
 #include "Common/World/World.hpp"
+#include "Common/World/WorldSolarSystem.hpp"
 
 class WorldManager
 {
@@ -16,9 +17,12 @@ public:
 	WorldManager();
 	~WorldManager();
 
+	WorldId getNextId();
+
 	void update(double deltaTime);
 
 	World* createNewWorld();
+	WorldSolarSystem* createNewWorldSolarSystem();
 	void destroyWorld(WorldId id);
 
 	World* getWorld(WorldId id);

@@ -1,7 +1,7 @@
 #include "Common/Physics/RigidBody.hpp"
 #include "Common/Entity/Entity.hpp"
 
-RigidBody::RigidBody(Entity* entity, double mass)
+/*RigidBody::RigidBody(Entity* entity, double mass)
 {
 	this->parent = entity;
 
@@ -10,7 +10,7 @@ RigidBody::RigidBody(Entity* entity, double mass)
 	btDefaultMotionState* motionState = new btDefaultMotionState();
 	btRigidBody::btRigidBodyConstructionInfo boxRigidBodyCI(mass, motionState, new btEmptyShape(), btVector3(1.0, 1.0, 1.0));
 	rigidBody = new btRigidBody(boxRigidBodyCI);
-}
+}*/
 
 RigidBody::RigidBody(Entity* entity, double mass, CollisionShape* shape)
 {
@@ -29,10 +29,10 @@ RigidBody::RigidBody(Entity* entity, double mass, CollisionShape* shape)
 RigidBody::~RigidBody()
 {
 	delete this->rigidBody;
-	delete this->compoundShape;
+	//delete this->compoundShape;
 }
 
-int RigidBody::addChildShape(CollisionShape* shape, Transform trans)
+/*int RigidBody::addChildShape(CollisionShape* shape, Transform trans)
 {
 	nextId++;
 
@@ -100,7 +100,7 @@ void RigidBody::updateChildShapes()
 	{
 		this->rigidBody->setCollisionShape(new btEmptyShape());
 	}
-}
+}*/
 
 void RigidBody::setMass(double massToAdd)
 {
@@ -133,13 +133,6 @@ void RigidBody::Activate(bool activate)
 Transform RigidBody::getWorldTransform()
 {
 	return toTransform(this->rigidBody->getWorldTransform());
-}
-
-Transform RigidBody::getWorldTransform(vector3D scale)
-{
-	Transform transform = toTransform(this->rigidBody->getWorldTransform());
-	transform.setScale(scale);
-	return transform;
 }
 
 void RigidBody::setWorldTransform(Transform transform)

@@ -38,8 +38,6 @@ void World::addEntityToWorld(Entity* entity)
 	if (entitiesInWorld.find(entity) == entitiesInWorld.end())
 	{
 		entitiesInWorld.insert(entity);
-
-		this->addEntityRigidBody(entity);
 	}
 }
 
@@ -48,8 +46,6 @@ void World::removeEntityFromWorld(Entity* entity)
 	if (entitiesInWorld.find(entity) != entitiesInWorld.end())
 	{
 		entitiesInWorld.erase(entity);
-
-		this->removeEntityRigidBody(entity);
 	}
 }
 
@@ -58,20 +54,14 @@ std::set<Entity*>* World::getEntitiesInWorld()
 	return &this->entitiesInWorld;
 }
 
-void  World::addEntityRigidBody(Entity* entity)
+void  World::addRigidBody(RigidBody* rigidBody)
 {
-	if (entity->hasRigidBody())
-	{
-		this->physicsWorld->addRigidBody(entity->getRigidBody());
-	}
+	this->physicsWorld->addRigidBody(rigidBody);
 }
 
-void  World::removeEntityRigidBody(Entity* entity)
+void  World::removeRigidBody(RigidBody* rigidBody)
 {
-	if (entity->hasRigidBody())
-	{
-		this->physicsWorld->removeRigidBody(entity->getRigidBody());
-	}
+	this->physicsWorld->removeRigidBody(rigidBody);
 }
 
 void World::addSubWorld(World* world)

@@ -1,23 +1,10 @@
 #include "Client/Client.hpp"
 
 #include "Client/Input/InputManager.hpp"
-#include "Common/World/WorldManager.hpp"
-#include "Common/Entity/EntityManager.hpp"
-#include "Client/Rendering/LightManager.hpp"
 
 #include "Client/Resource/ShaderPool.hpp"
 #include "Client/Resource/MeshPool.hpp"
 #include "Client/Resource/TexturedMesh.hpp"
-
-#include "Client/Component/ComponentModel.hpp"
-
-#include "Client/Resource/Skeleton.hpp"
-
-#include "Common/Physics/CollisionShapes/BoxShape.hpp"
-#include "Common/Physics/CollisionShapes/ConcaveMeshShape.hpp"
-#include "Common/Physics/CollisionShapes/CapsuleShape.hpp"
-
-#include "Client/Component/DebugCameraComponent.hpp"
 
 Client* Client::instance = nullptr;
 
@@ -31,204 +18,12 @@ Client::Client()
 	this->renderingManager = new RenderingManager();
 	this->renderingManager->setWindow(this->window);
 
-	//Load Test Shaders
-	ShaderPool::instance->loadShader("Textured", "res/shaders/Textured.vs", "res/shaders/Textured.fs", { { 0, "in_Position" }, { 1, "in_Normal" }, { 2, "in_TexCoord" } });
-	ShaderPool::instance->loadShader("TexturedLighting", "res/shaders/Textured.vs", "res/shaders/TexturedLighting.fs", { { 0, "in_Position" }, { 1, "in_Normal" }, { 2, "in_TexCoord" } });
-	//ShaderPool::instance->loadShader("TexturedAnimated", "res/shaders/TexturedAnimated.vs", "res/shaders/Textured.fs", { { 0, "in_Position" }, { 1, "in_Normal" }, { 2, "in_TexCoord" }, { 3, "in_boneIndices" }, { 4, "in_weights" } });
-
-	MeshPool::instance->loadModel("Ship", "res/models/LargeBlockShip.obj", true);
-	MeshPool::instance->loadModel("SmallCube", "res/models/Cube.obj", true);
-	//MeshPool::instance->loadModel("Ship_Inside", "res/models/Ship_Inside.obj", true);
-	//MeshPool::instance->loadModel("Ship_Outside", "res/models/Ship_Outside.obj", true);
-
-	TexturePool::instance->loadTexture("res/textures/1K_Grid.png");
-
-	this->tempWorld = WorldManager::instance->createNewWorld();
-	//this->tempWorld->setGravity(vector3D(0.0, -9.8, 0.0));
-
-	this->tempCamera = new Camera();
-	this->tempCamera->setProjection(45.0f, 0.1f, 100.0f);
-
-	Entity* cube = EntityManager::instance->createNewEntity();
-	cube->createRigidBody();
-	//cube->addToWorld(this->tempWorld);
-	cube->setTransform(Transform(vector3D(0.0, 0.0, -30.0)));
-
-	cube->getRigidBody()->addChildShape(new BoxShape(vector3D(2.0)), Transform());
-
-	cube->getRigidBody()->setDampening(0.0, 0.0);
-	cube->getRigidBody()->applyTorqueImpulse(cube->getTransform().getLeft() * 10.0);
-
-	//cube->getRigidBody()->setLinearVelocity(vector3D(0.0, 0.0, 20.0));
-
-	ComponentModel* model = new ComponentModel();
-	cube->addComponent("model", model);
-	model->model.setMesh("SmallCube");
-	model->model.setShader("Textured");
-	model->model.setLightingShader("TexturedLighting");
-	model->model.addTexture("res/textures/1K_Grid.png", 0);
-
-	Entity* ship = EntityManager::instance->createNewEntity();
-	ship->createRigidBody();
-	ship->addToWorld(this->tempWorld);
-	ship->setTransform(Transform(vector3D(0.0, 0.0, 20.0), quaternionD(0.707, 0.0, 0.707, 0.0)));
-
-	ship->getRigidBody()->addChildShape(new BoxShape(vector3D(30.0, 16.0, 100.0)), Transform());
-
-	ship->getRigidBody()->setMass(100000.0);
-	ship->getRigidBody()->setDampening(0.0, 0.0);
-
-	//ship->getRigidBody()->setLinearVelocity(vector3D(0.0, 0.0, 2.0));
-	//ship->getRigidBody()->setAngularVelocity(vector3D(0.0, 1.0, 0.0));
-
-	ship->setSubWorld(WorldManager::instance->createNewWorld());
-	ComponentModel* model1 = new ComponentModel();
-	//ship->addComponent("model", model1);
-	model1->model.setMesh("Ship");
-	model1->model.setShader("Textured");
-	model1->model.setLightingShader("TexturedLighting");
-	model1->model.addTexture("res/textures/1K_Grid.png", 0);
-	
-	ship->getSubWorld()->setGravity(vector3D(0.0, -9.8, 0.0));
-	ship->getSubWorld()->ambientLight = vector3F(0.75f);
-
-	//Ship Inside
-	Entity* interior = EntityManager::instance->createNewEntity();
-	interior->addToWorld(ship->getSubWorld());
-	interior->createRigidBody(0.0, new ConcaveMeshShape("res/models/LargeBlockShip.obj"));
-
-	interior->addComponent("model", model1);
-
-	cube->addToWorld(ship->getSubWorld());
-
-	LightManager::instance->addPointLight(ship->getSubWorld()->worldId, new PointLight(vector3D(0.0), 300.0f, vector3F(0.2f, 0.001f, 0.0f), vector3F(1.0f), 0.2f));
-	LightManager::instance->addPointLight(ship->getSubWorld()->worldId, new PointLight(vector3D(0.0, 0.0, 50.0), 200.0f, vector3F(0.2f, 0.01f, 0.0f), vector3F(0.01f, 0.4f, 0.7f), 0.7f));
-
-	LightManager::instance->addDirectionalLight(this->tempWorld->worldId, new DirectionalLight(glm::normalize(vector3F(0.4f, 1.0f, -0.2f)), vector3F(1.0f), 0.4f));
-
-	//SmallShip
-	/*Entity* smallShip = EntityManager::instance->createNewEntity();
-	smallShip->createRigidBody();
-	smallShip->addToWorld(ship->getSubWorld());
-	smallShip->getRigidBody()->addChildShape(new BoxShape(vector3D(4.5, 2.0, 7.5)), Transform(vector3D(0.0, 0.0, -1.5)));
-	smallShip->getRigidBody()->addChildShape(new BoxShape(vector3D(1.5, 2.0, 1.75)), Transform(vector3D(0.0, 0.0, 6.75)));
-	smallShip->getRigidBody()->setMass(1000.0);
-	smallShip->getRigidBody()->setDampening(0.0, 0.0);
-	smallShip->setSubWorld(WorldManager::instance->createNewWorld());
-
-	smallShip->setTransform(Transform(vector3D(0.0, 0.0, -20.0)));
-
-	ComponentModel* outside = new ComponentModel();
-	smallShip->addComponent("model", outside);
-	outside->model.setMesh("Ship_Outside");
-	outside->model.setShader("Textured");
-	outside->model.setLightingShader("TexturedLighting");
-	outside->model.addTexture("res/textures/1K_Grid.png", 0);
-
-	Entity* smallShipInterior = EntityManager::instance->createNewEntity();
-	smallShipInterior->addToWorld(smallShip->getSubWorld());
-	smallShipInterior->createRigidBody(0.0, new ConcaveMeshShape("res/models/Ship_Inside_Phys.obj"));
-
-	ComponentModel* inside = new ComponentModel();
-	smallShipInterior->addComponent("model", inside);
-	inside->model.setMesh("Ship_Inside");
-	inside->model.setShader("Textured");
-	inside->model.setLightingShader("TexturedLighting");
-	inside->model.addTexture("res/textures/1K_Grid.png", 0);*/
-
-	if (true)
-	{
-		MeshPool::instance->loadModel("Capsule", "res/models/Capsule.obj", true);
-		Entity* player = EntityManager::instance->createNewEntity();
-		player->createRigidBody(10.0, new CapsuleShape(0.4, 0.8));
-		player->getRigidBody()->setInertiaTensor(vector3D(0.0));
-
-		ComponentModel* componetModel = new ComponentModel();
-		Model* model = &componetModel->model;
-		model->setMesh("Capsule");
-		model->addTexture("res/textures/1K_Grid.png", 0);
-
-		model->setShader("Textured");
-		model->setLightingShader("TexturedLighting");
-
-		player->addComponent("model", componetModel);
-		player->addToWorld(ship->getSubWorld());
-
-
-	}
-
-	if (false)
-	{
-		MeshPool::instance->loadModel("AnimTest", "res/models/AnimTest.dae", false);
-		MeshPool::instance->loadModel("IsoSphere", "res/models/Arrow.obj", true);
-
-
-		Entity* cube2 = EntityManager::instance->createNewEntity();
-		cube2->createRigidBody(10.0, new BoxShape(vector3D(1.0)));
-
-		ComponentModel* componetModel = new ComponentModel();
-		Model* cubeModel = &componetModel->model;
-		cubeModel->setMesh("AnimTest");
-		cubeModel->addTexture("res/textures/1K_Grid.png", 0);
-
-		cubeModel->setShader("TexturedAnimated");
-		//cubeModel->setLightingShader("TexturedLighting");
-		cubeModel->skeleton = Skeleton::loadSkeleton("res/models/AnimTest1.dae");
-		cube2->addComponent("model", componetModel);
-
-		cube2->addToWorld(ship->getSubWorld());
-
-		/*matrix4 matrix = glm::translate(matrix4(1.0f), vector3F(0.0f, 2.0f, 0.0f));
-		matrix = glm::rotate(matrix, 3.1414926f / 2.0f, vector3F(1.0f, 0.0f, 0.0f));
-
-		matrix4 up = glm::translate(matrix4(1.0f), vector3F(0.0f, 0.0f, 2.0f));
-		Bone* bone1 = new Bone("TestBone", matrix);
-		Bone* bone2 = new Bone("TestBone2", up);
-		Bone* bone3 = new Bone("TestBone3", glm::rotate(up, 3.14f / 4, vector3F(1.0f, 0.0f, 0.0f)));
-		Bone* bone4 = new Bone("TestBone4", up);
-
-		bone1->children.push_back(bone2);
-		bone2->parent_bone = bone1;
-
-		bone2->children.push_back(bone3);
-		bone3->parent_bone = bone2;
-
-		bone3->children.push_back(bone4);
-		bone4->parent_bone = bone3;
-
-		cubeModel->skeleton = new Skeleton(bone1, 4);*/
-	}
-
-	if (false)
-	{
-		MeshPool::instance->loadModel("TestChar", "res/models/TestChar/TestChar.dae", true);
-
-		Entity* testChar = EntityManager::instance->createNewEntity();
-		testChar->createRigidBody(10.0, new BoxShape(vector3D(1.0)));
-
-		ComponentModel* componetModel = new ComponentModel();
-		Model* cubeModel = &componetModel->model;
-		cubeModel->setMesh("TestChar");
-		cubeModel->addTexture("res/textures/1K_Grid.png", 0);
-
-		cubeModel->setShader("Textured");
-		//cubeModel->setLightingShader("TexturedLighting");
-		cubeModel->skeleton = Skeleton::loadSkeleton("res/models/TestChar/TestChar.dae");
-		testChar->addComponent("model", componetModel);
-
-		testChar->addToWorld(ship->getSubWorld());
-		testChar->setTransform(Transform(vector3D(0.0, 0.0, -10.0f)));
-	}
-
-	//Debug Camera
-	this->debugCamera = EntityManager::instance->createNewEntity();
-	this->debugCamera->addToWorld(this->tempWorld);
-	this->debugCamera->addComponent("DebugCamera", new DebugCameraComponent(5.0, 0.5));
-	//this->debugCamera->addToWorld(smallShip->getSubWorld());
+	this->setGameState(new GameState_Multiplayer());
 }
 
 Client::~Client()
 {
+	delete this->currentState;
 	delete this->window;
 	delete this->renderingManager;
 }
@@ -258,14 +53,16 @@ void Client::update(double deltaTime)
 	}
 
 	InputManager::instance->update(deltaTime);
-	WorldManager::instance->update(deltaTime);
 
-	//Debug Camera for now
-	this->tempCamera->setCameraTransform(this->debugCamera->getRenderTransform());
+	if (this->previousState != nullptr)
+	{
+		delete this->previousState;
+	}
 
-	this->window->clearBuffer();
-	this->renderingManager->RenderWorld(this->tempWorld, this->tempCamera);
-	this->window->updateBuffer();
+	if (this->currentState != nullptr)
+	{
+		this->currentState->update(this, deltaTime);
+	}
 }
 
 void Client::exitGame()
@@ -276,4 +73,15 @@ void Client::exitGame()
 const bool Client::getShouldClose()
 {
 	return shouldClose;
+}
+
+void Client::setGameState(GameState* state)
+{
+	if (this->previousState != nullptr)
+	{
+		delete this->previousState;
+	}
+
+	this->previousState = this->currentState;
+	this->currentState = state;
 }

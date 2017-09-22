@@ -4,9 +4,10 @@
 #include <unordered_map>
 
 #include "Common/Physics/Bullet_Include.hpp"
-#include "Common/GLM_Include.hpp"
-#include "Common/Component/Transform.hpp"
 #include "Common/Physics/CollisionShape.hpp"
+
+#include "Common/GLM_Include.hpp"
+#include "Common/Transform.hpp"
 
 //Prototype Class
 class PhysicsWorld;
@@ -22,14 +23,14 @@ struct ChildShape
 class RigidBody
 {
 public:
-	RigidBody(Entity* entity, double mass);
+	//RigidBody(Entity* entity, double mass);
 	RigidBody(Entity* entity, double mass, CollisionShape* shape);
 	virtual ~RigidBody();
 
-	int addChildShape(CollisionShape* shape, Transform transform);
+	/*int addChildShape(CollisionShape* shape, Transform transform);
 	void removeChildShape(int i);
 	void updateChildTransform(int i, Transform transform);
-	void updateChildShapes();
+	void updateChildShapes();*/
 
 	void setMass(double massToAdd);
 	double getMass();
@@ -44,11 +45,7 @@ public:
 	void Activate(bool activate);
 
 	Transform getWorldTransform();
-	Transform getWorldTransform(vector3D scale);
 	void setWorldTransform(Transform transform);
-
-	/*Transform getCOMTransform();
-	void setCOMTransform(Transform transform);*/
 
 	vector3D getLinearVelocity() const;
 	void setLinearVelocity(vector3D velocity);
@@ -72,14 +69,14 @@ private:
 	Entity* parent = nullptr;
 
 	btRigidBody* rigidBody = nullptr;
-	btCompoundShape* compoundShape = nullptr;
+	//btCompoundShape* compoundShape = nullptr;
 
 	double mass = 1.0;
 	vector3D inertia = vector3D(1.0);
 
 	PhysicsWorld* world = nullptr;
 
-	std::unordered_map<int, ChildShape> shapes;
+	//std::unordered_map<int, ChildShape> shapes;
 	int nextId = 0;
 };
 

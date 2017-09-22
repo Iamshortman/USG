@@ -2,6 +2,7 @@
 #define PHYSICSWORLD_HPP
 
 #include "Common/Physics/Bullet_Include.hpp"
+#include "Common/Physics/RigidBody.hpp"
 #include "Common/Entity/Entity.hpp"
 
 //Prototype Classes
