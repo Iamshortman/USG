@@ -47,8 +47,11 @@ void ClientNetworkManager::listen()
 
 				PacketSend packetSend(PacketTypes::UserConnect, HIGH_PRIORITY, RELIABLE_ORDERED);
 				packetSend.write_String("Player1");
-
 				this->sendPacket(packetSend);
+
+				PacketSend packetSend1(PacketTypes::UserRequest, HIGH_PRIORITY, RELIABLE_ORDERED);
+				packetSend1.write_String("SpawnData");
+				this->sendPacket(packetSend1);
 			}
 			break;
 			case ID_NEW_INCOMING_CONNECTION:

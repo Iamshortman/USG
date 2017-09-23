@@ -6,8 +6,6 @@
 
 #include "Common/Types.hpp"
 #include "Common/Networking/Packet.hpp"
-#include "Server/Networking/ClientConnection.hpp"
-
 
 #include "RakPeerInterface.h"
 #include "MessageIdentifiers.h"
@@ -20,9 +18,11 @@ public:
 	ServerNetworkManager(unsigned int maxClients, unsigned int serverPort);
 	~ServerNetworkManager();
 
-	void listen();
+	void listen(); //Thread
 
-	void sendPacket(PacketSend &packet);
+	void sendPacket(PacketSend &packet, string username);
+
+	void update();
 
 private:
 	RakNet::RakPeerInterface *peer;
@@ -30,7 +30,6 @@ private:
 	bool shouldClose = false;
 
 	std::unordered_map<string, RakNet::SystemAddress> usernameAddressMap;
-	//std::unordered_map<RakNet::SystemAddress, ClientConnection*> connectedClients;
 };
 
 #endif //SERVERNETWORKMANAGER_HPP

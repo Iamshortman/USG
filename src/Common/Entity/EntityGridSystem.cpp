@@ -1,16 +1,20 @@
 #include "Common/Entity/EntityGridSystem.hpp"
 
 #include "Common/World/World.hpp"
+#include "Common/Physics/CollisionShapes/BoxShape.hpp"
 
 EntityGridSystem::EntityGridSystem(EntityId id)
 	:Entity(id)
 {
-
+	this->rigidBody = new RigidBody(this, 10.0, new BoxShape(vector3D(0.5)));
 }
 
 EntityGridSystem::~EntityGridSystem()
 {
-
+	if (this->rigidBody != nullptr)
+	{
+		delete this->rigidBody;
+	}
 }
 
 bool EntityGridSystem::hasSubWorld()
@@ -68,6 +72,10 @@ void EntityGridSystem::addToWorld(World* world)
 	//Remove from the current world
 	if (this->world != nullptr)
 	{
+		if (this->rigidBody != nullptr)
+		{
+			this->world->removeRigidBody(this->rigidBody);
+		}
 
 		this->world->removeEntityFromWorld(this);
 	}
@@ -78,6 +86,11 @@ void EntityGridSystem::addToWorld(World* world)
 	//add to the current world
 	if (this->world != nullptr)
 	{
+		if (this->rigidBody != nullptr)
+		{
+			this->world->addRigidBody(this->rigidBody);
+		}
+
 		this->world->addEntityToWorld(this);
 	}
 }

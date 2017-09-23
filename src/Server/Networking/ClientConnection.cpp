@@ -1,18 +1,13 @@
 #include "Server/Networking/ClientConnection.hpp"
 
-ClientConnection::ClientConnection(RakNet::SystemAddress address)
+ClientConnection::ClientConnection(string username)
 {
-	this->address = address;
+	this->username = username;
 }
 
 ClientConnection::~ClientConnection()
 {
 
-}
-
-void ClientConnection::setUsername(string username)
-{
-	this->username = username;
 }
 
 void ClientConnection::setControllingEntity(Entity* entity)

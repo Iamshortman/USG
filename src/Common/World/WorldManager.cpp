@@ -40,6 +40,27 @@ World* WorldManager::createNewWorld()
 	return world;
 }
 
+World* WorldManager::createWorld(int id, WORLDTYPE type)
+{
+	int ID = id;
+	World* world;
+	if (worlds.find(ID) != worlds.end())
+	{
+		ID = this->getNextId();
+	}
+
+	if (type == WORLDTYPE::SOLAR)
+	{
+		world = new WorldSolarSystem(ID);
+	}
+	else
+	{
+		world = new World(ID);
+	}
+
+	return world;
+}
+
 WorldSolarSystem* WorldManager::createNewWorldSolarSystem()
 {
 	WorldSolarSystem* world = new WorldSolarSystem(this->getNextId());

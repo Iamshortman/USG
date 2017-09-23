@@ -88,7 +88,7 @@
 
 		positionMatrix = glm::translate(matrix4(1.0F), (vector3F)((this->position - cameraPos) / divisorPosScale));
 		rotationMatrix = glm::toMat4((quaternionF)this->orientation);
-		scaleMatrix = glm::scale(matrix4(1.0F), (vector3F)(1.0 / divisorPosScale));
+		scaleMatrix = glm::scale(matrix4(1.0F), vector3F((float)(1.0 / divisorPosScale)));
 
 		return positionMatrix * rotationMatrix * scaleMatrix;
 	}

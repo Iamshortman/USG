@@ -1,4 +1,7 @@
 #include "Server/Networking/ServerNetworkManager.hpp"
+#include "Common/World/World.hpp"
+
+#include "Server/Server.hpp"
 
 ServerNetworkManager::ServerNetworkManager(unsigned int maxClients, unsigned int serverPort)
 {
@@ -9,13 +12,6 @@ ServerNetworkManager::ServerNetworkManager(unsigned int maxClients, unsigned int
 	printf("Starting the server.\n");
 	// We need to let the server accept incoming connections from the clients
 	peer->SetMaximumIncomingConnections(maxClients);
-
-
-	/*peer->Startup(1, &sd, 1);
-
-	printf("Connecting to ServerIP %s\n", server_ip.c_str());
-	peer->Connect(server_ip.c_str(), SERVER_PORT, 0, 0);*/
-
 	network_listener = std::thread(&ServerNetworkManager::listen, this);
 }
 
@@ -59,6 +55,7 @@ void ServerNetworkManager::listen()
 						{
 							printf("%s at address %s has disconnected\n", it.first.c_str(), it.second.ToString());
 							this->usernameAddressMap.erase(it.first);
+							Server::instance->removeClient(it.first);
 							break;
 						}
 					}
@@ -75,15 +72,31 @@ void ServerNetworkManager::listen()
 					{
 						printf("%s at address %s has connected\n", username.c_str(), packet->systemAddress.ToString());
 						this->usernameAddressMap[username] = packet->systemAddress;
+
+						Server::instance->addClient(username);
 					}
 					else
 					{
 						printf("Error: Client alread connected with this username %s\n", username.c_str());
+						peer->CloseConnection(packet->systemAddress, true);
 					}
 
 				}
 				break;
+				case UserRequest:
+				{
+					RakNet::RakString rs;
+					RakNet::BitStream bsIn(packet->data, packet->length, false);
+					bsIn.IgnoreBytes(sizeof(RakNet::MessageID));
+					bsIn.Read(rs);
+					string value = string(rs.C_String());
 
+					if (value == "SpawnMe")
+					{
+
+					}
+					break;
+				}
 				default:
 					printf("Message with identifier %i has arrived.\n", packet->data[0]);
 					break;
@@ -95,7 +108,20 @@ void ServerNetworkManager::listen()
 	RakNet::RakPeerInterface::DestroyInstance(peer);
 }
 
-void ServerNetworkManager::sendPacket(PacketSend &packet)
+void ServerNetworkManager::sendPacket(PacketSend &packet, string username)
 {
-	peer->Send(&packet.bitStream_out, packet.packet_priority, packet.packet_reliability, 0, peer->GetSystemAddressFromIndex(0), false);
+	if (this->usernameAddressMap.find(username) == this->usernameAddressMap.end())
+	{
+		peer->Send(&packet.bitStream_out, packet.packet_priority, packet.packet_reliability, 0, this->usernameAddressMap[username], false);
+	}
+	else
+	{
+		printf("Error: Username %s doesn't exsist\n", username.c_str());
+	}
+	
+}
+
+void ServerNetworkManager::update()
+{
+
 }

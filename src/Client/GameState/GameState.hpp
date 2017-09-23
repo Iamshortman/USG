@@ -1,8 +1,9 @@
 #ifndef GAMESTATE_HPP
 #define GAMESTATE_HPP
 
-#include "Common/World/WorldSolarSystem.hpp"
+#include "Common/World/World.hpp"
 #include "Client/Networking/ClientNetworkManager.hpp"
+#include "Client/Entity/PlayerInterface.hpp"
 
 //Prototype class
 class Client;
@@ -30,7 +31,8 @@ public:
 	virtual void update(Client* client, double deltaTime);
 
 private:
-	WorldSolarSystem* mainWorld = nullptr;
+	World* mainWorld = nullptr;
+	PlayerInterface playerInterface;
 };
 
 class GameState_Multiplayer : public GameState
@@ -41,7 +43,8 @@ public:
 	virtual void update(Client* client, double deltaTime);
 
 private:
-	WorldSolarSystem* mainWorld = nullptr;
+	World* mainWorld = nullptr;
+	PlayerInterface playerInterface;
 	ClientNetworkManager* networkManager = nullptr;
 };
 

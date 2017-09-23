@@ -2,6 +2,7 @@
 #define PACKET_HPP
 
 #include "Common/Types.hpp"
+#include "Common/GLM_Include.hpp"
 
 #include "BitStream.h"
 #include "RakNetTypes.h"
@@ -11,9 +12,8 @@
 enum PacketTypes
 {
 	UserConnect = ID_USER_PACKET_ENUM + 1,
-	EntitySpawn = ID_USER_PACKET_ENUM + 2,
-	EntityUpdate = ID_USER_PACKET_ENUM + 3,
-	EntitySpawnRequest = ID_USER_PACKET_ENUM + 4,
+	UserRequest = ID_USER_PACKET_ENUM + 2,
+	CreateWorld = ID_USER_PACKET_ENUM + 3,
 };
 
 
@@ -26,6 +26,7 @@ public:
 	void write_Int(int value);
 	void write_Float(float value);
 	void write_Double(double value);
+	void write_Vector3D(vector3D value);
 
 	RakNet::BitStream bitStream_out;
 	RakNet::MessageID packet_id;

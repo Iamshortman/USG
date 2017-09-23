@@ -29,6 +29,11 @@ void PacketSend::write_Double(double value)
 	this->bitStream_out.Write(value);
 }
 
+void PacketSend::write_Vector3D(vector3D value)
+{
+	this->bitStream_out.Write(value);
+}
+
 PacketReceive::PacketReceive(RakNet::MessageID id, RakNet::BitStream bitStream)
 {
 	this->packet_id = id;

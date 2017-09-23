@@ -1,8 +1,14 @@
 #include "Server/Server.hpp"
 #include <chrono>
 
+#include "Common/World/WorldManager.hpp"
+#include "Common/Entity/EntityManager.hpp"
+
 int main()
 {
+	EntityManager* entityManager = new EntityManager();
+	WorldManager* worldManager = new WorldManager();
+
 	Server* server = new Server();
 
 	std::chrono::high_resolution_clock::time_point last_time, current_time;

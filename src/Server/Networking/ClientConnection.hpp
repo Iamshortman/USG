@@ -4,15 +4,12 @@
 #include "Common/Types.hpp"
 #include "Common/Entity/Entity.hpp"
 
-#include "RakPeerInterface.h"
-
 class ClientConnection
 {
 public:
-	ClientConnection(RakNet::SystemAddress address);
+	ClientConnection(string username);
 	~ClientConnection();
 
-	void setUsername(string username);
 	void setControllingEntity(Entity* entity);
 
 	string getUsername();
@@ -22,8 +19,9 @@ public:
 	bool shouldCloseConnection();
 
 private:
-	RakNet::SystemAddress address;
+	//string email = ""; TODO email based login
 	string username = "";
+
 	Entity* controllingEntity = nullptr;
 	bool closeConnection = false;
 };
