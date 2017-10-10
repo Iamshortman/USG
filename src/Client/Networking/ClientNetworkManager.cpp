@@ -1,7 +1,13 @@
 #include "Client/Networking/ClientNetworkManager.hpp"
+#include "Client/GameState/GameState.hpp"
 
-ClientNetworkManager::ClientNetworkManager(string server_ip, int server_port)
+#include "Common/Entity/EntityManager.hpp"
+#include "Client/Entity/EntityPlayerClient.hpp"
+
+ClientNetworkManager::ClientNetworkManager(string server_ip, int server_port, GameState_Multiplayer* game)
 {
+	this->game = game;
+
 	this->server_ip = server_ip;
 
 	peer = RakNet::RakPeerInterface::GetInstance();
@@ -16,6 +22,7 @@ ClientNetworkManager::ClientNetworkManager(string server_ip, int server_port)
 
 ClientNetworkManager::~ClientNetworkManager()
 {
+	printf("Closing Connection\n");
 	this->shouldClose = true;
 	network_listener.join();
 }
@@ -30,28 +37,28 @@ void ClientNetworkManager::listen()
 	{
 		for (packet = peer->Receive(); packet; peer->DeallocatePacket(packet), packet = peer->Receive())
 		{
+			if (packet->data[0] > ID_USER_PACKET_ENUM)
+			{
+				PacketData data;
+				data.length = packet->length;
+				data.data = (unsigned char*)malloc(packet->length);
+				memcpy_s(data.data, data.length, packet->data, packet->length);
+
+				this->queueMutex.lock();
+				this->packetsToProcess.push(data);
+				this->queueMutex.unlock();
+			}
+			
 			switch (packet->data[0])
 			{
-			case ID_REMOTE_DISCONNECTION_NOTIFICATION:
-				printf("Another client has disconnected.\n");
-				break;
-			case ID_REMOTE_CONNECTION_LOST:
-				printf("Another client has lost the connection.\n");
-				break;
-			case ID_REMOTE_NEW_INCOMING_CONNECTION:
-				printf("Another client has connected.\n");
-				break;
 			case ID_CONNECTION_REQUEST_ACCEPTED:
 			{
+				isConnected = true;
 				printf("Our connection request has been accepted.\n");
 
 				PacketSend packetSend(PacketTypes::UserConnect, HIGH_PRIORITY, RELIABLE_ORDERED);
-				packetSend.write_String("Player1");
+				packetSend.bitStream_out.Write("Player1");
 				this->sendPacket(packetSend);
-
-				PacketSend packetSend1(PacketTypes::UserRequest, HIGH_PRIORITY, RELIABLE_ORDERED);
-				packetSend1.write_String("SpawnData");
-				this->sendPacket(packetSend1);
 			}
 			break;
 			case ID_NEW_INCOMING_CONNECTION:
@@ -61,18 +68,14 @@ void ClientNetworkManager::listen()
 				printf("The server is full.\n");
 				break;
 			case ID_DISCONNECTION_NOTIFICATION:
+				isConnected = false;
 				printf("We have been disconnected.\n");
 				break;
 			case ID_CONNECTION_LOST:
+				isConnected = false;
 				printf("Connection lost.\n");
 				break;
 			}
-
-			if (packet->data[0] >= PacketTypes::UserConnect)
-			{
-
-			}
-
 		}
 	}
 
@@ -83,4 +86,54 @@ void ClientNetworkManager::listen()
 void ClientNetworkManager::sendPacket(PacketSend &packet)
 {
 	peer->Send(&packet.bitStream_out, packet.packet_priority, packet.packet_reliability, 0, peer->GetSystemAddressFromIndex(0), false);
+}
+
+void ClientNetworkManager::processPackets()
+{
+	this->queueMutex.lock();
+	while (!this->packetsToProcess.empty())
+	{
+		PacketData packet = this->packetsToProcess.front();
+
+		if (packet.data[0] == PacketTypes::UpdateEntity)
+		{
+			BitStream bsIn(packet.data, packet.length, false);
+			bsIn.IgnoreBytes(sizeof(RakNet::MessageID));
+			EntityId id;
+			bsIn.Read(id);
+			Entity* entity = EntityManager::instance->getEntity(id);
+			if (entity != nullptr)
+			{
+				entity->readNetworkPacket(&bsIn);
+			}
+		}
+		else if (packet.data[0] == PacketTypes::CreateEntity)
+		{
+			BitStream bsIn(packet.data, packet.length, false);
+			bsIn.IgnoreBytes(sizeof(RakNet::MessageID));
+			EntityManager::instance->createEntityFromNetwork(&bsIn);
+		}
+		else if (packet.data[0] == PacketTypes::ClientBindEntity)
+		{
+			BitStream bsIn(packet.data, packet.length, false);
+			bsIn.IgnoreBytes(sizeof(RakNet::MessageID));
+			EntityId entityId;
+			bsIn.Read(entityId);
+			Entity* entity = EntityManager::instance->getEntity(entityId);
+
+			if (entity != nullptr)
+			{
+				if (entity->getEntityType() == ENTITYTYPE::PLAYER_THIS)
+				{
+					printf("Client Bind\n");
+					EntityPlayerClient* player = (EntityPlayerClient*)entity;
+					this->game->playerInterface.bindCharacter(player);
+				}
+			}
+		}
+
+		free(packet.data);
+		this->packetsToProcess.pop();
+	}
+	this->queueMutex.unlock();
 }

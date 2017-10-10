@@ -38,6 +38,9 @@ set_target_properties(Client PROPERTIES VS_DEBUGGER_WORKING_DIRECTORY "${CMAKE_S
 target_compile_definitions(Client PUBLIC CLIENT)
 target_compile_definitions(Server PUBLIC SERVER)
 
+target_compile_definitions(Client PUBLIC CLIENT)
+target_compile_definitions(Server PUBLIC SERVER)
+
 #libs part 2
 
 #GLM
@@ -49,6 +52,7 @@ include_directories(lib/jsoncons-0.99.1/src/)
 #Bullet
 include_directories(lib/bullet3-2.86.1/src/)
 target_link_libraries  (Client BulletCollision_Debug)
+
 target_link_libraries  (Client BulletDynamics_Debug)
 target_link_libraries  (Client LinearMath_Debug)
 target_link_libraries  (Server BulletCollision_Debug)

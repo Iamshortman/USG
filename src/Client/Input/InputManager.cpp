@@ -11,6 +11,7 @@ InputManager* InputManager::instance = nullptr;
 InputManager::InputManager()
 {
 	InputManager::instance = this;
+	SDL_SetHint(SDL_HINT_JOYSTICK_ALLOW_BACKGROUND_EVENTS, "1");
 
 	this->device_map = unordered_map<void*, InputDevice*>();
 
@@ -296,19 +297,24 @@ void InputManager::loadJoystick(SDL_Joystick* joystick)
 	printf("Loaded Joystick: %s\n", SDL_JoystickName(joystick));
 	if (device->name == "CH PRO THROTTLE USB ")
 	{
-		JoystickButton axis;
-		axis.buttonIndex = 0;
-		//axis.deadzone = 0.0;
-		//axis.inverted = false;
+		JoystickButton axis(0);
 		device->addButton("Throttle", axis);
 	}
 	else if (device->name == "Logitech Extreme 3D")
 	{
-		JoystickButton axis;
-		axis.buttonIndex = 0;
-		//axis.deadzone = 0.0;
-		//axis.inverted = false;
+		JoystickButton axis(0);
 		device->addButton("Throttle", axis);
+	}
+	else if (device->name == "DUALSHOCK®4 USB Wireless Adaptor")
+	{
+		device->addAxis("DebugForwardBackward", JoystickAxis(1, 0.1, true));
+		device->addAxis("DebugLeftRight", JoystickAxis(0, 0.1, true));
+
+		device->addAxis("DebugPitch", JoystickAxis(5, 0.1, false));
+		device->addAxis("DebugYaw", JoystickAxis(2, 0.1, true));
+
+		device->addButton("DebugRollRight", JoystickButton(5));
+		device->addButton("DebugRollLeft", JoystickButton(4));
 	}
 
 	this->device_map[joystick] = device;

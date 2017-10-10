@@ -5,7 +5,11 @@
 #include <unordered_map>
 #include <algorithm>
 #include "Common/Entity/Entity.hpp"
-#include "Common/Entity/EntityGridSystem.hpp"
+
+struct Creator
+{
+	virtual Entity* create(EntityId id) = 0;
+};
 
 class EntityManager
 {
@@ -18,14 +22,22 @@ public:
 
 	EntityId getNextId();
 
-	EntityGridSystem* createNewGridSystem();
+	Entity* createEntity(ENTITYTYPE type);
+	Entity* createEntity(ENTITYTYPE type, EntityId entityId);
+	Entity* createEntityFromNetwork(BitStream* in);
+
 	void destroyEntity(EntityId id);
 
 	Entity* getEntity(EntityId id);
 
 	std::unordered_map<EntityId, Entity*>::iterator getAllEntities();
-private:
 	std::unordered_map<EntityId, Entity*> entities;
+
+	void registerCreator(ENTITYTYPE type, Creator* creator);
+private:
+	std::unordered_map<ENTITYTYPE, Creator*> creators;
+
+
 	EntityId nextId = 1;
 
 };

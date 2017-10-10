@@ -24,6 +24,7 @@ RigidBody::RigidBody(Entity* entity, double mass, CollisionShape* shape)
 	btDefaultMotionState* motionState = new btDefaultMotionState();
 	btRigidBody::btRigidBodyConstructionInfo boxRigidBodyCI(mass, motionState, shape->btShape, vector);
 	rigidBody = new btRigidBody(boxRigidBodyCI);
+	rigidBody->setUserPointer(entity);
 }
 
 RigidBody::~RigidBody()

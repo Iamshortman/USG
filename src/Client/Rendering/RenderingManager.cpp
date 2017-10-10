@@ -2,14 +2,32 @@
 
 #include "Common/World/WorldSolarSystem.hpp"
 
+#include "Client/Resource/MeshPool.hpp"
+#include "Client/Resource/ShaderPool.hpp"
+#include "Client/Resource/TexturePool.hpp"
+
 RenderingManager::RenderingManager()
 {
+	ShaderPool::instance->loadShader("Textured", "res/shaders/Textured.vs", "res/shaders/Textured.fs", { { 0, "in_Position" },{ 1, "in_Normal" },{ 2, "in_TexCoord" } });
+	MeshPool::instance->loadModel("SmallCube", "res/models/SmallCube.obj", true);
+	MeshPool::instance->loadModel("tempShip", "res/models/CubeShip.obj", true);
 
+	TexturePool::instance->loadTexture("res/textures/1K_Grid.png");
+
+	tempModel = new Model();
+	tempModel->setShader("Textured");
+	tempModel->setMesh("SmallCube");
+	tempModel->addTexture("res/textures/1K_Grid.png", 0);
+
+	tempModel1 = new Model();
+	tempModel1->setShader("Textured");
+	tempModel1->setMesh("tempShip");
+	tempModel1->addTexture("res/textures/1K_Grid.png", 0);
 }
 
 RenderingManager::~RenderingManager()
 {
-
+	delete this->tempModel;
 }
 
 void RenderingManager::setWindow(Window* win)
@@ -66,16 +84,17 @@ void RenderingManager::RenderWorld(World* world, Camera* cam)
 			switch (entity->getEntityType())
 			{
 			case ENTITYTYPE::GRIDSYSTEM:
+				this->RenderMesh(this->tempModel, entity->getRenderTransform(), cam, world);
 				break;
 			case ENTITYTYPE::CHARACTOR:
 				break;
-			case ENTITYTYPE::PROP:
+			case ENTITYTYPE::TEMPSHIP:
+				this->RenderMesh(this->tempModel1, entity->getRenderTransform(), cam, world);
 				break;
 			}
 		}
 
 	}
-
 
 	//TODO Rendering Sub Worlds
 	auto subWorlds = world->getSubWorlds();
@@ -88,7 +107,7 @@ void RenderingManager::RenderWorld(World* world, Camera* cam)
 
 }
 
-/*void RenderingManager::RenderMesh(Model* model, Transform globalPos, Camera* cam, World* world)
+void RenderingManager::RenderMesh(Model* model, Transform globalPos, Camera* cam, World* world)
 {
 	ShaderProgram* program = model->getShader();
 	Mesh* mesh = model->getMesh();
@@ -119,7 +138,7 @@ void RenderingManager::RenderWorld(World* world, Camera* cam)
 		controller->setGLSLUniform(program);
 	}
 
-	if (model->skeleton != nullptr)
+	/*if (model->skeleton != nullptr)
 	{
 		//matrix4 transform = glm::translate(matrix4(1.0f), vector3F(0.0f, 10.0f, 0.0f));
 		//program->setUniform("boneTransforms[0]", transform);
@@ -162,14 +181,14 @@ void RenderingManager::RenderWorld(World* world, Camera* cam)
 				bones.push(bone->children[i]);
 			}
 		}
-	}
+	}*/
 
 	mesh->draw(program);
 
 	program->deactivateProgram();
 
 	//Switch to lighting Shading
-	LightSet* lights = LightManager::instance->getLightsForWorld(world->worldId);
+	/*LightSet* lights = LightManager::instance->getLightsForWorld(world->worldId);
 	program = model->getLightingShader();
 	if (lights != nullptr && program != nullptr)
 	{
@@ -234,6 +253,6 @@ void RenderingManager::RenderWorld(World* world, Camera* cam)
 		glDepthFunc(GL_LESS);
 		glDepthMask(true);
 		glDisable(GL_BLEND);
-	}
+	}*/
 
-}*/
+}

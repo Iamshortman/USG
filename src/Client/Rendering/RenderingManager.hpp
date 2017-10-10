@@ -25,12 +25,15 @@ public:
 	void RenderWorld(World* world, Camera* cam);
 	void Render(World* baseWorld, Camera* cam);
 
-	//void RenderMesh(Model* model, Transform globalPos, Camera* cam, World* world);
+	void RenderMesh(Model* model, Transform globalPos, Camera* cam, World* world);
 
 private:
+	Model* tempModel = nullptr;
+	Model* tempModel1 = nullptr;
+
 	Window* window = nullptr;
 
-	bool useLighting = true;
+	bool useLighting = false;
 };
 
 #endif //RENDERINGMANAGER_HPP

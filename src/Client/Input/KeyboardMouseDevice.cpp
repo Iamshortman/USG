@@ -45,7 +45,6 @@ void KeyboardMouseDevice::processEvent(SDL_Event event)
 	{
 		int xPos, yPos;
 		Client::instance->window->getCenteredMousePos(xPos, yPos);
-
 		this->mouse_axis_state[0] = -xPos;
 		this->mouse_axis_state[1] = yPos;
 		this->mouse_axis_timestamp = event.motion.timestamp;

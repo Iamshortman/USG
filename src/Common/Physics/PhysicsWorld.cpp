@@ -18,9 +18,6 @@ PhysicsWorld::PhysicsWorld(World* world)
 	// The world
 	dynamicsWorld = new btDiscreteDynamicsWorld(dispatcher, broadphase, solver, collisionConfiguration);
 	dynamicsWorld->setGravity(btVector3(0.0, 0.0, 0.0));
-
-	//gContactAddedCallback = collisonCallback;
-
 }
 
 PhysicsWorld::~PhysicsWorld()
@@ -35,46 +32,45 @@ PhysicsWorld::~PhysicsWorld()
 
 void PhysicsWorld::update(double timeStep)
 {
-	/*auto entities = this->parent->getEntitiesInWorld();
-
-	for (auto it = entities->begin(); it != entities->end(); it++)
-	{
-		Entity* entity = *it;
-
-		if (entity != nullptr)
-		{
-			RigidBody* rigidBody = entity->getRigidBody();
-			if (rigidBody != nullptr)
-			{
-				rigidBody->setWorldTransform(entity->getTransform());
-			}
-		}
-	}*/
-
 	//Run Physics Simulation
-	dynamicsWorld->stepSimulation(timeStep, 8, 1.0 / 120.0);
+	this->dynamicsWorld->stepSimulation(timeStep, 8, 1.0 / 120.0);
 
-	/*for (auto it = entities->begin(); it != entities->end(); it++)
+
+	int numManifolds = this->dynamicsWorld->getDispatcher()->getNumManifolds();
+	for (int i = 0; i < numManifolds; i++)
 	{
-		Entity* entity = *it;
+		btPersistentManifold* contactManifold = this->dynamicsWorld->getDispatcher()->getManifoldByIndexInternal(i);
+		const btCollisionObject* obA = contactManifold->getBody0();
+		const btCollisionObject* obB = contactManifold->getBody1();
 
-		if (entity != nullptr)
+		Entity* ptr1 = (Entity*)obA->getUserPointer();
+		Entity* ptr2 = (Entity*)obB->getUserPointer();
+
+		/*if (ptr->getEntityType() == ENTITYTYPE::GRIDSYSTEM)
 		{
-			RigidBody* rigidBody = entity->getRigidBody();
-			if (rigidBody != nullptr)
+			printf("Hit: %d\n", ptr->entityId);
+		}*/
+
+		/*int numContacts = contactManifold->getNumContacts();
+		for (int j = 0; j < numContacts; j++)
+		{
+			btManifoldPoint& pt = contactManifold->getContactPoint(j);
+			if (pt.getDistance() < 0.f)
 			{
-				entity->setTransform(rigidBody->getWorldTransform());
+				const btVector3& ptA = pt.getPositionWorldOnA();
+				const btVector3& ptB = pt.getPositionWorldOnB();
+				const btVector3& normalOnB = pt.m_normalWorldOnB;
 			}
-		}
-	}*/
+		}*/
+	}
 }
 
 void PhysicsWorld::addRigidBody(RigidBody* rigidBody)
 {
-	dynamicsWorld->addRigidBody(rigidBody->getRigidBody());
+	this->dynamicsWorld->addRigidBody(rigidBody->getRigidBody());
 }
 
 void PhysicsWorld::removeRigidBody(RigidBody* rigidBody)
 {
-	dynamicsWorld->removeRigidBody(rigidBody->getRigidBody());
+	this->dynamicsWorld->removeRigidBody(rigidBody->getRigidBody());
 }

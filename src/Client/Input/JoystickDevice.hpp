@@ -27,6 +27,14 @@ struct JoystickButtonValue
 
 struct JoystickAxis
 {
+	JoystickAxis() {};
+	JoystickAxis(int axisIndex, double deadzone = 0.0, bool inverted = false)
+	{
+		this->axisIndex = axisIndex;
+		this->deadzone = deadzone;
+		this->inverted = inverted;
+	}
+
 	int axisIndex = 0;
 	double deadzone = 0.0;
 	bool inverted = false;
@@ -34,6 +42,12 @@ struct JoystickAxis
 
 struct JoystickButton
 {
+	JoystickButton() {};
+	JoystickButton(int buttonIndex)
+	{
+		this->buttonIndex = buttonIndex;
+	}
+
 	int buttonIndex = 0;
 };
 

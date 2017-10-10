@@ -2,6 +2,8 @@
 #include "Common/World/World.hpp"
 
 #include "Server/Server.hpp"
+#include "Common/Entity/EntityManager.hpp"
+#include "Common/Entity/EntityCharacter.hpp"
 
 ServerNetworkManager::ServerNetworkManager(unsigned int maxClients, unsigned int serverPort)
 {
@@ -30,7 +32,22 @@ void ServerNetworkManager::listen()
 	while (shouldClose == false)
 	{
 		for (packet = peer->Receive(); packet; peer->DeallocatePacket(packet), packet = peer->Receive())
+		{
+			if (packet->data[0] == PacketTypes::UpdateClientEntity)
 			{
+				BitStream bsIn(packet->data, packet->length, false);
+				bsIn.IgnoreBytes(sizeof(RakNet::MessageID));
+				EntityId id;
+				bsIn.Read(id);
+				EntityCharacter* entity = (EntityCharacter*)EntityManager::instance->getEntity(id);
+				if (entity != nullptr)
+				{
+					entity->readNetworkPacket(&bsIn);
+					//printf("%lf, %lf, %lf\n", entity->getRigidBody()->getLinearVelocity().x, entity->getRigidBody()->getLinearVelocity().y, entity->getRigidBody()->getLinearVelocity().z);
+				}
+				continue;
+			}
+
 				switch (packet->data[0])
 				{
 				case ID_REMOTE_DISCONNECTION_NOTIFICATION:
@@ -110,7 +127,7 @@ void ServerNetworkManager::listen()
 
 void ServerNetworkManager::sendPacket(PacketSend &packet, string username)
 {
-	if (this->usernameAddressMap.find(username) == this->usernameAddressMap.end())
+	if (this->usernameAddressMap.find(username) != this->usernameAddressMap.end())
 	{
 		peer->Send(&packet.bitStream_out, packet.packet_priority, packet.packet_reliability, 0, this->usernameAddressMap[username], false);
 	}
@@ -119,6 +136,11 @@ void ServerNetworkManager::sendPacket(PacketSend &packet, string username)
 		printf("Error: Username %s doesn't exsist\n", username.c_str());
 	}
 	
+}
+
+void ServerNetworkManager::sendPacketToAll(PacketSend &packet)
+{
+	peer->Send(&packet.bitStream_out, packet.packet_priority, packet.packet_reliability, 0, RakNet::UNASSIGNED_SYSTEM_ADDRESS, true);
 }
 
 void ServerNetworkManager::update()

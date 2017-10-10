@@ -88,7 +88,7 @@ public:
 
 private:
 	int32_t mouse_axis_state[2];
-	uint32_t mouse_axis_timestamp;
+	uint32_t mouse_axis_timestamp = 0;
 
 	MouseButtonValue mouse_state[8];
 	unordered_map<Uint32, KeyboardButtonValue> keyboard_state;

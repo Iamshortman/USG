@@ -3,7 +3,7 @@
 
 #include "Common/World/World.hpp"
 #include "Client/Networking/ClientNetworkManager.hpp"
-#include "Client/Entity/PlayerInterface.hpp"
+#include "Client/Entity/PlayerController.hpp"
 
 //Prototype class
 class Client;
@@ -32,7 +32,7 @@ public:
 
 private:
 	World* mainWorld = nullptr;
-	PlayerInterface playerInterface;
+	PlayerController playerInterface;
 };
 
 class GameState_Multiplayer : public GameState
@@ -42,9 +42,10 @@ public:
 	virtual ~GameState_Multiplayer();
 	virtual void update(Client* client, double deltaTime);
 
+	PlayerController playerInterface;
+
 private:
 	World* mainWorld = nullptr;
-	PlayerInterface playerInterface;
 	ClientNetworkManager* networkManager = nullptr;
 };
 

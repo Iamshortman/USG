@@ -21,6 +21,7 @@ public:
 	void listen(); //Thread
 
 	void sendPacket(PacketSend &packet, string username);
+	void sendPacketToAll(PacketSend &packet);
 
 	void update();
 

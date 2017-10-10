@@ -6,12 +6,15 @@
 
 #include "Common/GLM_Include.hpp"
 #include "Common/Transform.hpp"
+#include "Common/Networking/Packet.hpp"
 
 enum ENTITYTYPE
 {
-	CHARACTOR,
-	PROP,
 	GRIDSYSTEM,
+	PLAYER_OTHER,
+	PLAYER_THIS,
+	CHARACTOR,
+	TEMPSHIP,
 };
 
 //Prototype Classe
@@ -22,11 +25,7 @@ typedef uint32_t EntityId;
 class Entity
 {
 public:
-
 	const EntityId entityId;
-	World* world = nullptr;
-	bool alive = true;
-	Transform transform;
 
 	Entity(EntityId id);
 	virtual ~Entity();
@@ -42,6 +41,14 @@ public:
 	Transform getRenderTransform();
 
 	virtual ENTITYTYPE getEntityType() const = 0;
+
+	virtual void writeNetworkPacket(BitStream* packet) {};
+	virtual void readNetworkPacket(BitStream* packet) {};
+
+protected:
+	World* world = nullptr;
+	bool alive = true;
+	Transform transform;
 };
 
 #endif //ENTITY_HPP

@@ -1,4 +1,6 @@
 #include "Server/Networking/ClientConnection.hpp"
+#include "Common/World/World.hpp"
+
 
 ClientConnection::ClientConnection(string username)
 {
@@ -25,12 +27,29 @@ Entity* ClientConnection::getControllingEntity()
 	return this->controllingEntity;
 }
 
-void ClientConnection::CloseConnection()
+void ClientConnection::closeConnection()
 {
-	this->closeConnection = true;
+	this->shoudlCloseConnection = true;
 }
 
 bool ClientConnection::shouldCloseConnection()
 {
-	return this->closeConnection;
+	return this->shoudlCloseConnection;
+}
+
+void ClientConnection::updateEntitiesInFocus()
+{
+	if (this->controllingEntity != nullptr)
+	{
+		World* world = this->controllingEntity->getWorld();
+
+		std::set<Entity*>* entities = world->getEntitiesInWorld();
+
+		this->entitiesInFocus.insert(entities->begin(), entities->end());
+	}
+	else
+	{
+		this->entitiesInFocus.clear();
+	}
+
 }

@@ -4,6 +4,8 @@
 #include "Common/Types.hpp"
 #include "Common/Entity/Entity.hpp"
 
+#include <set>
+
 class ClientConnection
 {
 public:
@@ -15,15 +17,20 @@ public:
 	string getUsername();
 	Entity* getControllingEntity();
 
-	void CloseConnection();
+	void closeConnection();
 	bool shouldCloseConnection();
 
+	void updateEntitiesInFocus();
+
+	std::set<Entity*> entitiesInFocus;
+	std::set<EntityId> entitiesLoaded;
+
 private:
-	//string email = ""; TODO email based login
+	//string email = ""; //TODO email based login
 	string username = "";
 
 	Entity* controllingEntity = nullptr;
-	bool closeConnection = false;
+	bool shoudlCloseConnection = false;
 };
 
 #endif //CLIENTCONNECTION_HPP

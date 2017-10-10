@@ -1,15 +1,15 @@
-#include "Common/Entity/EntityGridSystem.hpp"
+#include "Common/Entity/EntityTempShip.hpp"
 
 #include "Common/World/World.hpp"
 #include "Common/Physics/CollisionShapes/BoxShape.hpp"
 
-EntityGridSystem::EntityGridSystem(EntityId id)
+EntityTempShip::EntityTempShip(EntityId id)
 	:Entity(id)
 {
-	this->rigidBody = new RigidBody(this, 10.0, new BoxShape(vector3D(0.5)));
+	this->rigidBody = new RigidBody(this, 100.0, new BoxShape(vector3D(1.5)));
 }
 
-EntityGridSystem::~EntityGridSystem()
+EntityTempShip::~EntityTempShip()
 {
 	if (this->rigidBody != nullptr)
 	{
@@ -17,17 +17,17 @@ EntityGridSystem::~EntityGridSystem()
 	}
 }
 
-bool EntityGridSystem::hasSubWorld()
+bool EntityTempShip::hasSubWorld()
 {
 	return this->subWorld != nullptr;
 }
 
-World* EntityGridSystem::getSubWorld()
+World* EntityTempShip::getSubWorld()
 {
 	return this->subWorld;
 }
 
-void EntityGridSystem::setSubWorld(World* world)
+void EntityTempShip::setSubWorld(World* world)
 {
 	this->removeSubWorld();
 
@@ -36,7 +36,7 @@ void EntityGridSystem::setSubWorld(World* world)
 	this->world->addSubWorld(this->subWorld);
 }
 
-void EntityGridSystem::removeSubWorld()
+void EntityTempShip::removeSubWorld()
 {
 	if (this->subWorld != nullptr)
 	{
@@ -46,28 +46,28 @@ void EntityGridSystem::removeSubWorld()
 	}
 }
 
-RigidBody* EntityGridSystem::getRigidBody()
+RigidBody* EntityTempShip::getRigidBody()
 {
 	return this->rigidBody;
 }
 
-void EntityGridSystem::update(double deltaTime)
+void EntityTempShip::update(double deltaTime)
 {
 
 }
 
-Transform EntityGridSystem::getTransform()
+Transform EntityTempShip::getTransform()
 {
 	return this->rigidBody->getWorldTransform();
 }
 
 
-void EntityGridSystem::setTransform(Transform transform)
+void EntityTempShip::setTransform(Transform transform)
 {
 	this->rigidBody->setWorldTransform(transform);
 }
 
-void EntityGridSystem::addToWorld(World* world)
+void EntityTempShip::addToWorld(World* world)
 {
 	//Remove from the current world
 	if (this->world != nullptr)
@@ -95,12 +95,12 @@ void EntityGridSystem::addToWorld(World* world)
 	}
 }
 
-ENTITYTYPE EntityGridSystem::getEntityType() const
+ENTITYTYPE EntityTempShip::getEntityType() const
 {
-	return ENTITYTYPE::GRIDSYSTEM;
+	return ENTITYTYPE::TEMPSHIP;
 }
 
-void EntityGridSystem::writeNetworkPacket(BitStream* packet)
+void EntityTempShip::writeNetworkPacket(BitStream* packet)
 {
 	packet->Write(this->entityId);
 	packet->Write(this->getTransform());
@@ -108,7 +108,7 @@ void EntityGridSystem::writeNetworkPacket(BitStream* packet)
 	packet->Write(this->rigidBody->getAngularVelocity());
 }
 
-void EntityGridSystem::readNetworkPacket(BitStream* packet)
+void EntityTempShip::readNetworkPacket(BitStream* packet)
 {
 	//printf("ReadPacket");
 	packet->Read(this->transform);

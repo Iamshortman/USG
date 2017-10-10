@@ -4,11 +4,11 @@
 
 #include "Common/Entity/EntityManager.hpp"
 
-class EntityGridSystem : public Entity
+class EntityTempShip : public Entity
 {
 public:
-	EntityGridSystem(EntityId id);
-	~EntityGridSystem();
+	EntityTempShip(EntityId id);
+	~EntityTempShip();
 	
 	bool hasSubWorld();
 	World* getSubWorld();
@@ -31,10 +31,10 @@ protected:
 	World* subWorld = nullptr;
 };
 
-struct CreatorGridSystem : public Creator
+struct CreatorTempShip : public Creator
 {
 	virtual Entity* create(EntityId id)
 	{
-		return new EntityGridSystem(id);
+		return new EntityTempShip(id);
 	};
 };

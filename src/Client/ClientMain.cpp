@@ -10,6 +10,10 @@
 #include "Client/Input/InputManager.hpp"
 #include "Client/Rendering/LightManager.hpp"
 
+#include "Common/Entity/EntityGridSystem.hpp"
+#include "Common/Entity/EntityCharacter.hpp"
+#include "Client/Entity/EntityPlayerClient.hpp"
+
 int main()
 {
 	SDL_Init(SDL_INIT_EVERYTHING);
@@ -20,6 +24,8 @@ int main()
 	MeshPool* meshPool = new MeshPool();
 
 	EntityManager* entityManager = new EntityManager();
+	entityManager->registerCreator(ENTITYTYPE::PLAYER_THIS, new CreatorPlayerClient());
+
 	WorldManager* worldManager = new WorldManager();
 	InputManager* inputManager = new InputManager();
 	LightManager* lightManager = new LightManager();
@@ -28,7 +34,7 @@ int main()
 
 	inputManager->centerMouse();
 
-	double deltaTime = 0;
+	double deltaTime = 0.;
 
 	Uint32 lastTime = SDL_GetTicks();
 	Uint32 lastFrameTime = SDL_GetTicks();
