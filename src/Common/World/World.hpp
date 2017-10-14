@@ -49,6 +49,9 @@ public:
 	void setParent(Entity* entity);
 	Entity* getParent();
 
+	bool hasParentWorld();
+	World* getParentWorld();
+
 	Transform getWorldOffsetMatrix();
 
 	virtual WORLDTYPE getWorldType() const;
@@ -60,6 +63,7 @@ private:
 
 	std::set<Entity*> entitiesInWorld;
 	std::set<World*> subWorlds;
+	World* parentWorld = nullptr;
 };
 
 #endif //WORLD_HPP

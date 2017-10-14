@@ -9,12 +9,6 @@ class EntityGridSystem : public Entity
 public:
 	EntityGridSystem(EntityId id);
 	~EntityGridSystem();
-	
-	bool hasSubWorld();
-	World* getSubWorld();
-	void setSubWorld(World* world);
-	void removeSubWorld();
-	RigidBody* getRigidBody();
 
 	virtual void update(double deltaTime);
 	virtual Transform getTransform();

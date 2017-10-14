@@ -5,6 +5,7 @@
 #include "Common/Entity/Entity.hpp"
 
 #include <set>
+#include <stack>
 
 class ClientConnection
 {
@@ -22,8 +23,14 @@ public:
 
 	void updateEntitiesInFocus();
 
+	std::stack<World*> worldsToLoad;
+	std::stack<Entity*> entitiesToLoad;
+
+	std::set<World*> worldsInFocus;
 	std::set<Entity*> entitiesInFocus;
-	std::set<EntityId> entitiesLoaded;
+
+	std::stack<World*> worldsToUnload;
+	std::stack<Entity*> entitiesToUnload;
 
 private:
 	//string email = ""; //TODO email based login

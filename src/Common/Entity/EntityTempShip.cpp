@@ -6,7 +6,7 @@
 EntityTempShip::EntityTempShip(EntityId id)
 	:Entity(id)
 {
-	this->rigidBody = new RigidBody(this, 100.0, new BoxShape(vector3D(1.5)));
+	this->rigidBody = new RigidBody(this, 100.0, new BoxShape(vector3D(1.5, 1.5, 4.5)));
 }
 
 EntityTempShip::~EntityTempShip()

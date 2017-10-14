@@ -21,10 +21,9 @@ public:
 
 	void update(double deltaTime);
 
-	World* createNewWorld();
-	World* createWorld(int id, WORLDTYPE type);
+	World* createWorld(WORLDTYPE type);
+	World* createWorld(WORLDTYPE type, WorldId id);
 
-	WorldSolarSystem* createNewWorldSolarSystem();
 	void destroyWorld(WorldId id);
 
 	World* getWorld(WorldId id);

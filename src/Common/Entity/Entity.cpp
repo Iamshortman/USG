@@ -1,6 +1,6 @@
 #include "Common/Entity/Entity.hpp"
 #include "Common/World/World.hpp"
-
+#include "Common/World/WorldManager.hpp"
 
 Entity::Entity(EntityId id)
 	:entityId(id)
@@ -11,9 +11,19 @@ Entity::Entity(EntityId id)
 Entity::~Entity()
 {
 	//Remove from the current world
-	if (world != nullptr)
+	if (this->world != nullptr)
 	{
-		world->removeEntityFromWorld(this);
+		this->world->removeEntityFromWorld(this);
+	}
+
+	if (this->rigidBody != nullptr)
+	{
+		delete this->rigidBody;
+	}
+
+	if (this->subWorld != nullptr)
+	{
+		WorldManager::instance->destroyWorld(this->subWorld->worldId);
 	}
 }
 
@@ -32,6 +42,11 @@ void Entity::addToWorld(World* world)
 	//Remove from the current world
 	if (this->world != nullptr)
 	{
+		if (this->rigidBody != nullptr)
+		{
+			this->world->removeRigidBody(this->rigidBody);
+		}
+
 		this->world->removeEntityFromWorld(this);
 	}
 
@@ -41,6 +56,11 @@ void Entity::addToWorld(World* world)
 	//add to the current world
 	if (this->world != nullptr)
 	{
+		if (this->rigidBody != nullptr)
+		{
+			this->world->addRigidBody(this->rigidBody);
+		}
+
 		this->world->addEntityToWorld(this);
 	}
 }
@@ -70,4 +90,39 @@ Transform Entity::getRenderTransform()
 	}
 
 	return transform;
+}
+
+bool Entity::hasSubWorld()
+{
+	return this->subWorld != nullptr;
+}
+
+World* Entity::getSubWorld()
+{
+	return this->subWorld;
+}
+
+void Entity::setSubWorld(World* world)
+{
+	this->removeSubWorld();
+
+	this->subWorld = world;
+	this->subWorld->setParent(this);
+	this->world->addSubWorld(this->subWorld);
+}
+
+void Entity::removeSubWorld()
+{
+	if (this->subWorld != nullptr)
+	{
+		printf("Removing a subworld, Is this a problem\n");
+		this->world->removeSubWorld(this->subWorld);
+		this->subWorld->setParent(nullptr);
+		this->subWorld = nullptr;
+	}
+}
+
+RigidBody* Entity::getRigidBody()
+{
+	return this->rigidBody;
 }

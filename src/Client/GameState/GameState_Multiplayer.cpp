@@ -9,7 +9,7 @@ GameState_Multiplayer::GameState_Multiplayer()
 {
 	this->networkManager = new ClientNetworkManager("127.0.0.1", 60000, this);
 
-	this->mainWorld = WorldManager::instance->createNewWorldSolarSystem();
+	//this->mainWorld = WorldManager::instance->createNewWorldSolarSystem();
 	/*EntityPlayerCharacter* player = new EntityPlayerCharacter(EntityManager::instance->getNextId());
 	EntityManager::instance->entities[player->entityId] = player;
 
@@ -67,6 +67,9 @@ void GameState_Multiplayer::update(Client* client, double deltaTime)
 	Camera cam;
 	cam.setCameraTransform(transform);
 	client->window->clearBuffer();
-	client->renderingManager->RenderWorld(this->mainWorld, &cam);
+	if (player != nullptr)
+	{
+		client->renderingManager->RenderWorld(player->getWorld(), &cam);
+	}
 	client->window->updateBuffer();
 }

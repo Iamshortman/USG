@@ -21,6 +21,7 @@ enum PacketTypes
 	UpdateClientEntity,
 	ClientBindEntity,
 	CreateEntity,
+	CreateWorld,
 };
 
 void write_Tranform(BitStream* bitStream, Transform transform);

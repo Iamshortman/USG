@@ -2,6 +2,7 @@
 #include "Client/GameState/GameState.hpp"
 
 #include "Common/Entity/EntityManager.hpp"
+#include "Common/World/WorldManager.hpp"
 #include "Client/Entity/EntityPlayerClient.hpp"
 
 ClientNetworkManager::ClientNetworkManager(string server_ip, int server_port, GameState_Multiplayer* game)
@@ -95,6 +96,7 @@ void ClientNetworkManager::processPackets()
 	{
 		PacketData packet = this->packetsToProcess.front();
 
+		
 		if (packet.data[0] == PacketTypes::UpdateEntity)
 		{
 			BitStream bsIn(packet.data, packet.length, false);
@@ -130,6 +132,35 @@ void ClientNetworkManager::processPackets()
 					this->game->playerInterface.bindCharacter(player);
 				}
 			}
+		}
+		else if (packet.data[0] == PacketTypes::CreateWorld)
+		{
+			BitStream bsIn(packet.data, packet.length, false);
+			bsIn.IgnoreBytes(sizeof(RakNet::MessageID));
+
+			WorldId id;
+			vector3D gravity;
+			vector3F ambientLight;
+			EntityId parentId;
+
+			bsIn.Read(id);
+			//bsIn.Read(gravity);
+			//bsIn.Read(ambientLight);
+			bsIn.Read(parentId);
+
+			World* world = WorldManager::instance->createWorld(WORLDTYPE::BASE, id);
+			//world->setGravity(gravity);
+			//world->ambientLight = ambientLight;
+
+			if (parentId != 0)
+			{
+				Entity* entity = EntityManager::instance->getEntity(parentId);
+				if (entity != nullptr)
+				{
+					entity->setSubWorld(world);
+				}
+			}
+
 		}
 
 		free(packet.data);

@@ -15,14 +15,13 @@ Server::Server()
 
 	networkManager = new ServerNetworkManager(32, 60000);
 
-	rootWorlds.push_back(WorldManager::instance->createNewWorldSolarSystem());
-
-	/*EntityCharacter* player = new EntityCharacter(EntityManager::instance->getNextId());
-	EntityManager::instance->entities[player->entityId] = player;
-	player->addToWorld(this->rootWorlds[0]);*/
-
+	rootWorlds.push_back(WorldManager::instance->createWorld(WORLDTYPE::SOLAR));
 
 	//Spawn some stuff for testing
+	EntityTempShip* ship = (EntityTempShip*)EntityManager::instance->createEntity(ENTITYTYPE::TEMPSHIP);
+	ship->setTransform(Transform(vector3D(10.0, 5.0, 10.0)));
+	ship->addToWorld(this->rootWorlds[0]);
+
 	for (int x = 0; x < 5; x++)
 	{
 		for (int y = 0; y < 5; y++)
@@ -32,10 +31,6 @@ Server::Server()
 			ship->addToWorld(this->rootWorlds[0]);
 		}
 	}
-
-	EntityTempShip* ship = (EntityTempShip*)EntityManager::instance->createEntity(ENTITYTYPE::TEMPSHIP);
-	ship->setTransform(Transform(vector3D(10.0, 5.0, 10.0)));
-	ship->addToWorld(this->rootWorlds[0]);
 	
 }
 
@@ -63,6 +58,14 @@ void Server::update(double deltaTime)
 				entity->writeNetworkPacket(&packetCreate.bitStream_out);
 				this->networkManager->sendPacket(packetCreate, client->getUsername());
 
+				if (entity->hasSubWorld())
+				{
+					PacketSend packetCreateW(PacketTypes::CreateWorld, HIGH_PRIORITY, RELIABLE);
+					packetCreateW.bitStream_out.Write(entity->getSubWorld()->worldId);
+					packetCreateW.bitStream_out.Write(entity->entityId);
+					this->networkManager->sendPacket(packetCreateW, client->getUsername());
+				}
+
 				client->entitiesLoaded.insert(entity->entityId);
 			}
 
@@ -72,24 +75,15 @@ void Server::update(double deltaTime)
 				entity->writeNetworkPacket(&packet.bitStream_out);
 				this->networkManager->sendPacket(packet, client->getUsername());
 			}
+			else if (entity->getEntityType() == ENTITYTYPE::CHARACTOR && entity != client->getControllingEntity())
+			{
+				PacketSend packet(PacketTypes::UpdateEntity, LOW_PRIORITY, UNRELIABLE);
+				entity->writeNetworkPacket(&packet.bitStream_out);
+				this->networkManager->sendPacket(packet, client->getUsername());
+			}
+
 		}
 	}
-
-	/*auto entities = this->rootWorlds[0]->getEntitiesInWorld();
-	for (auto it = entities->begin(); it != entities->end(); it++)
-	{
-		if ((*it)->getEntityType() == ENTITYTYPE::GRIDSYSTEM)
-		{
-			PacketSend packet(PacketTypes::UpdateEntity, HIGH_PRIORITY, UNRELIABLE);
-			(*it)->writeNetworkPacket(&packet.bitStream_out);
-			this->networkManager->sendPacketToAll(packet);
-
-			for (auto user = this->clients.begin(); user != this->clients.end(); user++)
-			{
-				this->networkManager->sendPacket(packet, (*user)->getUsername());
-			}
-		}
-	}*/
 }
 
 void Server::exitGame()
@@ -108,10 +102,25 @@ void Server::addClient(string username)
 	this->clients.emplace(client);
 
 	EntityCharacter* player = (EntityCharacter*)EntityManager::instance->createEntity(ENTITYTYPE::CHARACTOR);
-	player->addToWorld(this->rootWorlds[0]);
+	player->addToWorld(EntityManager::instance->getEntity(1)->getSubWorld());
 
 	client->setControllingEntity(player);
-	client->entitiesLoaded.insert(player->entityId);
+
+	World* world = player->getWorld();
+	client->worldsToLoad.push(world);
+
+	while (world->hasParentWorld())
+	{
+		world = world->getParentWorld();
+		client->worldsToLoad.push(world);
+	}
+
+	/*client->entitiesLoaded.insert(player->entityId);
+
+	PacketSend packetCreateW(PacketTypes::CreateWorld, HIGH_PRIORITY, RELIABLE);
+	packetCreateW.bitStream_out.Write(player->getWorld()->worldId);
+	packetCreateW.bitStream_out.Write(0);
+	this->networkManager->sendPacket(packetCreateW, client->getUsername());
 
 	PacketSend packetCreate(PacketTypes::CreateEntity, HIGH_PRIORITY, RELIABLE);
 	packetCreate.bitStream_out.Write(ENTITYTYPE::PLAYER_THIS);
@@ -121,7 +130,7 @@ void Server::addClient(string username)
 
 	PacketSend packet(PacketTypes::ClientBindEntity, HIGH_PRIORITY, RELIABLE);
 	packet.bitStream_out.Write(player->entityId);
-	this->networkManager->sendPacket(packet, username);
+	this->networkManager->sendPacket(packet, username);*/
 }
 
 void Server::removeClient(string username)

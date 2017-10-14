@@ -19,6 +19,13 @@ WorldManager::~WorldManager()
 WorldId WorldManager::getNextId()
 {
 	WorldId worldId = nextId;
+
+	while (this->worlds.find(worldId) != this->worlds.end())
+	{
+		nextId++;
+		worldId = nextId;
+	}
+
 	nextId++;
 	return worldId;
 }
@@ -29,42 +36,37 @@ void WorldManager::update(double deltaTime)
 	std::unordered_map<WorldId, World*>::iterator iter;
 	for (iter = this->worlds.begin(); iter != this->worlds.end(); iter++)
 	{
-		iter->second->update(deltaTime);
+		if (iter->second != nullptr)
+		{
+			iter->second->update(deltaTime);
+		}
 	}
 }
 
-World* WorldManager::createNewWorld()
+World* WorldManager::createWorld(WORLDTYPE type)
 {
-	World* world = new World(this->getNextId());
-	worlds[world->worldId] = world;
-	return world;
+	return this->createWorld(type, this->getNextId());
 }
 
-World* WorldManager::createWorld(int id, WORLDTYPE type)
+World* WorldManager::createWorld(WORLDTYPE type, WorldId id)
 {
-	int ID = id;
 	World* world;
-	if (worlds.find(ID) != worlds.end())
+	if (this->worlds.find(id) != this->worlds.end())
 	{
-		ID = this->getNextId();
+		return nullptr;
 	}
 
 	if (type == WORLDTYPE::SOLAR)
 	{
-		world = new WorldSolarSystem(ID);
+		world = new WorldSolarSystem(id);
 	}
 	else
 	{
-		world = new World(ID);
+		world = new World(id);
 	}
 
-	return world;
-}
+	this->worlds[id] = world;
 
-WorldSolarSystem* WorldManager::createNewWorldSolarSystem()
-{
-	WorldSolarSystem* world = new WorldSolarSystem(this->getNextId());
-	worlds[world->worldId] = world;
 	return world;
 }
 

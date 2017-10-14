@@ -9,7 +9,7 @@
 
 GameState_Singleplayer::GameState_Singleplayer()
 {
-	this->mainWorld = WorldManager::instance->createNewWorldSolarSystem();
+	this->mainWorld = WorldManager::instance->createWorld(WORLDTYPE::SOLAR);
 	EntityPlayerClient* player = new EntityPlayerClient(EntityManager::instance->getNextId());
 	EntityManager::instance->entities[player->entityId] = player;
 
@@ -32,7 +32,7 @@ GameState_Singleplayer::GameState_Singleplayer()
 	EntityTempShip* ship = (EntityTempShip*)EntityManager::instance->createEntity(ENTITYTYPE::TEMPSHIP);
 	ship->setTransform(Transform(vector3D(10.0, 5.0, 10.0)));
 	ship->addToWorld(this->mainWorld);
-	ship->setSubWorld(WorldManager::instance->createNewWorld());
+	ship->setSubWorld(WorldManager::instance->createWorld(BASE));
 
 }
 
@@ -49,10 +49,14 @@ void GameState_Singleplayer::update(Client* client, double deltaTime)
 	this->playerInterface.updatePlayerInput();
 	WorldManager::instance->update(deltaTime);
 
+	Entity* player = this->playerInterface.getBoundCharacter();
 	Transform transform = this->playerInterface.getCameraTransform();
 	Camera cam;
 	cam.setCameraTransform(transform);
 	client->window->clearBuffer();
-	client->renderingManager->RenderWorld(this->mainWorld, &cam);
+	if (player != nullptr)
+	{
+		client->renderingManager->RenderWorld(player->getWorld(), &cam);
+	}
 	client->window->updateBuffer();
 }

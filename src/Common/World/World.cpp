@@ -67,11 +67,13 @@ void  World::removeRigidBody(RigidBody* rigidBody)
 void World::addSubWorld(World* world)
 {
 	this->subWorlds.insert(world);
+	world->parentWorld = this;
 }
 
 void World::removeSubWorld(World* world)
 {
 	this->subWorlds.erase(world);
+	world->parentWorld = nullptr;
 }
 
 std::set<World*>* World::getSubWorlds()
@@ -89,16 +91,6 @@ void World::setGravity(vector3D gravity)
 	physicsWorld->dynamicsWorld->setGravity(toBtVec3(gravity));
 }
 
-Transform World::getWorldOffsetMatrix()
-{
-	if (this->parent != nullptr)
-	{
-		return this->parent->getRenderTransform();
-	}
-	
-	return Transform();
-}
-
 void World::setParent(Entity* entity)
 {
 	this->parent = entity;
@@ -107,6 +99,26 @@ void World::setParent(Entity* entity)
 Entity* World::getParent()
 {
 	return this->parent;
+}
+
+bool World::hasParentWorld()
+{
+	return this->parentWorld != nullptr;
+}
+
+World* World::getParentWorld()
+{
+	return this->parentWorld;
+}
+
+Transform World::getWorldOffsetMatrix()
+{
+	if (this->parent != nullptr)
+	{
+		return this->parent->getRenderTransform();
+	}
+
+	return Transform();
 }
 
 WORLDTYPE World::getWorldType() const

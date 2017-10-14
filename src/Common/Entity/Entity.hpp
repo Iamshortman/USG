@@ -7,6 +7,7 @@
 #include "Common/GLM_Include.hpp"
 #include "Common/Transform.hpp"
 #include "Common/Networking/Packet.hpp"
+#include "Common/Physics/RigidBody.hpp"
 
 enum ENTITYTYPE
 {
@@ -40,6 +41,12 @@ public:
 	virtual void setTransform(Transform transform);
 	Transform getRenderTransform();
 
+	bool hasSubWorld();
+	World* getSubWorld();
+	void setSubWorld(World* world);
+	void removeSubWorld();
+	RigidBody* getRigidBody();
+
 	virtual ENTITYTYPE getEntityType() const = 0;
 
 	virtual void writeNetworkPacket(BitStream* packet) {};
@@ -49,6 +56,9 @@ protected:
 	World* world = nullptr;
 	bool alive = true;
 	Transform transform;
+
+	RigidBody* rigidBody = nullptr;
+	World* subWorld = nullptr;
 };
 
 #endif //ENTITY_HPP

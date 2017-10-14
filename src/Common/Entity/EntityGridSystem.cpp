@@ -17,40 +17,6 @@ EntityGridSystem::~EntityGridSystem()
 	}
 }
 
-bool EntityGridSystem::hasSubWorld()
-{
-	return this->subWorld != nullptr;
-}
-
-World* EntityGridSystem::getSubWorld()
-{
-	return this->subWorld;
-}
-
-void EntityGridSystem::setSubWorld(World* world)
-{
-	this->removeSubWorld();
-
-	this->subWorld = world;
-	this->subWorld->setParent(this);
-	this->world->addSubWorld(this->subWorld);
-}
-
-void EntityGridSystem::removeSubWorld()
-{
-	if (this->subWorld != nullptr)
-	{
-		this->world->removeSubWorld(this->subWorld);
-		this->subWorld->setParent(nullptr);
-		this->subWorld = nullptr;
-	}
-}
-
-RigidBody* EntityGridSystem::getRigidBody()
-{
-	return this->rigidBody;
-}
-
 void EntityGridSystem::update(double deltaTime)
 {
 
@@ -77,6 +43,11 @@ void EntityGridSystem::addToWorld(World* world)
 			this->world->removeRigidBody(this->rigidBody);
 		}
 
+		if (this->subWorld != nullptr)
+		{
+			this->world->removeSubWorld(this->subWorld);
+		}
+
 		this->world->removeEntityFromWorld(this);
 	}
 
@@ -89,6 +60,11 @@ void EntityGridSystem::addToWorld(World* world)
 		if (this->rigidBody != nullptr)
 		{
 			this->world->addRigidBody(this->rigidBody);
+		}
+
+		if (this->subWorld != nullptr)
+		{
+			this->world->addSubWorld(this->subWorld);
 		}
 
 		this->world->addEntityToWorld(this);

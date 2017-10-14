@@ -10,7 +10,7 @@ RenderingManager::RenderingManager()
 {
 	ShaderPool::instance->loadShader("Textured", "res/shaders/Textured.vs", "res/shaders/Textured.fs", { { 0, "in_Position" },{ 1, "in_Normal" },{ 2, "in_TexCoord" } });
 	MeshPool::instance->loadModel("SmallCube", "res/models/SmallCube.obj", true);
-	MeshPool::instance->loadModel("tempShip", "res/models/CubeShip.obj", true);
+	MeshPool::instance->loadModel("tempShip", "res/models/CubeShip1.obj", true);
 
 	TexturePool::instance->loadTexture("res/textures/1K_Grid.png");
 
@@ -42,7 +42,14 @@ Window* RenderingManager::getWindow()
 
 void RenderingManager::Render(World* baseWorld, Camera* cam)
 {
-	this->RenderWorld(baseWorld, cam);
+	World* world = baseWorld;
+
+	while (world->hasParentWorld())
+	{
+		world = world->getParentWorld();
+	}
+
+	this->RenderWorld(world, cam);
 }
 
 void RenderingManager::RenderWorld(World* world, Camera* cam)
@@ -51,7 +58,6 @@ void RenderingManager::RenderWorld(World* world, Camera* cam)
 	{
 		return;
 	}
-
 
 	if (world->getWorldType() == WORLDTYPE::SOLAR)
 	{

@@ -1,6 +1,6 @@
 #include "Server/Networking/ClientConnection.hpp"
 #include "Common/World/World.hpp"
-
+#include <stack>
 
 ClientConnection::ClientConnection(string username)
 {
@@ -39,17 +39,26 @@ bool ClientConnection::shouldCloseConnection()
 
 void ClientConnection::updateEntitiesInFocus()
 {
-	if (this->controllingEntity != nullptr)
+	/*if (this->controllingEntity != nullptr)
 	{
-		World* world = this->controllingEntity->getWorld();
+		std::stack<World*> worlds;
+		worlds.push(this->controllingEntity->getWorld());
+		while (!worlds.empty())
+		{
+			World* world = this->controllingEntity->getWorld();
+			std::set<Entity*>* entities = world->getEntitiesInWorld();
+			this->entitiesInFocus.insert(entities->begin(), entities->end());
 
-		std::set<Entity*>* entities = world->getEntitiesInWorld();
+			if (world->hasParentWorld())
+			{
+				worlds.push(world->getParentWorld());
+			}
 
-		this->entitiesInFocus.insert(entities->begin(), entities->end());
+		}
 	}
 	else
 	{
 		this->entitiesInFocus.clear();
-	}
+	}*/
 
 }
