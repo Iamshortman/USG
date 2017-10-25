@@ -27,20 +27,10 @@ ENTITYTYPE EntityGridSystem::getEntityType() const
 void EntityGridSystem::writeNetworkPacket(BitStream* packet)
 {
 	Entity::writeNetworkPacket(packet);
-
-	packet->Write(this->rigidBody->getLinearVelocity());
-	packet->Write(this->rigidBody->getAngularVelocity());
 }
 
 void EntityGridSystem::readNetworkPacket(BitStream* packet)
 {
 	Entity::readNetworkPacket(packet);
-
-	vector3D temp;
-	packet->Read(temp);
-	this->rigidBody->setLinearVelocity(temp);
-
-	packet->Read(temp);
-	this->rigidBody->setAngularVelocity(temp);
 }
 

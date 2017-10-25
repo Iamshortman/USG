@@ -166,6 +166,12 @@ void Entity::writeNetworkPacket(BitStream* packet)
 	}
 
 	packet->Write(this->getTransform());
+
+	if (this->rigidBody != nullptr)
+	{
+		packet->Write(this->rigidBody->getLinearVelocity());
+		packet->Write(this->rigidBody->getAngularVelocity());
+	}
 }
 
 void Entity::readNetworkPacket(BitStream* packet)
@@ -173,22 +179,30 @@ void Entity::readNetworkPacket(BitStream* packet)
 	WorldId worldId = 0;
 	packet->Read(worldId);
 
-	/*if (this->world != nullptr)
+	if (this->world != nullptr)
 	{
 		if (this->world->worldId != worldId)
 		{
 			World* newWorld = WorldManager::instance->getWorld(worldId);
 			this->addToWorld(newWorld);
-			printf("WorldID: %d\n", worldId);
 		}
 	}
 	else
 	{
 		World* newWorld = WorldManager::instance->getWorld(worldId);
 		this->addToWorld(newWorld);
-		printf("WorldID: %d\n", worldId);
-	}*/
+	}
 
 	packet->Read(this->transform);
 	this->setTransform(this->transform);
+
+	if (this->rigidBody != nullptr)
+	{
+		vector3D temp;
+		packet->Read(temp);
+		this->rigidBody->setLinearVelocity(temp);
+
+		packet->Read(temp);
+		this->rigidBody->setAngularVelocity(temp);
+	}
 }
