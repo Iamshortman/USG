@@ -53,14 +53,8 @@ void ClientNetworkManager::listen()
 			switch (packet->data[0])
 			{
 			case ID_CONNECTION_REQUEST_ACCEPTED:
-			{
 				isConnected = true;
 				printf("Our connection request has been accepted.\n");
-
-				PacketSend packetSend(PacketTypes::UserConnect, HIGH_PRIORITY, RELIABLE_ORDERED);
-				packetSend.bitStream_out.Write("Player1");
-				this->sendPacket(packetSend);
-			}
 			break;
 			case ID_NEW_INCOMING_CONNECTION:
 				printf("A connection is incoming.\n");
@@ -96,14 +90,14 @@ void ClientNetworkManager::processPackets()
 	{
 		PacketData packet = this->packetsToProcess.front();
 
-		
 		if (packet.data[0] == PacketTypes::UpdateEntity)
 		{
 			BitStream bsIn(packet.data, packet.length, false);
 			bsIn.IgnoreBytes(sizeof(RakNet::MessageID));
-			EntityId id;
-			bsIn.Read(id);
-			Entity* entity = EntityManager::instance->getEntity(id);
+			EntityId entityId;
+			bsIn.Read(entityId);
+
+			Entity* entity = EntityManager::instance->getEntity(entityId);
 			if (entity != nullptr)
 			{
 				entity->readNetworkPacket(&bsIn);
@@ -114,6 +108,36 @@ void ClientNetworkManager::processPackets()
 			BitStream bsIn(packet.data, packet.length, false);
 			bsIn.IgnoreBytes(sizeof(RakNet::MessageID));
 			EntityManager::instance->createEntityFromNetwork(&bsIn);
+		}
+		else if (packet.data[0] == PacketTypes::CreateWorld)
+		{
+			BitStream bsIn(packet.data, packet.length, false);
+			bsIn.IgnoreBytes(sizeof(RakNet::MessageID));
+			WorldManager::instance->createWorldFromNetwork(&bsIn);
+		}
+		else if (packet.data[0] == PacketTypes::DeleteEntity)
+		{
+			BitStream bsIn(packet.data, packet.length, false);
+			bsIn.IgnoreBytes(sizeof(RakNet::MessageID));
+			EntityId entityId;
+			bsIn.Read(entityId);
+
+			if (EntityManager::instance->getEntity(entityId) != nullptr)
+			{
+				EntityManager::instance->destroyEntity(entityId);
+			}
+		}
+		else if (packet.data[0] == PacketTypes::DeleteWorld)
+		{
+			BitStream bsIn(packet.data, packet.length, false);
+			bsIn.IgnoreBytes(sizeof(RakNet::MessageID));
+			WorldId worldId;
+			bsIn.Read(worldId);
+
+			if (WorldManager::instance->getWorld(worldId) != nullptr)
+			{
+				WorldManager::instance->destroyWorld(worldId);
+			}
 		}
 		else if (packet.data[0] == PacketTypes::ClientBindEntity)
 		{
@@ -132,35 +156,6 @@ void ClientNetworkManager::processPackets()
 					this->game->playerInterface.bindCharacter(player);
 				}
 			}
-		}
-		else if (packet.data[0] == PacketTypes::CreateWorld)
-		{
-			BitStream bsIn(packet.data, packet.length, false);
-			bsIn.IgnoreBytes(sizeof(RakNet::MessageID));
-
-			WorldId id;
-			vector3D gravity;
-			vector3F ambientLight;
-			EntityId parentId;
-
-			bsIn.Read(id);
-			//bsIn.Read(gravity);
-			//bsIn.Read(ambientLight);
-			bsIn.Read(parentId);
-
-			World* world = WorldManager::instance->createWorld(WORLDTYPE::BASE, id);
-			//world->setGravity(gravity);
-			//world->ambientLight = ambientLight;
-
-			if (parentId != 0)
-			{
-				Entity* entity = EntityManager::instance->getEntity(parentId);
-				if (entity != nullptr)
-				{
-					entity->setSubWorld(world);
-				}
-			}
-
 		}
 
 		free(packet.data);

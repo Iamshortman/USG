@@ -12,12 +12,7 @@ public:
 	EntityCharacter(EntityId id);
 	virtual ~EntityCharacter();
 
-	RigidBody* getRigidBody();
-
 	virtual void update(double deltaTime);
-	virtual Transform getTransform();
-	virtual void setTransform(Transform transform);
-	virtual void addToWorld(World* world);
 
 	virtual ENTITYTYPE getEntityType() const;
 
@@ -37,8 +32,6 @@ protected:
 
 	vector3D linearInput = vector3D(0.0);
 	vector3D angularInput = vector3D(0.0);
-
-	RigidBody* rigidBody = nullptr;
 };
 
 struct CreatorCharacter : public Creator

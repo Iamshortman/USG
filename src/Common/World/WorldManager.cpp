@@ -1,4 +1,6 @@
 #include "Common/World/WorldManager.hpp"
+#include "Common/Entity/EntityManager.hpp"
+
 
 WorldManager* WorldManager::instance = nullptr;
 
@@ -48,24 +50,55 @@ World* WorldManager::createWorld(WORLDTYPE type)
 	return this->createWorld(type, this->getNextId());
 }
 
-World* WorldManager::createWorld(WORLDTYPE type, WorldId id)
+World* WorldManager::createWorld(WORLDTYPE type, WorldId worldId)
 {
-	World* world;
-	if (this->worlds.find(id) != this->worlds.end())
+	if (worldId == 0)
 	{
+		printf("Error: attempted to created a world with Id:0\n");
+		return nullptr;
+	}
+
+	World* world;
+	if (this->worlds.find(worldId) != this->worlds.end())
+	{
+		printf("Error: World with Id:%d already exsits\n", worldId);
 		return nullptr;
 	}
 
 	if (type == WORLDTYPE::SOLAR)
 	{
-		world = new WorldSolarSystem(id);
+		world = new WorldSolarSystem(worldId);
 	}
 	else
 	{
-		world = new World(id);
+		world = new World(worldId);
 	}
 
-	this->worlds[id] = world;
+	this->worlds[worldId] = world;
+
+	return world;
+}
+
+World* WorldManager::createWorldFromNetwork(BitStream* in)
+{
+	WORLDTYPE type;
+	WorldId id;
+	EntityId parentId;
+
+	in->Read(type);
+	in->Read(id);
+	in->Read(parentId);
+
+	World* world = WorldManager::instance->createWorld(type, id);
+
+	if (world != nullptr && parentId != 0)
+	{
+		Entity* entity = EntityManager::instance->getEntity(parentId);
+		if (entity != nullptr)
+		{
+			entity->setSubWorld(world);
+		}
+	}
 
 	return world;
 }
@@ -81,6 +114,11 @@ void WorldManager::destroyWorld(WorldId id)
 
 World* WorldManager::getWorld(WorldId id)
 {
+	if (this->worlds.find(id) == this->worlds.end())
+	{
+		return nullptr;
+	}
+
 	return worlds[id];
 }
 

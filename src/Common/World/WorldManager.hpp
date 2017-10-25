@@ -23,6 +23,7 @@ public:
 
 	World* createWorld(WORLDTYPE type);
 	World* createWorld(WORLDTYPE type, WorldId id);
+	World* createWorldFromNetwork(BitStream* in);
 
 	void destroyWorld(WorldId id);
 

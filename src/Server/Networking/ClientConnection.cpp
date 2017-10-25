@@ -1,10 +1,10 @@
 #include "Server/Networking/ClientConnection.hpp"
-#include "Common/World/World.hpp"
+#include "Common/World/WorldManager.hpp"
 #include <stack>
 
-ClientConnection::ClientConnection(string username)
+ClientConnection::ClientConnection(RakNet::SystemAddress address)
 {
-	this->username = username;
+	this->address = address;
 }
 
 ClientConnection::~ClientConnection()
@@ -19,7 +19,12 @@ void ClientConnection::setControllingEntity(Entity* entity)
 
 string ClientConnection::getUsername()
 {
-	return this->username;
+	return "";//this->username;
+}
+
+RakNet::SystemAddress ClientConnection::getAddress()
+{
+	return this->address;
 }
 
 Entity* ClientConnection::getControllingEntity()
@@ -29,7 +34,10 @@ Entity* ClientConnection::getControllingEntity()
 
 void ClientConnection::closeConnection()
 {
-	this->shoudlCloseConnection = true;
+	if (this->controllingEntity != nullptr)
+	{
+		this->controllingEntity->kill();
+	}
 }
 
 bool ClientConnection::shouldCloseConnection()
@@ -39,26 +47,29 @@ bool ClientConnection::shouldCloseConnection()
 
 void ClientConnection::updateEntitiesInFocus()
 {
-	/*if (this->controllingEntity != nullptr)
+	for (auto worldId : this->worldsInFocus)
 	{
-		std::stack<World*> worlds;
-		worlds.push(this->controllingEntity->getWorld());
-		while (!worlds.empty())
+		World* world = WorldManager::instance->getWorld(worldId);
+		auto entities = world->getEntitiesInWorld();
+		for (auto entity = entities->begin(); entity != entities->end(); entity++)
 		{
-			World* world = this->controllingEntity->getWorld();
-			std::set<Entity*>* entities = world->getEntitiesInWorld();
-			this->entitiesInFocus.insert(entities->begin(), entities->end());
-
-			if (world->hasParentWorld())
+			if (this->entitiesInFocus.find((*entity)->entityId) == this->entitiesInFocus.end())
 			{
-				worlds.push(world->getParentWorld());
+				this->entitiesToLoad.push((*entity)->entityId);
 			}
-
 		}
 	}
-	else
-	{
-		this->entitiesInFocus.clear();
-	}*/
 
+	/*if (this->controllingEntity != nullptr)
+	{
+		World* world = this->controllingEntity->getWorld();
+		auto entities = world->getEntitiesInWorld();
+		for (auto entity = entities->begin(); entity != entities->end(); entity++)
+		{
+			if (this->entitiesInFocus.find(*entity) == this->entitiesInFocus.end())
+			{
+				this->entitiesToLoad.push(*entity);
+			}
+		}
+	}*/
 }

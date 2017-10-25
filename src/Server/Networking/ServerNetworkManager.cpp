@@ -33,109 +33,55 @@ void ServerNetworkManager::listen()
 	{
 		for (packet = peer->Receive(); packet; peer->DeallocatePacket(packet), packet = peer->Receive())
 		{
-			if (packet->data[0] == PacketTypes::UpdateClientEntity)
+			if (packet->data[0] == ID_NO_FREE_INCOMING_CONNECTIONS)
 			{
-				BitStream bsIn(packet->data, packet->length, false);
-				bsIn.IgnoreBytes(sizeof(RakNet::MessageID));
-				EntityId id;
-				bsIn.Read(id);
-				EntityCharacter* entity = (EntityCharacter*)EntityManager::instance->getEntity(id);
-				if (entity != nullptr)
-				{
-					entity->readNetworkPacket(&bsIn);
-					//printf("%lf, %lf, %lf\n", entity->getRigidBody()->getLinearVelocity().x, entity->getRigidBody()->getLinearVelocity().y, entity->getRigidBody()->getLinearVelocity().z);
-				}
+				printf("The server is full.\n");
 				continue;
 			}
 
-				switch (packet->data[0])
-				{
-				case ID_REMOTE_DISCONNECTION_NOTIFICATION:
-					printf("Another client has disconnected.\n");
-					break;
-				case ID_REMOTE_CONNECTION_LOST:
-					printf("Another client has lost the connection.\n");
-					break;
-				case ID_REMOTE_NEW_INCOMING_CONNECTION:
-					printf("Another client has connected.\n");
-					break;
-				case ID_NEW_INCOMING_CONNECTION:
-					break;
-				case ID_NO_FREE_INCOMING_CONNECTIONS:
-					printf("The server is full.\n");
-					break;
-				case ID_DISCONNECTION_NOTIFICATION:
-				case ID_CONNECTION_LOST:
-					for (auto it : this->usernameAddressMap)
-					{
-						if (it.second == packet->systemAddress)
-						{
-							printf("%s at address %s has disconnected\n", it.first.c_str(), it.second.ToString());
-							this->usernameAddressMap.erase(it.first);
-							Server::instance->removeClient(it.first);
-							break;
-						}
-					}
-					break;
-				case UserConnect:
-				{
-					RakNet::RakString rs;
-					RakNet::BitStream bsIn(packet->data, packet->length, false);
-					bsIn.IgnoreBytes(sizeof(RakNet::MessageID));
-					bsIn.Read(rs);
-					string username = string(rs.C_String());
+			PacketData data;
+			data.systemAddress = packet->systemAddress;
+			data.length = packet->length;
+			data.data = (unsigned char*)malloc(packet->length);
+			memcpy_s(data.data, data.length, packet->data, packet->length);
 
-					if (this->usernameAddressMap.find(username) == this->usernameAddressMap.end())
-					{
-						printf("%s at address %s has connected\n", username.c_str(), packet->systemAddress.ToString());
-						this->usernameAddressMap[username] = packet->systemAddress;
+			this->queueMutex.lock();
+			this->packetsToProcess.push(data);
+			this->queueMutex.unlock();
 
-						Server::instance->addClient(username);
-					}
-					else
-					{
-						printf("Error: Client alread connected with this username %s\n", username.c_str());
-						peer->CloseConnection(packet->systemAddress, true);
-					}
-
-				}
+			/*(switch (packet->data[0])
+			{
+			case ID_REMOTE_DISCONNECTION_NOTIFICATION:
+				printf("Another client has disconnected.\n");
 				break;
-				case UserRequest:
-				{
-					RakNet::RakString rs;
-					RakNet::BitStream bsIn(packet->data, packet->length, false);
-					bsIn.IgnoreBytes(sizeof(RakNet::MessageID));
-					bsIn.Read(rs);
-					string value = string(rs.C_String());
-
-					if (value == "SpawnMe")
-					{
-
-					}
-					break;
-				}
-				default:
-					printf("Message with identifier %i has arrived.\n", packet->data[0]);
-					break;
-				}
-			}
+			case ID_REMOTE_CONNECTION_LOST:
+				printf("Another client has lost the connection.\n");
+				break;
+			case ID_REMOTE_NEW_INCOMING_CONNECTION:
+			case ID_NEW_INCOMING_CONNECTION:
+				
+				break;
+			case ID_NO_FREE_INCOMING_CONNECTIONS:
+				printf("The server is full.\n");
+				break;
+			case ID_DISCONNECTION_NOTIFICATION:
+			case ID_CONNECTION_LOST:
+				Server::instance->removeClient(packet->systemAddress);
+				break;
+			default:
+				printf("Message with identifier %i has arrived.\n", packet->data[0]);
+				break;
+			}*/
+		}
 	}
 
 	peer->Shutdown(100);
 	RakNet::RakPeerInterface::DestroyInstance(peer);
 }
 
-void ServerNetworkManager::sendPacket(PacketSend &packet, string username)
+void ServerNetworkManager::sendPacket(PacketSend &packet, ClientConnection* client)
 {
-	if (this->usernameAddressMap.find(username) != this->usernameAddressMap.end())
-	{
-		peer->Send(&packet.bitStream_out, packet.packet_priority, packet.packet_reliability, 0, this->usernameAddressMap[username], false);
-	}
-	else
-	{
-		printf("Error: Username %s doesn't exsist\n", username.c_str());
-	}
-	
+	peer->Send(&packet.bitStream_out, packet.packet_priority, packet.packet_reliability, 0, client->getAddress(), false);
 }
 
 void ServerNetworkManager::sendPacketToAll(PacketSend &packet)
@@ -146,4 +92,48 @@ void ServerNetworkManager::sendPacketToAll(PacketSend &packet)
 void ServerNetworkManager::update()
 {
 
+}
+
+void ServerNetworkManager::processPackets()
+{
+	this->queueMutex.lock();
+	while (!this->packetsToProcess.empty())
+	{
+		PacketData packet = this->packetsToProcess.front();
+		
+		if (packet.data[0] == PacketTypes::UpdateClientEntity)
+		{
+			BitStream bsIn(packet.data, packet.length, false);
+			bsIn.IgnoreBytes(sizeof(RakNet::MessageID));
+			EntityId id;
+			bsIn.Read(id);
+			EntityCharacter* entity = (EntityCharacter*)EntityManager::instance->getEntity(id);
+			if (entity != nullptr)
+			{
+				entity->readNetworkPacket(&bsIn);
+			}
+		}
+		else if (packet.data[0] == ID_NEW_INCOMING_CONNECTION)
+		{
+			//User connect
+			printf("Client has connected at address: %s\n", packet.systemAddress.ToString());
+			Server::instance->addClient(packet.systemAddress);
+		}
+		else if (packet.data[0] == ID_DISCONNECTION_NOTIFICATION)
+		{
+			//Clean disconnect
+			printf("Client has cleanly disconnected at address: %s\n", packet.systemAddress.ToString());
+			Server::instance->removeClient(packet.systemAddress);
+		}
+		else if (packet.data[0] == ID_CONNECTION_LOST)
+		{
+			//Unclean disconnect
+			printf("Client has lost connection at address: %s\n", packet.systemAddress.ToString());
+			Server::instance->removeClient(packet.systemAddress);
+		}
+
+		free(packet.data);
+		this->packetsToProcess.pop();
+	}
+	this->queueMutex.unlock();
 }

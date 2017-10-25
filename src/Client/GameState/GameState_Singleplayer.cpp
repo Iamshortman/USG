@@ -22,7 +22,7 @@ GameState_Singleplayer::GameState_Singleplayer()
 	{
 		for (int y = 1; y < 11; y++)
 		{
-			EntityGridSystem* ship = (EntityGridSystem*)EntityManager::instance->createEntity(ENTITYTYPE::GRIDSYSTEM);
+			EntityGridSystem* ship = (EntityGridSystem*)EntityManager::instance->createEntity(ENTITYTYPE::CHARACTOR);
 			ship->setTransform(Transform(vector3D(x * 2.0, 0.0, y * 2.0)));
 
 			ship->addToWorld(this->mainWorld);

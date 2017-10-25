@@ -7,21 +7,13 @@
 EntityCharacter::EntityCharacter(EntityId id)
 	:Entity(id)
 {
-	this->rigidBody = new RigidBody(this, 100.0, new CapsuleShape(0.3, 1.8));
+	this->rigidBody = new RigidBody(this, 100.0, new CapsuleShape(0.4, 1));
 	this->rigidBody->setInertiaTensor(vector3D(0.0));
 }
 
 EntityCharacter::~EntityCharacter()
 {
-	if (this->rigidBody != nullptr)
-	{
-		delete this->rigidBody;
-	}
-}
 
-RigidBody* EntityCharacter::getRigidBody()
-{
-	return this->rigidBody;
 }
 
 void EntityCharacter::update(double deltaTime)
@@ -154,45 +146,6 @@ void EntityCharacter::update(double deltaTime)
 	}
 }
 
-Transform EntityCharacter::getTransform()
-{
-	return this->rigidBody->getWorldTransform();
-}
-
-
-void EntityCharacter::setTransform(Transform transform)
-{
-	this->rigidBody->setWorldTransform(transform);
-}
-
-void EntityCharacter::addToWorld(World* world)
-{
-	//Remove from the current world
-	if (this->world != nullptr)
-	{
-		if (this->rigidBody != nullptr)
-		{
-			this->world->removeRigidBody(this->rigidBody);
-		}
-
-		this->world->removeEntityFromWorld(this);
-	}
-
-	//Set the new world even if its null
-	this->world = world;
-
-	//add to the current world
-	if (this->world != nullptr)
-	{
-		if (this->rigidBody != nullptr)
-		{
-			this->world->addRigidBody(this->rigidBody);
-		}
-
-		this->world->addEntityToWorld(this);
-	}
-}
-
 ENTITYTYPE EntityCharacter::getEntityType() const
 {
 	return ENTITYTYPE::CHARACTOR;
@@ -200,8 +153,7 @@ ENTITYTYPE EntityCharacter::getEntityType() const
 
 void EntityCharacter::writeNetworkPacket(BitStream* packet)
 {
-	packet->Write(this->entityId);
-	packet->Write(this->getTransform());
+	Entity::writeNetworkPacket(packet);
 	packet->Write(this->rigidBody->getLinearVelocity());
 	packet->Write(this->rigidBody->getAngularVelocity());
 	packet->Write(this->linearInput);
@@ -210,8 +162,7 @@ void EntityCharacter::writeNetworkPacket(BitStream* packet)
 
 void EntityCharacter::readNetworkPacket(BitStream* packet)
 {
-	packet->Read(this->transform);
-	this->setTransform(this->transform);
+	Entity::readNetworkPacket(packet);
 
 	vector3D temp;
 	packet->Read(temp);

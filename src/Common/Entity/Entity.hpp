@@ -49,8 +49,8 @@ public:
 
 	virtual ENTITYTYPE getEntityType() const = 0;
 
-	virtual void writeNetworkPacket(BitStream* packet) {};
-	virtual void readNetworkPacket(BitStream* packet) {};
+	virtual void writeNetworkPacket(BitStream* packet);
+	virtual void readNetworkPacket(BitStream* packet);
 
 protected:
 	World* world = nullptr;

@@ -30,6 +30,7 @@ public:
 private:
 	Model* tempModel = nullptr;
 	Model* tempModel1 = nullptr;
+	Model* playerModel = nullptr;
 
 	Window* window = nullptr;
 

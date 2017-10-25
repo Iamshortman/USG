@@ -7,26 +7,17 @@
 
 GameState_Multiplayer::GameState_Multiplayer()
 {
-	this->networkManager = new ClientNetworkManager("127.0.0.1", 60000, this);
+	string address = "127.0.0.1";
+	/*string temp;
+	printf("Enter Server Address: ");
+	std::cin >> temp;
 
-	//this->mainWorld = WorldManager::instance->createNewWorldSolarSystem();
-	/*EntityPlayerCharacter* player = new EntityPlayerCharacter(EntityManager::instance->getNextId());
-	EntityManager::instance->entities[player->entityId] = player;
-
-	this->playerInterface.bindCharacter(player);
-
-	player->addToWorld(this->mainWorld);
-
-	//Spawn some stuff for testing
-	for (int x = 0; x < 5; x++)
+	if (temp != "")
 	{
-		for (int y = 0; y < 5; y++)
-		{
-			EntityGridSystem* ship = (EntityGridSystem*)EntityManager::instance->createEntity(ENTITYTYPE::GRIDSYSTEM);
-			ship->setTransform(Transform(vector3D(x * 2.0, 0.0, (y * 2.0) + 2)));
-			ship->addToWorld(this->mainWorld);
-		}
+		address = temp;
 	}*/
+
+	this->networkManager = new ClientNetworkManager(address, 60000, this);
 }
 
 GameState_Multiplayer::~GameState_Multiplayer()
@@ -53,15 +44,16 @@ void GameState_Multiplayer::update(Client* client, double deltaTime)
 
 	this->playerInterface.updatePlayerInput();
 	WorldManager::instance->update(deltaTime);
+	EntityManager::instance->update();
 
 	Entity* player = this->playerInterface.getBoundCharacter();
 	if (player != nullptr)
 	{
 		PacketSend send(PacketTypes::UpdateClientEntity, MEDIUM_PRIORITY, UNRELIABLE_SEQUENCED);
+		send.bitStream_out.Write(player->entityId);
 		player->writeNetworkPacket(&send.bitStream_out);
 		this->networkManager->sendPacket(send);
 	}
-
 
 	Transform transform = this->playerInterface.getCameraTransform();
 	Camera cam;
@@ -69,7 +61,7 @@ void GameState_Multiplayer::update(Client* client, double deltaTime)
 	client->window->clearBuffer();
 	if (player != nullptr)
 	{
-		client->renderingManager->RenderWorld(player->getWorld(), &cam);
+		client->renderingManager->Render(player->getWorld(), &cam);
 	}
 	client->window->updateBuffer();
 }

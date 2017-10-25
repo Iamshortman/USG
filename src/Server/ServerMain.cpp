@@ -30,7 +30,7 @@ int main()
 
 		if (current_time - last_frame_time > std::chrono::milliseconds(1000))
 		{
-			printf("frames: %d\n", frames);
+			//printf("frames: %d\n", frames);
 			last_frame_time = current_time;
 			frames = 0;
 		}

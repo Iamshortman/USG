@@ -1,6 +1,7 @@
 #ifndef ENTITYMANAGER_HPP
 #define ENTITYMANAGER_HPP
 
+#include <stack>
 #include <vector>
 #include <unordered_map>
 #include <algorithm>
@@ -20,6 +21,8 @@ public:
 
 	EntityManager();
 
+	void update();
+
 	EntityId getNextId();
 
 	Entity* createEntity(ENTITYTYPE type);
@@ -36,7 +39,7 @@ public:
 	void registerCreator(ENTITYTYPE type, Creator* creator);
 private:
 	std::unordered_map<ENTITYTYPE, Creator*> creators;
-
+	std::stack<EntityId> entities_to_delete;
 
 	EntityId nextId = 1;
 

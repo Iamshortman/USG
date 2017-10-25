@@ -22,8 +22,8 @@ public:
 	ServerNetworkManager* networkManager;
 	vector<World*> rootWorlds;
 
-	void addClient(string username);
-	void removeClient(string username);
+	void addClient(RakNet::SystemAddress);
+	void removeClient(RakNet::SystemAddress);
 
 private:
 	std::set<ClientConnection*> clients;

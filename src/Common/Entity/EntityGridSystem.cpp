@@ -11,64 +11,12 @@ EntityGridSystem::EntityGridSystem(EntityId id)
 
 EntityGridSystem::~EntityGridSystem()
 {
-	if (this->rigidBody != nullptr)
-	{
-		delete this->rigidBody;
-	}
+
 }
 
 void EntityGridSystem::update(double deltaTime)
 {
 
-}
-
-Transform EntityGridSystem::getTransform()
-{
-	return this->rigidBody->getWorldTransform();
-}
-
-
-void EntityGridSystem::setTransform(Transform transform)
-{
-	this->rigidBody->setWorldTransform(transform);
-}
-
-void EntityGridSystem::addToWorld(World* world)
-{
-	//Remove from the current world
-	if (this->world != nullptr)
-	{
-		if (this->rigidBody != nullptr)
-		{
-			this->world->removeRigidBody(this->rigidBody);
-		}
-
-		if (this->subWorld != nullptr)
-		{
-			this->world->removeSubWorld(this->subWorld);
-		}
-
-		this->world->removeEntityFromWorld(this);
-	}
-
-	//Set the new world even if its null
-	this->world = world;
-
-	//add to the current world
-	if (this->world != nullptr)
-	{
-		if (this->rigidBody != nullptr)
-		{
-			this->world->addRigidBody(this->rigidBody);
-		}
-
-		if (this->subWorld != nullptr)
-		{
-			this->world->addSubWorld(this->subWorld);
-		}
-
-		this->world->addEntityToWorld(this);
-	}
 }
 
 ENTITYTYPE EntityGridSystem::getEntityType() const
@@ -78,17 +26,15 @@ ENTITYTYPE EntityGridSystem::getEntityType() const
 
 void EntityGridSystem::writeNetworkPacket(BitStream* packet)
 {
-	packet->Write(this->entityId);
-	packet->Write(this->getTransform());
+	Entity::writeNetworkPacket(packet);
+
 	packet->Write(this->rigidBody->getLinearVelocity());
 	packet->Write(this->rigidBody->getAngularVelocity());
 }
 
 void EntityGridSystem::readNetworkPacket(BitStream* packet)
 {
-	//printf("ReadPacket");
-	packet->Read(this->transform);
-	this->setTransform(this->transform);
+	Entity::readNetworkPacket(packet);
 
 	vector3D temp;
 	packet->Read(temp);

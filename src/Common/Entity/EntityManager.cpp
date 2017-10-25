@@ -17,6 +17,25 @@ EntityManager::EntityManager()
 	this->registerCreator(ENTITYTYPE::TEMPSHIP, new CreatorTempShip());
 }
 
+void EntityManager::update()
+{
+	while (!this->entities_to_delete.empty())
+	{
+		EntityId entityId = this->entities_to_delete.top();
+
+		if (entities.count(entityId))
+		{
+			entities[entityId]->addToWorld(nullptr);
+
+			delete entities[entityId];
+			this->entities.erase(entityId);
+		}
+
+
+		this->entities_to_delete.pop();
+	}
+}
+
 EntityId EntityManager::getNextId()
 {
 	EntityId entityId = nextId;
@@ -33,18 +52,26 @@ EntityId EntityManager::getNextId()
 
 Entity* EntityManager::createEntity(ENTITYTYPE type)
 {
-	Entity* entity = this->creators[type]->create(this->getNextId());
-	entities[entity->entityId] = entity;
-	return entity;
+	return this->createEntity(type, this->getNextId());
 }
 
 Entity* EntityManager::createEntity(ENTITYTYPE type, EntityId entityId)
 {
+	if (entityId == 0)
+	{
+		printf("Error: attempted to created a entity with Id:0\n");
+		return nullptr;
+	}
+
 	if (this->entities.find(entityId) == this->entities.end())
 	{
 		Entity* entity = this->creators[type]->create(entityId);
 		entities[entity->entityId] = entity;
 		return entity;
+	}
+	else
+	{
+		printf("Error: Entity with Id:%d already exsits\n", entityId);
 	}
 
 	return nullptr;
@@ -52,18 +79,28 @@ Entity* EntityManager::createEntity(ENTITYTYPE type, EntityId entityId)
 
 Entity* EntityManager::createEntityFromNetwork(BitStream* in)
 {
-	ENTITYTYPE type; 
+	ENTITYTYPE type;
+	WorldId worldId = 0;
+	EntityId entityId = 0;
+	WorldId subworldId = 0;
+
 	in->Read(type);
-
-	WorldId worldId;
-	in->Read(worldId);
-
-	EntityId entityId;
 	in->Read(entityId);
+	in->Read(worldId);
+	in->Read(subworldId);
 
 	Entity* entity = this->createEntity(type, entityId);
 	if (entity != nullptr)
 	{
+		if (subworldId != 0)
+		{
+			World* subworld = WorldManager::instance->getWorld(subworldId);
+			if (subworld != nullptr)
+			{
+				entity->setSubWorld(subworld);
+			}
+		}
+
 		World* world = WorldManager::instance->getWorld(worldId);
 		if (world != nullptr)
 		{
@@ -80,18 +117,19 @@ Entity* EntityManager::createEntityFromNetwork(BitStream* in)
 	return entity;
 }
 
-void EntityManager::destroyEntity(EntityId id)
+void EntityManager::destroyEntity(EntityId entityId)
 {
-	if (entities.count(id))
-	{
-		delete entities[id];
-		entities.erase(id);
-	}
+	this->entities_to_delete.push(entityId);
 }
 
-Entity* EntityManager::getEntity(EntityId id)
+Entity* EntityManager::getEntity(EntityId entityId)
 {
-	return entities[id];
+	if (this->entities.find(entityId) == this->entities.end())
+	{
+		return nullptr;
+	}
+
+	return this->entities[entityId];
 }
 
 std::unordered_map<EntityId, Entity*>::iterator EntityManager::getAllEntities()

@@ -47,6 +47,11 @@ void Entity::addToWorld(World* world)
 			this->world->removeRigidBody(this->rigidBody);
 		}
 
+		if (this->subWorld != nullptr)
+		{
+			this->world->removeSubWorld(this->subWorld);
+		}
+
 		this->world->removeEntityFromWorld(this);
 	}
 
@@ -61,6 +66,11 @@ void Entity::addToWorld(World* world)
 			this->world->addRigidBody(this->rigidBody);
 		}
 
+		if (this->subWorld != nullptr)
+		{
+			this->world->addSubWorld(this->subWorld);
+		}
+
 		this->world->addEntityToWorld(this);
 	}
 }
@@ -72,11 +82,21 @@ World* Entity::getWorld()
 
 Transform Entity::getTransform()
 {
+	if (this->rigidBody != nullptr)
+	{
+		this->transform = this->rigidBody->getWorldTransform();
+	}
+	
 	return this->transform;
 }
 
 void Entity::setTransform(Transform transform)
 {
+	if (this->rigidBody != nullptr)
+	{
+		this->rigidBody->setWorldTransform(transform);
+	}
+
 	this->transform = transform;
 }
 
@@ -108,7 +128,11 @@ void Entity::setSubWorld(World* world)
 
 	this->subWorld = world;
 	this->subWorld->setParent(this);
-	this->world->addSubWorld(this->subWorld);
+
+	if (this->world != nullptr)
+	{
+		this->world->addSubWorld(this->subWorld);
+	}
 }
 
 void Entity::removeSubWorld()
@@ -116,7 +140,10 @@ void Entity::removeSubWorld()
 	if (this->subWorld != nullptr)
 	{
 		printf("Removing a subworld, Is this a problem\n");
-		this->world->removeSubWorld(this->subWorld);
+		if (this->world != nullptr)
+		{
+			this->world->removeSubWorld(this->subWorld);
+		}
 		this->subWorld->setParent(nullptr);
 		this->subWorld = nullptr;
 	}
@@ -125,4 +152,43 @@ void Entity::removeSubWorld()
 RigidBody* Entity::getRigidBody()
 {
 	return this->rigidBody;
+}
+
+void Entity::writeNetworkPacket(BitStream* packet)
+{
+	if (this->world != nullptr)
+	{
+		packet->Write(this->world->worldId);
+	}
+	else
+	{
+		packet->Write((WorldId) 0);
+	}
+
+	packet->Write(this->getTransform());
+}
+
+void Entity::readNetworkPacket(BitStream* packet)
+{
+	WorldId worldId = 0;
+	packet->Read(worldId);
+
+	/*if (this->world != nullptr)
+	{
+		if (this->world->worldId != worldId)
+		{
+			World* newWorld = WorldManager::instance->getWorld(worldId);
+			this->addToWorld(newWorld);
+			printf("WorldID: %d\n", worldId);
+		}
+	}
+	else
+	{
+		World* newWorld = WorldManager::instance->getWorld(worldId);
+		this->addToWorld(newWorld);
+		printf("WorldID: %d\n", worldId);
+	}*/
+
+	packet->Read(this->transform);
+	this->setTransform(this->transform);
 }

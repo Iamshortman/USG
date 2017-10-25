@@ -11,6 +11,7 @@ RenderingManager::RenderingManager()
 	ShaderPool::instance->loadShader("Textured", "res/shaders/Textured.vs", "res/shaders/Textured.fs", { { 0, "in_Position" },{ 1, "in_Normal" },{ 2, "in_TexCoord" } });
 	MeshPool::instance->loadModel("SmallCube", "res/models/SmallCube.obj", true);
 	MeshPool::instance->loadModel("tempShip", "res/models/CubeShip1.obj", true);
+	MeshPool::instance->loadModel("player", "res/models/Player_Capsule.obj", true);
 
 	TexturePool::instance->loadTexture("res/textures/1K_Grid.png");
 
@@ -23,11 +24,18 @@ RenderingManager::RenderingManager()
 	tempModel1->setShader("Textured");
 	tempModel1->setMesh("tempShip");
 	tempModel1->addTexture("res/textures/1K_Grid.png", 0);
+
+	playerModel = new Model();
+	playerModel->setShader("Textured");
+	playerModel->setMesh("player");
+	playerModel->addTexture("res/textures/1K_Grid.png", 0);
 }
 
 RenderingManager::~RenderingManager()
 {
 	delete this->tempModel;
+	delete this->tempModel1;
+	delete this->playerModel;
 }
 
 void RenderingManager::setWindow(Window* win)
@@ -93,6 +101,7 @@ void RenderingManager::RenderWorld(World* world, Camera* cam)
 				this->RenderMesh(this->tempModel, entity->getRenderTransform(), cam, world);
 				break;
 			case ENTITYTYPE::CHARACTOR:
+				this->RenderMesh(this->playerModel, entity->getRenderTransform(), cam, world);
 				break;
 			case ENTITYTYPE::TEMPSHIP:
 				this->RenderMesh(this->tempModel1, entity->getRenderTransform(), cam, world);
