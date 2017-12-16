@@ -26,10 +26,14 @@ public:
 	void Render(World* baseWorld, Camera* cam);
 
 	void RenderMesh(Model* model, Transform globalPos, Camera* cam, World* world);
+	void RenderMesh(Mesh* mesh, ShaderProgram* program, Transform globalPos, Camera* cam, World* world);
+
 
 private:
 	Model* tempModel = nullptr;
 	Model* tempModel1 = nullptr;
+	Model* tempModel2 = nullptr;
+
 	Model* playerModel = nullptr;
 
 	Window* window = nullptr;

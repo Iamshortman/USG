@@ -83,12 +83,22 @@ std::set<World*>* World::getSubWorlds()
 
 vector3D World::getGravity()
 {
-	return toVec3(physicsWorld->dynamicsWorld->getGravity());
+	return toVec3(this->physicsWorld->dynamicsWorld->getGravity());
 }
 
 void World::setGravity(vector3D gravity)
 {
-	physicsWorld->dynamicsWorld->setGravity(toBtVec3(gravity));
+	this->physicsWorld->dynamicsWorld->setGravity(toBtVec3(gravity));
+}
+
+SingleRayTestResult World::singleRayTest(vector3D startPos, vector3D endPos)
+{
+	return this->physicsWorld->singleRayTest(startPos, endPos);
+}
+
+SingleRayTestResult World::singleRayTestNotMe(vector3D startPos, vector3D endPos, Entity* me)
+{
+	return this->physicsWorld->singleRayTestNotMe(startPos, endPos, me);
 }
 
 void World::setParent(Entity* entity)

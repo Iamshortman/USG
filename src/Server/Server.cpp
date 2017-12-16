@@ -191,7 +191,7 @@ void Server::addClient(RakNet::SystemAddress address)
 	this->clients.emplace(client);
 
 	EntityCharacter* player = (EntityCharacter*)EntityManager::instance->createEntity(ENTITYTYPE::CHARACTOR);
-	player->addToWorld(WorldManager::instance->getWorld(2));
+	player->addToWorld(WorldManager::instance->getWorld(1));
 
 	client->setControllingEntity(player);
 

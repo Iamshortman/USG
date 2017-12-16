@@ -49,7 +49,7 @@ void GameState_Multiplayer::update(Client* client, double deltaTime)
 	Entity* player = this->playerInterface.getBoundCharacter();
 	if (player != nullptr)
 	{
-		PacketSend send(PacketTypes::UpdateClientEntity, MEDIUM_PRIORITY, UNRELIABLE_SEQUENCED);
+		PacketSend send(PacketTypes::UpdateEntity, MEDIUM_PRIORITY, UNRELIABLE_SEQUENCED);
 		send.bitStream_out.Write(player->entityId);
 		player->writeNetworkPacket(&send.bitStream_out);
 		this->networkManager->sendPacket(send);

@@ -16,7 +16,6 @@ using RakNet::BitStream;
 enum PacketTypes
 {
 	UpdateEntity = ID_USER_PACKET_ENUM + 1,
-	UpdateClientEntity,
 	ClientBindEntity,
 	CreateEntity,
 	CreateWorld,

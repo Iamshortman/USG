@@ -16,6 +16,8 @@ enum ENTITYTYPE
 	PLAYER_THIS,
 	CHARACTOR,
 	TEMPSHIP,
+	TEMPSHIPINSIDE,
+	ENTITY_NODE,
 };
 
 //Prototype Classe
@@ -46,6 +48,8 @@ public:
 	void setSubWorld(World* world);
 	void removeSubWorld();
 	RigidBody* getRigidBody();
+
+	virtual void interactRay(Entity* entity, vector3D localStartPos, vector3D localHitPos, vector3D localHitNormal, int bodyId = -1) {};
 
 	virtual ENTITYTYPE getEntityType() const = 0;
 

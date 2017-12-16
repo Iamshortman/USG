@@ -78,7 +78,7 @@ void Window::initGL()
 void Window::set3dRendering()
 {
 	glEnable(GL_DEPTH_TEST);
-	glDepthFunc(GL_LEQUAL);
+	glDepthFunc(GL_LESS);
 
 	//glEnable(GL_DEPTH_TEST);
 	//glDepthFunc(GL_GREATER);

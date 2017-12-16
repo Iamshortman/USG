@@ -101,7 +101,7 @@ void ServerNetworkManager::processPackets()
 	{
 		PacketData packet = this->packetsToProcess.front();
 		
-		if (packet.data[0] == PacketTypes::UpdateClientEntity)
+		if (packet.data[0] == PacketTypes::UpdateEntity)
 		{
 			BitStream bsIn(packet.data, packet.length, false);
 			bsIn.IgnoreBytes(sizeof(RakNet::MessageID));

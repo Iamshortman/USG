@@ -26,8 +26,10 @@ InputManager::InputManager()
 	keyboardMouse->addButton("DebugRollLeft", KeyboardMouseButton(KEYBOARD, SDL_SCANCODE_Q));
 	keyboardMouse->addButton("DebugRollRight", KeyboardMouseButton(KEYBOARD, SDL_SCANCODE_E));
 
-	keyboardMouse->addAxis("DebugPitch", MouseAxis(MouseDirection::Mouse_Y, 0.1, 0.01, false));
-	keyboardMouse->addAxis("DebugYaw", MouseAxis(MouseDirection::Mouse_X, 0.1, 0.01, false));
+	keyboardMouse->addAxis("DebugPitch", MouseAxis(MouseDirection::Mouse_Y, 0.05, 0.01, false));
+	keyboardMouse->addAxis("DebugYaw", MouseAxis(MouseDirection::Mouse_X, 0.05, 0.01, false));
+
+	keyboardMouse->addButton("DebugInteract", KeyboardMouseButton(KEYBOARD, SDL_SCANCODE_F));
 
 	/*keyboardMouse->addAxis("DebugPitch", new MouseAxis(MouseDirection::Mouse_Y, 10.0, 0.01, false));
 	keyboardMouse->addAxis("DebugYaw", new MouseAxis(MouseDirection::Mouse_X, 10.0, 0.01, true));
@@ -315,6 +317,8 @@ void InputManager::loadJoystick(SDL_Joystick* joystick)
 
 		device->addButton("DebugRollRight", JoystickButton(5));
 		device->addButton("DebugRollLeft", JoystickButton(4));
+
+		device->addButton("DebugInteract", JoystickButton(0));
 	}
 
 	this->device_map[joystick] = device;

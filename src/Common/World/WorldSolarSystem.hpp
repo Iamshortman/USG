@@ -2,16 +2,18 @@
 #define WORLDSOLARSYSTEM_HPP
 
 #include "Common/World/World.hpp"
+#include "Common/World/Planet.hpp"
 
 //Prototype
 class Star {};
-class Planet {};
 
 class WorldSolarSystem : public World
 {
 public:
 	WorldSolarSystem(WorldId Id);
 	~WorldSolarSystem();
+
+	virtual void update(double deltaTime);
 
 	virtual WORLDTYPE getWorldType() const;
 

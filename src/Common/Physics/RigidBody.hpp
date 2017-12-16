@@ -13,34 +13,41 @@
 class PhysicsWorld;
 class Entity;
 
+enum RIGIDBODYTYPE
+{
+	SINGLE,
+	COMPOUND,
+};
+
+typedef unsigned int childId;
+
 struct ChildShape
 {
 	CollisionShape* shape;
 	Transform transform;
-	int index;
+	childId index;
 };
 
 class RigidBody
 {
 public:
-	//RigidBody(Entity* entity, double mass);
-	RigidBody(Entity* entity, double mass, CollisionShape* shape);
+	RigidBody(Entity* entity, RIGIDBODYTYPE type);
+
 	virtual ~RigidBody();
 
-	/*int addChildShape(CollisionShape* shape, Transform transform);
-	void removeChildShape(int i);
-	void updateChildTransform(int i, Transform transform);
-	void updateChildShapes();*/
+	void setCollisionShape(CollisionShape* shape);
+	CollisionShape* getCollisionShape();
+
+	childId addChildShape(CollisionShape* shape, Transform transform);
+	void removeChildShape(childId id);
+	void updateChildTransform(childId id, Transform transform);
+	void rebuildCompondShape();
 
 	void setMass(double massToAdd);
 	double getMass();
 
 	void setInertiaTensor(vector3D inertia);
 	vector3D getInertiaTensor();
-
-	/*void addToPhysicsWorld(PhysicsWorld* physicsWorld, Entity* entity, Transform worldTransform);
-	void removeFromPhysicsWorld();
-	bool isInPhysicsWorld();*/
 
 	void Activate(bool activate);
 
@@ -53,15 +60,16 @@ public:
 	vector3D getAngularVelocity() const;
 	void setAngularVelocity(vector3D velocity);
 
-	void applyCentralForce(vector3D force);
-	void applyCentralImpulse(vector3D impulse);
+	void applyForce(vector3D &force, vector3D &localPos);
+	void applyImpulse(vector3D &impulse, vector3D &localPos);
 
-	void applyTorque(vector3D torque);
-	void applyTorqueImpulse(vector3D torque);
+	void applyCentralForce(vector3D &force);
+	void applyCentralImpulse(vector3D &impulse);
+
+	void applyTorque(vector3D &torque);
+	void applyTorqueImpulse(vector3D &torque);
 
 	void setDampening(double linear, double angular);
-
-	PhysicsWorld* getPhysicsWorld() const;
 
 	btRigidBody* getRigidBody();
 
@@ -69,15 +77,22 @@ private:
 	Entity* parent = nullptr;
 
 	btRigidBody* rigidBody = nullptr;
-	//btCompoundShape* compoundShape = nullptr;
+
+	RIGIDBODYTYPE type = RIGIDBODYTYPE::SINGLE;
+
+	CollisionShape* singleShape = nullptr;
+
+	btCompoundShape* compoundShape = nullptr;
+	std::unordered_map<int, ChildShape> childShapes;
+
+	btEmptyShape* emptyShape = nullptr;
 
 	double mass = 1.0;
 	vector3D inertia = vector3D(1.0);
 
 	PhysicsWorld* world = nullptr;
 
-	//std::unordered_map<int, ChildShape> shapes;
-	int nextId = 0;
+	childId getNextId();
 };
 
 #endif //RIGIDBODY_HPP

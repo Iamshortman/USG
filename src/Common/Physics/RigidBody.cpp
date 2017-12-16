@@ -1,112 +1,183 @@
 #include "Common/Physics/RigidBody.hpp"
 #include "Common/Entity/Entity.hpp"
 
-/*RigidBody::RigidBody(Entity* entity, double mass)
+RigidBody::RigidBody(Entity* entity, RIGIDBODYTYPE type)
 {
+	emptyShape = new btEmptyShape();
+
+	btDefaultMotionState* motionState = new btDefaultMotionState();
+	btRigidBody::btRigidBodyConstructionInfo boxRigidBodyCI(mass, motionState, emptyShape, btVector3(0.0, 0.0, 0.0));
+	this->rigidBody = new btRigidBody(boxRigidBodyCI);
+
 	this->parent = entity;
+	this->rigidBody->setUserPointer(entity);
 
-	//this->mass = mass;
-
-	btDefaultMotionState* motionState = new btDefaultMotionState();
-	btRigidBody::btRigidBodyConstructionInfo boxRigidBodyCI(mass, motionState, new btEmptyShape(), btVector3(1.0, 1.0, 1.0));
-	rigidBody = new btRigidBody(boxRigidBodyCI);
-}*/
-
-RigidBody::RigidBody(Entity* entity, double mass, CollisionShape* shape)
-{
-	btVector3 vector = btVector3(0.0, 0.0, 0.0);
-
-	if (mass > 0.0)
-	{
-		shape->btShape->calculateLocalInertia(mass, vector);
-	}
-
-	btDefaultMotionState* motionState = new btDefaultMotionState();
-	btRigidBody::btRigidBodyConstructionInfo boxRigidBodyCI(mass, motionState, shape->btShape, vector);
-	rigidBody = new btRigidBody(boxRigidBodyCI);
-	rigidBody->setUserPointer(entity);
+	this->type = type;
 }
 
 RigidBody::~RigidBody()
 {
-	delete this->rigidBody;
-	//delete this->compoundShape;
-}
+	if (this->rigidBody != nullptr)
+	{
+		delete this->rigidBody;
+	}
 
-/*int RigidBody::addChildShape(CollisionShape* shape, Transform trans)
-{
-	nextId++;
-
-	this->shapes[nextId] = ChildShape();
-	this->shapes[nextId].shape = shape;
-	this->shapes[nextId].transform = trans;
-
-	updateChildShapes();
-
-	return nextId;
-}
-
-void RigidBody::removeChildShape(int i)
-{
-	this->shapes.erase(i);
-	updateChildShapes();
-}
-
-
-void RigidBody::updateChildTransform(int i, Transform transform)
-{
-	ChildShape* child = &this->shapes[i];
-	child->transform = transform;
+	if (this->singleShape != nullptr)
+	{
+		delete this->singleShape;
+	}
 
 	if (this->compoundShape != nullptr)
-	{
-		this->compoundShape->updateChildTransform(child->index, toBtTransform(transform), true);
-	}
-}
-
-void RigidBody::updateChildShapes()
-{
-	btCollisionShape* oldShape = this->rigidBody->getCollisionShape();
-	if (oldShape != nullptr && oldShape != this->compoundShape)
-	{
-		delete this->rigidBody->getCollisionShape();
-	}
-	else if (this->compoundShape != nullptr)
 	{
 		delete this->compoundShape;
 	}
 
-	if (this->shapes.size() > 0)
+	for (auto it = this->childShapes.begin(); it != this->childShapes.end(); it++)
 	{
-		this->compoundShape = new btCompoundShape(true, this->shapes.size());
+		delete it->second.shape;
+	}
 
-		//Sets Parent Index
-		this->compoundShape->setUserPointer(this->parent);
+	if (this->emptyShape != nullptr)
+	{
+		delete this->emptyShape;
+	}
+}
 
-		ChildShape* child;
-		for (auto iter = this->shapes.begin(); iter != this->shapes.end(); iter++)
+void RigidBody::setCollisionShape(CollisionShape* shape)
+{
+	if (this->type == RIGIDBODYTYPE::SINGLE)
+	{
+		if (this->singleShape != nullptr)
 		{
-			child = &iter->second;
-			child->index = this->compoundShape->getNumChildShapes();
-
-			//Sets Child Index
-			child->shape->btShape->setUserIndex(child->index);
-			
-			this->compoundShape->addChildShape(toBtTransform(child->transform), child->shape->btShape);
+			delete this->singleShape;
 		}
 
-		this->rigidBody->setCollisionShape(this->compoundShape);
+		this->singleShape = shape;
+
+		if (this->singleShape != nullptr)
+		{
+			this->singleShape->btShape->setUserIndex(-1);
+			this->singleShape->btShape->setUserPointer(this->parent);
+			this->rigidBody->setCollisionShape(this->singleShape->btShape);
+			this->setMass(this->mass);
+
+			if (this->mass != 0.0)
+			{
+				btVector3 inertiaToSet;
+				this->singleShape->btShape->calculateLocalInertia(this->mass, inertiaToSet);
+
+				this->setInertiaTensor(toVec3(inertiaToSet));
+			}
+		}
+		else
+		{
+			this->rigidBody->setCollisionShape(this->emptyShape);
+		}
 	}
-	else
+}
+
+CollisionShape* RigidBody::getCollisionShape()
+{
+	return this->singleShape;
+}
+
+childId RigidBody::addChildShape(CollisionShape* shape, Transform trans)
+{
+	if (this->type == RIGIDBODYTYPE::COMPOUND)
 	{
-		this->rigidBody->setCollisionShape(new btEmptyShape());
+		childId id = getNextId();
+
+		this->childShapes[id] = ChildShape();
+		this->childShapes[id].shape = shape;
+		this->childShapes[id].transform = trans;
+
+		this->rebuildCompondShape();
+
+		return id;
 	}
-}*/
+
+	return -1;
+}
+
+void RigidBody::removeChildShape(childId id)
+{
+	if (this->type == RIGIDBODYTYPE::COMPOUND)
+	{
+		this->childShapes.erase(id);
+		this->rebuildCompondShape();
+	}
+}
+
+
+void RigidBody::updateChildTransform(childId id, Transform transform)
+{
+	if (this->type == RIGIDBODYTYPE::COMPOUND)
+	{
+		if (this->childShapes.find(id) != this->childShapes.end())
+		{
+			ChildShape* child = &this->childShapes[id];
+			child->transform = transform;
+
+			if (this->compoundShape != nullptr)
+			{
+				this->compoundShape->updateChildTransform(child->index, toBtTransform(transform), true);
+			}
+		}
+	}
+}
+
+void RigidBody::rebuildCompondShape()
+{
+	if (this->type == RIGIDBODYTYPE::COMPOUND)
+	{
+		btCollisionShape* oldShape = this->rigidBody->getCollisionShape();
+
+		if (oldShape != nullptr && oldShape != this->emptyShape)
+		{
+			delete this->rigidBody->getCollisionShape();
+
+			if (oldShape == this->compoundShape)
+			{
+				this->compoundShape = nullptr;
+			}
+		}
+
+		if (this->childShapes.size() > 0)
+		{
+			this->compoundShape = new btCompoundShape(true, (int) this->childShapes.size());
+
+			//Sets Parent Index
+			this->compoundShape->setUserPointer(this->parent);
+
+			ChildShape* child;
+			for (auto iter = this->childShapes.begin(); iter != this->childShapes.end(); iter++)
+			{
+				child = &iter->second;
+				child->index = this->compoundShape->getNumChildShapes();
+
+				//Sets Child Index
+				child->shape->btShape->setUserIndex(child->index);
+				child->shape->btShape->setUserPointer(this->parent);
+
+				this->compoundShape->addChildShape(toBtTransform(child->transform), child->shape->btShape);
+			}
+
+			btVector3 inertiaTemp;
+			this->compoundShape->calculateLocalInertia(this->mass, inertiaTemp);
+			this->inertia = toVec3(inertiaTemp);
+
+			this->rigidBody->setCollisionShape(this->compoundShape);
+		}
+		else
+		{
+			this->rigidBody->setCollisionShape(this->emptyShape);
+		}
+	}
+}
 
 void RigidBody::setMass(double massToAdd)
 {
 	this->mass = massToAdd;
-
 	this->rigidBody->setMassProps(this->mass, toBtVec3(this->inertia));
 }
 
@@ -161,22 +232,32 @@ void RigidBody::setAngularVelocity(vector3D velocity)
 	this->rigidBody->setAngularVelocity(toBtVec3(velocity));
 }
 
-void RigidBody::applyCentralForce(vector3D force)
+void RigidBody::applyForce(vector3D &force, vector3D &localPos)
+{
+	this->rigidBody->applyForce(toBtVec3(force), toBtVec3(localPos));
+}
+
+void RigidBody::applyImpulse(vector3D &impulse, vector3D &localPos)
+{
+	this->rigidBody->applyImpulse(toBtVec3(impulse), toBtVec3(localPos));
+}
+
+void RigidBody::applyCentralForce(vector3D &force)
 {
 	this->rigidBody->applyCentralForce(toBtVec3(force));
 }
 
-void RigidBody::applyCentralImpulse(vector3D impulse)
+void RigidBody::applyCentralImpulse(vector3D &impulse)
 {
 	this->rigidBody->applyCentralImpulse(toBtVec3(impulse));
 }
 
-void RigidBody::applyTorque(vector3D torque)
+void RigidBody::applyTorque(vector3D &torque)
 {
 	this->rigidBody->applyTorque(toBtVec3(torque));
 }
 
-void RigidBody::applyTorqueImpulse(vector3D torque)
+void RigidBody::applyTorqueImpulse(vector3D &torque)
 {
 	this->rigidBody->applyTorqueImpulse(toBtVec3(torque));
 }
@@ -189,4 +270,16 @@ void RigidBody::setDampening(double linear, double angular)
 btRigidBody* RigidBody::getRigidBody()
 {
 	return this->rigidBody;
+}
+
+childId RigidBody::getNextId()
+{
+	childId id = 0;
+
+	while (this->childShapes.find(id) != this->childShapes.end())
+	{
+		id++;
+	}
+
+	return id;
 }

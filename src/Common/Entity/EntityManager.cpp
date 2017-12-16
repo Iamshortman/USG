@@ -5,6 +5,8 @@
 #include "Common/Entity/EntityCharacter.hpp"
 #include "Common/Entity/EntityGridSystem.hpp"
 #include "Common/Entity/EntityTempShip.hpp"
+#include "Common/Entity/EntityTempShipInside.hpp"
+#include "Common/Entity/EntityNode.hpp"
 
 EntityManager* EntityManager::instance = nullptr;
 
@@ -15,6 +17,9 @@ EntityManager::EntityManager()
 	this->registerCreator(ENTITYTYPE::GRIDSYSTEM, new CreatorGridSystem());
 	this->registerCreator(ENTITYTYPE::CHARACTOR, new CreatorCharacter());
 	this->registerCreator(ENTITYTYPE::TEMPSHIP, new CreatorTempShip());
+	this->registerCreator(ENTITYTYPE::TEMPSHIPINSIDE, new CreatorTempShipInside());
+
+	this->registerCreator(ENTITYTYPE::ENTITY_NODE, new CreatorEntityNode());
 }
 
 void EntityManager::update()
@@ -33,6 +38,19 @@ void EntityManager::update()
 
 
 		this->entities_to_delete.pop();
+	}
+
+	while (!this->entities_world_change.empty())
+	{
+		WorldChange change = this->entities_world_change.top();
+
+		if (change.entity != nullptr)
+		{
+			change.entity->addToWorld(change.newWorld);
+			change.entity->setTransform(change.newTrans);
+		}
+
+		this->entities_world_change.pop();
 	}
 }
 
@@ -117,11 +135,6 @@ Entity* EntityManager::createEntityFromNetwork(BitStream* in)
 	return entity;
 }
 
-void EntityManager::destroyEntity(EntityId entityId)
-{
-	this->entities_to_delete.push(entityId);
-}
-
 Entity* EntityManager::getEntity(EntityId entityId)
 {
 	if (this->entities.find(entityId) == this->entities.end())
@@ -132,10 +145,21 @@ Entity* EntityManager::getEntity(EntityId entityId)
 	return this->entities[entityId];
 }
 
+void EntityManager::destroyEntity(EntityId entityId)
+{
+	this->entities_to_delete.push(entityId);
+}
+
+void EntityManager::ChangeWorld(Entity* entity, World* newWorld, Transform newTrans)
+{
+	this->entities_world_change.push({entity, newWorld, newTrans});
+}
+
 std::unordered_map<EntityId, Entity*>::iterator EntityManager::getAllEntities()
 {
 	return this->entities.begin();
 }
+
 
 void EntityManager::registerCreator(ENTITYTYPE type, Creator* creator)
 {

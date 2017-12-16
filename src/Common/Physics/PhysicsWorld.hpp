@@ -8,16 +8,16 @@
 //Prototype Classes
 class World;
 
-/*struct SingleRayTestResult
+struct SingleRayTestResult
 {
-	Entity* hitEntity = nullptr;
 	bool hasHit = false;
+	Entity* entity = nullptr;
 	const btRigidBody* hitBody;
 	vector3D hitPosition;
 	vector3D hitNormal;
-	int index = 0;
 	int userValue = 0;
-};*/
+	int bodyId = 0;
+};
 
 class PhysicsWorld
 {
@@ -30,13 +30,11 @@ public:
 	void addRigidBody(RigidBody* rigidBody);
 	void removeRigidBody(RigidBody* rigidBody);
 
-	//SingleRayTestResult singleRayTest(vector3D startPos, vector3D endPos);
-	//SingleRayTestResult singleRayTestNotMe(vector3D startPos, vector3D endPos, btCollisionObject* me);
+	SingleRayTestResult singleRayTest(vector3D startPos, vector3D endPos);
+	SingleRayTestResult singleRayTestNotMe(vector3D startPos, vector3D endPos, Entity* me);
 	btDiscreteDynamicsWorld* dynamicsWorld = nullptr;
 
 protected:
-
-private:
 	World* parent = nullptr;
 
 	btBroadphaseInterface* broadphase = nullptr;

@@ -30,7 +30,7 @@ public:
 	const WorldId worldId;
 	World(WorldId id);
 	virtual ~World();
-	void update(double deltaTime);
+	virtual void update(double deltaTime);
 
 	void addEntityToWorld(Entity* entity);
 	void removeEntityFromWorld(Entity* entity);
@@ -46,6 +46,9 @@ public:
 	vector3D getGravity();
 	void setGravity(vector3D gravity);
 
+	SingleRayTestResult singleRayTest(vector3D startPos, vector3D endPos);
+	SingleRayTestResult singleRayTestNotMe(vector3D startPos, vector3D endPos, Entity* me);
+
 	void setParent(Entity* entity);
 	Entity* getParent();
 
@@ -56,7 +59,7 @@ public:
 
 	virtual WORLDTYPE getWorldType() const;
 
-private:
+protected:
 	PhysicsWorld* physicsWorld = nullptr;
 
 	Entity* parent = nullptr;

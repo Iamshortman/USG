@@ -3,7 +3,7 @@
 WorldSolarSystem::WorldSolarSystem(WorldId Id)
 	:World(Id)
 {
-
+	//this->planets.insert(new Planet(this, vector3D(0.0, -100, 0.0), 500000000000));
 }
 
 WorldSolarSystem::~WorldSolarSystem()
@@ -19,6 +19,15 @@ WorldSolarSystem::~WorldSolarSystem()
 	}
 }
 
+void WorldSolarSystem::update(double deltaTime)
+{
+	World::update(deltaTime);
+
+	for (Planet* planet : this->planets)
+	{
+		planet->update(deltaTime);
+	}
+}
 
 void WorldSolarSystem::addStar(Star* star)
 {

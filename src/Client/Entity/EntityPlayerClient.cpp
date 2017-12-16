@@ -1,8 +1,8 @@
 #include "Client/Entity/EntityPlayerClient.hpp"
 
-#include <algorithm>
 #include "Client/Input/InputManager.hpp"
 #include "Common/GLM_Include.hpp"
+#include "Common/World/World.hpp"
 
 EntityPlayerClient::EntityPlayerClient(EntityId id)
 	:EntityCharacter(id)
@@ -29,11 +29,20 @@ void EntityPlayerClient::updatePlayerInput()
 	this->angularInput.x = InputManager::instance->getButtonAxisCombo("DebugPitch", "DebugPitchUp", "DebugPitchDown");
 	this->angularInput.y = InputManager::instance->getButtonAxisCombo("DebugYaw", "DebugYawLeft", "DebugYawRight");
 	this->angularInput.z = InputManager::instance->getButtonAxisCombo("DebugRoll", "DebugRollRight", "DebugRollLeft");
+
+	this->interact = InputManager::instance->getButtonPressed("DebugInteract");
 }
 
 Transform EntityPlayerClient::getCameraTransform()
 {
-	return Transform(vector3D(0.0, 0.5, 0.0)).transformBy(this->getRenderTransform());
+	Transform transform = this->getEyeTransform();
+
+	if (this->world != nullptr)
+	{
+		transform = transform.transformBy(this->world->getWorldOffsetMatrix());
+	}
+
+	return transform;
 }
 
 void EntityPlayerClient::writeNetworkPacket(BitStream* packet)

@@ -18,8 +18,8 @@ Client::Client()
 	this->renderingManager = new RenderingManager();
 	this->renderingManager->setWindow(this->window);
 
-	this->setGameState(new GameState_Multiplayer());
-	//this->setGameState(new GameState_Singleplayer());
+	//this->setGameState(new GameState_Multiplayer());
+	this->setGameState(new GameState_Singleplayer());
 }
 
 Client::~Client()

@@ -104,7 +104,7 @@ Transform Entity::getRenderTransform()
 {
 	Transform transform = getTransform();
 
-	if (this->getWorld())
+	if (this->getWorld() != nullptr)
 	{
 		transform = transform.transformBy(world->getWorldOffsetMatrix());
 	}

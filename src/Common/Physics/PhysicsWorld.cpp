@@ -36,7 +36,7 @@ void PhysicsWorld::update(double timeStep)
 	this->dynamicsWorld->stepSimulation(timeStep, 8, 1.0 / 120.0);
 
 
-	int numManifolds = this->dynamicsWorld->getDispatcher()->getNumManifolds();
+	/*int numManifolds = this->dynamicsWorld->getDispatcher()->getNumManifolds();
 	for (int i = 0; i < numManifolds; i++)
 	{
 		btPersistentManifold* contactManifold = this->dynamicsWorld->getDispatcher()->getManifoldByIndexInternal(i);
@@ -46,12 +46,12 @@ void PhysicsWorld::update(double timeStep)
 		Entity* ptr1 = (Entity*)obA->getUserPointer();
 		Entity* ptr2 = (Entity*)obB->getUserPointer();
 
-		/*if (ptr->getEntityType() == ENTITYTYPE::GRIDSYSTEM)
+		if (ptr->getEntityType() == ENTITYTYPE::GRIDSYSTEM)
 		{
 			printf("Hit: %d\n", ptr->entityId);
-		}*/
+		}
 
-		/*int numContacts = contactManifold->getNumContacts();
+		int numContacts = contactManifold->getNumContacts();
 		for (int j = 0; j < numContacts; j++)
 		{
 			btManifoldPoint& pt = contactManifold->getContactPoint(j);
@@ -61,8 +61,8 @@ void PhysicsWorld::update(double timeStep)
 				const btVector3& ptB = pt.getPositionWorldOnB();
 				const btVector3& normalOnB = pt.m_normalWorldOnB;
 			}
-		}*/
-	}
+		}
+	}*/
 }
 
 void PhysicsWorld::addRigidBody(RigidBody* rigidBody)
@@ -73,4 +73,101 @@ void PhysicsWorld::addRigidBody(RigidBody* rigidBody)
 void PhysicsWorld::removeRigidBody(RigidBody* rigidBody)
 {
 	this->dynamicsWorld->removeRigidBody(rigidBody->getRigidBody());
+}
+
+SingleRayTestResult PhysicsWorld::singleRayTest(vector3D startPos, vector3D endPos)
+{
+	btVector3 start = toBtVec3(startPos);
+	btVector3 end = toBtVec3(endPos);
+
+	MyClosestRayResultCallback rayCallback(start, end);
+
+	// Perform raycast
+	dynamicsWorld->rayTest(start, end, rayCallback);
+
+	SingleRayTestResult result;
+
+	if (rayCallback.hasHit())
+	{
+		result.hasHit = true;
+		const btRigidBody* hitBody = btRigidBody::upcast(rayCallback.m_collisionObject);
+		result.hitBody = hitBody;
+		result.hitPosition = toVec3(rayCallback.m_hitPointWorld);
+		result.hitNormal = toVec3(rayCallback.m_hitNormalWorld);
+		result.entity = (Entity*)hitBody->getUserPointer();
+
+		if (rayCallback.m_bodyId != -1)
+		{
+			if (hitBody->getCollisionShape()->getShapeType() == COMPOUND_SHAPE_PROXYTYPE)
+			{
+				btCompoundShape* shape = (btCompoundShape*)hitBody->getCollisionShape();
+
+				btCollisionShape* child = nullptr;
+				
+				if (rayCallback.m_bodyId <= shape->getNumChildShapes())
+				{
+					child = shape->getChildShape(rayCallback.m_bodyId);
+				}
+
+				if (child != nullptr)
+				{
+					result.bodyId = child->getUserIndex();
+				}
+			}
+		}
+	}
+
+	return result;
+}
+
+SingleRayTestResult PhysicsWorld::singleRayTestNotMe(vector3D startPos, vector3D endPos, Entity* me)
+{
+	btVector3 start = toBtVec3(startPos);
+	btVector3 end = toBtVec3(endPos);
+
+	btCollisionWorld::AllHitsRayResultCallback rayCallback(start, end);
+
+	// Perform raycast
+	dynamicsWorld->rayTest(start, end, rayCallback);
+
+	SingleRayTestResult result;
+
+	if (rayCallback.hasHit())
+	{
+		int closestHitIndex = -1;
+
+		for (int i = 0; i < rayCallback.m_collisionObjects.size(); i++)
+		{
+			if (rayCallback.m_collisionObjects[i]->getUserPointer() != me)
+			{
+				if (closestHitIndex != -1)
+				{
+					btVector3 distance1 = rayCallback.m_hitPointWorld[i] - start;
+					btVector3 distance2 = rayCallback.m_hitPointWorld[closestHitIndex] - start;
+					if (distance1.length() < distance2.length())
+					{
+						closestHitIndex = i;
+					}
+				}
+				else
+				{
+					closestHitIndex = i;
+				}
+			}
+
+		}
+
+		if (closestHitIndex != -1)
+		{
+			result.hasHit = true;
+			const btRigidBody* hitBody = btRigidBody::upcast(rayCallback.m_collisionObjects[closestHitIndex]);
+			result.hitBody = hitBody;
+			result.hitPosition = toVec3(rayCallback.m_hitPointWorld[closestHitIndex]);
+			result.hitNormal = toVec3(rayCallback.m_hitNormalWorld[closestHitIndex]);
+			result.entity = (Entity*)hitBody->getUserPointer();
+		}
+
+	}
+
+	return result;
 }

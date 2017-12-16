@@ -14,6 +14,8 @@ public:
 
 	virtual void update(double deltaTime);
 
+	Transform getEyeTransform();
+
 	virtual ENTITYTYPE getEntityType() const;
 
 	virtual void writeNetworkPacket(BitStream* packet);
@@ -23,7 +25,10 @@ protected:
 	bool inGravity = false;
 
 	double groundSpeed = 5.0;
-	double groundTurnSpeed = 1.0f;
+	double groundTurnSpeed = 0.75f;
+
+	double headPitch = 0.0;
+	//double headYaw = 0.0;
 
 	double spaceMaxSpeed = 50.0;
 	double spaceAcceleration = 0.5;
@@ -32,6 +37,7 @@ protected:
 
 	vector3D linearInput = vector3D(0.0);
 	vector3D angularInput = vector3D(0.0);
+	bool interact = false;
 };
 
 struct CreatorCharacter : public Creator

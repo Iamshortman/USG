@@ -6,12 +6,18 @@
 #include "Client/Resource/ShaderPool.hpp"
 #include "Client/Resource/TexturePool.hpp"
 
+#include <stack>
+#include "Common/Entity/EntityNode.hpp"
+
 RenderingManager::RenderingManager()
 {
 	ShaderPool::instance->loadShader("Textured", "res/shaders/Textured.vs", "res/shaders/Textured.fs", { { 0, "in_Position" },{ 1, "in_Normal" },{ 2, "in_TexCoord" } });
 	MeshPool::instance->loadModel("SmallCube", "res/models/SmallCube.obj", true);
 	MeshPool::instance->loadModel("tempShip", "res/models/CubeShip1.obj", true);
 	MeshPool::instance->loadModel("player", "res/models/Player_Capsule.obj", true);
+
+	MeshPool::instance->loadModel("tempShipOut", "res/models/ship/outside.obj", true);
+	MeshPool::instance->loadModel("tempShipIn", "res/models/ship/inside.obj", true);
 
 	TexturePool::instance->loadTexture("res/textures/1K_Grid.png");
 
@@ -22,8 +28,13 @@ RenderingManager::RenderingManager()
 
 	tempModel1 = new Model();
 	tempModel1->setShader("Textured");
-	tempModel1->setMesh("tempShip");
+	tempModel1->setMesh("tempShipOut");
 	tempModel1->addTexture("res/textures/1K_Grid.png", 0);
+
+	tempModel2 = new Model();
+	tempModel2->setShader("Textured");
+	tempModel2->setMesh("tempShipIn");
+	tempModel2->addTexture("res/textures/1K_Grid.png", 0);
 
 	playerModel = new Model();
 	playerModel->setShader("Textured");
@@ -106,6 +117,24 @@ void RenderingManager::RenderWorld(World* world, Camera* cam)
 			case ENTITYTYPE::TEMPSHIP:
 				this->RenderMesh(this->tempModel1, entity->getRenderTransform(), cam, world);
 				break;
+			case ENTITYTYPE::TEMPSHIPINSIDE:
+				this->RenderMesh(this->tempModel2, entity->getRenderTransform(), cam, world);
+				break;
+			case ENTITYTYPE::ENTITY_NODE:
+				std::stack<Node*> nodes;
+				nodes.push(((EntityNode*)entity)->rootNode);
+				while (!nodes.empty())
+				{
+					Node* node = nodes.top();
+					nodes.pop();
+
+					this->RenderMesh(MeshPool::instance->getModel("SmallCube"), ShaderPool::instance->getShader("Textured"), node->getTransform().transformBy(entity->getRenderTransform()), cam, world);
+
+					for (Node* child : node->child_nodes)
+					{
+						nodes.push(child);
+					}
+				}
 			}
 		}
 
@@ -270,4 +299,31 @@ void RenderingManager::RenderMesh(Model* model, Transform globalPos, Camera* cam
 		glDisable(GL_BLEND);
 	}*/
 
+}
+
+void RenderingManager::RenderMesh(Mesh* mesh, ShaderProgram* program, Transform globalPos, Camera* cam, World* world)
+{
+	if (mesh == nullptr || program == nullptr)
+	{
+		return;
+	}
+
+	vector3F ambientLight = world->ambientLight;
+
+	matrix4 projection = cam->getProjectionMatrix(this->window);
+	matrix4 view = cam->getOriginViewMatrix();
+	matrix4 modelMatrix = globalPos.getModleMatrix(cam->getPosition());
+	matrix4 mvp = projection * view * modelMatrix;
+
+	program->setActiveProgram();
+	program->setUniform("MVP", mvp);
+	program->setUniform("modelMatrix", modelMatrix);
+	program->setUniform("normalMatrix", globalPos.getNormalMatrix());
+	program->setUniform("ambientLight", ambientLight);
+
+	glBindTexture(GL_TEXTURE_2D, TexturePool::instance->getTexture("res/textures/1K_Grid.png"));
+
+	mesh->draw(program);
+
+	program->deactivateProgram();
 }

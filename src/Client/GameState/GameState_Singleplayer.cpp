@@ -6,34 +6,25 @@
 #include "Common/Entity/EntityGridSystem.hpp"
 #include "Client/Entity/EntityPlayerClient.hpp"
 #include "Common/Entity/EntityTempShip.hpp"
+#include "Common/Entity/EntityNode.hpp"
 
 GameState_Singleplayer::GameState_Singleplayer()
 {
 	this->mainWorld = WorldManager::instance->createWorld(WORLDTYPE::SOLAR);
-	EntityPlayerClient* player = new EntityPlayerClient(EntityManager::instance->getNextId());
-	EntityManager::instance->entities[player->entityId] = player;
-
-	this->playerInterface.bindCharacter(player);
-
-	player->addToWorld(this->mainWorld);
-
-	//Spawn some stuff for testing
-	for (int x = 0; x < 10; x++)
-	{
-		for (int y = 1; y < 11; y++)
-		{
-			EntityGridSystem* ship = (EntityGridSystem*)EntityManager::instance->createEntity(ENTITYTYPE::CHARACTOR);
-			ship->setTransform(Transform(vector3D(x * 2.0, 0.0, y * 2.0)));
-
-			ship->addToWorld(this->mainWorld);
-		}
-	}
 
 	EntityTempShip* ship = (EntityTempShip*)EntityManager::instance->createEntity(ENTITYTYPE::TEMPSHIP);
-	ship->setTransform(Transform(vector3D(10.0, 5.0, 10.0)));
+	//ship->setTransform(Transform(vector3D(10.0, 5.0, 10.0)));
 	ship->addToWorld(this->mainWorld);
-	ship->setSubWorld(WorldManager::instance->createWorld(BASE));
 
+	EntityPlayerClient* player = (EntityPlayerClient*)EntityManager::instance->createEntity(ENTITYTYPE::PLAYER_THIS);
+	this->playerInterface.bindCharacter(player);
+
+	player->setTransform(Transform(vector3D(0.0, 0.0, -15.0)));
+	player->addToWorld(this->mainWorld);
+
+	EntityNode* nodes = (EntityNode*)EntityManager::instance->createEntity(ENTITYTYPE::ENTITY_NODE);
+	nodes->setTransform(Transform(vector3D(0.0, 15.0, 0.0)));
+	nodes->addToWorld(this->mainWorld);
 }
 
 GameState_Singleplayer::~GameState_Singleplayer()
@@ -46,6 +37,7 @@ GameState_Singleplayer::~GameState_Singleplayer()
 
 void GameState_Singleplayer::update(Client* client, double deltaTime)
 {
+	EntityManager::instance->update();
 	this->playerInterface.updatePlayerInput();
 	WorldManager::instance->update(deltaTime);
 
@@ -56,7 +48,7 @@ void GameState_Singleplayer::update(Client* client, double deltaTime)
 	client->window->clearBuffer();
 	if (player != nullptr)
 	{
-		client->renderingManager->RenderWorld(player->getWorld(), &cam);
+		client->renderingManager->Render(player->getWorld(), &cam);
 	}
 	client->window->updateBuffer();
 }
