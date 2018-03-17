@@ -15,91 +15,83 @@ MeshPool::~MeshPool()
 	}
 }
 
-void MeshPool::loadModel(string name, string filename, bool isStatic)
+void MeshPool::loadMesh(string filename)
 {
-	if (this->staticMeshes.count(name))
+	if (this->hasMesh(filename))
 	{
 		//Already loaded
 		return;
 	}
 
-	if (isStatic)
-	{
-		StaticMeshResource resource;
-		resource.usingCount = 0;
-		resource.mesh = TexturedMesh::loadObj(filename);
+	StaticMeshResource resource;
+	resource.usingCount = 0;
+	resource.mesh = nullptr;
 
-		if (resource.mesh != nullptr)
+	this->staticMeshes[filename] = resource;
+}
+
+void MeshPool::unloadMesh(string filename)
+{
+	if (this->hasMesh(filename))
+	{
+		delete this->staticMeshes[filename].mesh;
+		this->staticMeshes[filename].mesh = nullptr;
+		//this->staticMeshes.erase(filename);
+	}
+}
+
+void MeshPool::setUsing(string filename)
+{
+	if (this->hasMesh(filename))
+	{
+		if (this->staticMeshes[filename].mesh == nullptr)
 		{
-			this->staticMeshes[name] = resource;
+			this->staticMeshes[filename].mesh = TexturedMesh::loadObj(filename);
 		}
-	}
-	else
-	{
-		StaticMeshResource resource;
-		resource.usingCount = 0;
-		resource.mesh = AnimatedMesh::loadMesh(filename);
-
-		this->staticMeshes[name] = resource;
+		this->staticMeshes[filename].usingCount++;
 	}
 }
 
-void MeshPool::unloadModel(string name)
-{
-	if (this->staticMeshes.count(name))
-	{
-		delete this->staticMeshes[name].mesh;
-		this->staticMeshes.erase(name);
-	}
-}
-
-void MeshPool::setUsing(string name)
-{
-	//TODO, load the shader if it doesn't exsist
-	if (!this->staticMeshes.count(name))
-	{
-		//TODO load here
-		return;
-	}
-
-	this->staticMeshes[name].usingCount++;
-}
-
-int MeshPool::getUsing(string name)
+int MeshPool::getUsing(string filename)
 {
 	//Return -1 if it is not loaded
-	if (!this->staticMeshes.count(name))
+	if (!this->hasMesh(filename))
 	{
 		return -1;
 	}
 
-	return this->staticMeshes[name].usingCount;
+	return this->staticMeshes[filename].usingCount;
 }
 
-void MeshPool::releaseUsing(string name)
+void MeshPool::releaseUsing(string filename)
 {
 	//Do nothing if it's not loaded
-	if (!this->staticMeshes.count(name))
+	if (!this->hasMesh(filename))
 	{
 		return;
 	}
 
-	this->staticMeshes[name].usingCount--;
+	this->staticMeshes[filename].usingCount--;
 
 	//If no one is using it, unload it
-	if (this->staticMeshes[name].usingCount <= 0)
+	if (this->staticMeshes[filename].usingCount <= 0)
 	{
-		this->unloadModel(name);
+		this->unloadMesh(filename);
 	}
 }
 
-Mesh* MeshPool::getModel(string name)
+Mesh* MeshPool::getMesh(string filename)
 {
 	//Does not contain
-	if (!this->staticMeshes.count(name))
+	if (!this->hasMesh(filename))
 	{
 		return nullptr;
 	}
 
-	return staticMeshes[name].mesh;
+	return this->staticMeshes[filename].mesh;
+}
+
+bool MeshPool::hasMesh(string filename)
+{
+	return this->staticMeshes.find(filename) != this->staticMeshes.end();
 }

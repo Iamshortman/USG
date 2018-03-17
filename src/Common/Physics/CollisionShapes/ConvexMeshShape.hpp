@@ -1,7 +1,7 @@
 #ifndef CONVEXMESHSHAPE_HPP
 #define CONVEXMESHSHAPE_HPP
 
-#include "Common/Physics/CollisionShapes/CollisionShape.hpp"
+#include "Common/Physics/CollisionShape.hpp"
 #include "Common/Physics/Bullet_Include.hpp"
 #include "Common/GLM_Include.hpp"
 #include "Common/Types.hpp"

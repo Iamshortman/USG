@@ -1,31 +1,14 @@
+#ifndef ENTITYNODE_HPP
+#define ENTITYNODE_HPP
+
 #include "Common/Entity/Entity.hpp"
 #include "Common/Entity/EntityManager.hpp"
 
 #include <set>
+#include "Node.hpp"
 
-class leaf;
-
-class Node
-{
-public:
-	Node* parent;
-	std::set<Node*> child_nodes;
-	std::set<leaf*> child_leaves;
-	Transform offset;
-
-	Transform getTransform()
-	{
-		if (this->parent != nullptr)
-		{
-			return this->offset.transformBy(this->parent->getTransform());
-		}
-		else
-		{
-			return this->offset;
-		}
-	};
-};
-
+//prototype class
+class ComponentModel;
 
 class EntityNode: public Entity
 {
@@ -44,6 +27,8 @@ public:
 
 	Node* rootNode = nullptr;
 
+	std::set<ComponentModel*> models;
+
 protected:
 };
 
@@ -54,3 +39,5 @@ struct CreatorEntityNode : public Creator
 		return new EntityNode(id);
 	};
 };
+
+#endif //ENTITYNODE_HPP

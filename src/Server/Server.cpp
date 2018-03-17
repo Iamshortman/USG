@@ -2,10 +2,7 @@
 
 #include "Common/World/WorldManager.hpp"
 #include "Common/Entity/EntityManager.hpp"
-
-#include "Common/Entity/EntityGridSystem.hpp"
 #include "Common/Entity/EntityCharacter.hpp"
-#include "Common/Entity/EntityTempShip.hpp"
 
 Server* Server::instance = nullptr;
 
@@ -16,26 +13,6 @@ Server::Server()
 	networkManager = new ServerNetworkManager(32, 60000);
 
 	rootWorlds.push_back(WorldManager::instance->createWorld(WORLDTYPE::SOLAR));
-
-	//Spawn some stuff for testing
-	EntityTempShip* ship = (EntityTempShip*)EntityManager::instance->createEntity(ENTITYTYPE::TEMPSHIP);
-	ship->setSubWorld(WorldManager::instance->createWorld(WORLDTYPE::BASE));
-	ship->setTransform(Transform(vector3D(10.0, 5.0, 10.0)));
-	ship->addToWorld(this->rootWorlds[0]);
-
-	/*Entity* entity = (EntityGridSystem*)EntityManager::instance->createEntity(ENTITYTYPE::GRIDSYSTEM);
-	entity->addToWorld(ship->getSubWorld());*/
-
-	for (int x = 0; x < 5; x++)
-	{
-		for (int y = 0; y < 5; y++)
-		{
-			EntityGridSystem* cube = (EntityGridSystem*)EntityManager::instance->createEntity(ENTITYTYPE::GRIDSYSTEM);
-			cube->setTransform(Transform(vector3D(x * 2.0, 0.0, (y * 2.0) + 2)));
-			cube->addToWorld(this->rootWorlds[0]);
-		}
-	}
-	
 }
 
 Server::~Server()

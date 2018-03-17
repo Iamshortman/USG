@@ -9,9 +9,11 @@
 #include "Common/GLM_Include.hpp"
 #include "Common/Transform.hpp"
 
+
 //Prototype Class
 class PhysicsWorld;
 class Entity;
+class Node;
 
 enum RIGIDBODYTYPE
 {
@@ -24,8 +26,11 @@ typedef unsigned int childId;
 struct ChildShape
 {
 	CollisionShape* shape;
+	double mass;
+
 	Transform transform;
 	childId index;
+	Node* node;
 };
 
 class RigidBody
@@ -38,7 +43,8 @@ public:
 	void setCollisionShape(CollisionShape* shape);
 	CollisionShape* getCollisionShape();
 
-	childId addChildShape(CollisionShape* shape, Transform transform);
+	childId addChildShape(CollisionShape* shape, Transform transform, double mass, Node* node = nullptr);
+	Node* getChildNode(childId id);
 	void removeChildShape(childId id);
 	void updateChildTransform(childId id, Transform transform);
 	void rebuildCompondShape();

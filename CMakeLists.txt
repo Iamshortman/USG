@@ -38,9 +38,6 @@ set_target_properties(Client PROPERTIES VS_DEBUGGER_WORKING_DIRECTORY "${CMAKE_S
 target_compile_definitions(Client PUBLIC CLIENT)
 target_compile_definitions(Server PUBLIC SERVER)
 
-target_compile_definitions(Client PUBLIC CLIENT)
-target_compile_definitions(Server PUBLIC SERVER)
-
 #libs part 2
 
 #GLM

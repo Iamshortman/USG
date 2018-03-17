@@ -1,5 +1,6 @@
 #include "Common/Physics/RigidBody.hpp"
 #include "Common/Entity/Entity.hpp"
+#include "Common/Entity/Node.hpp"
 
 RigidBody::RigidBody(Entity* entity, RIGIDBODYTYPE type)
 {
@@ -81,7 +82,7 @@ CollisionShape* RigidBody::getCollisionShape()
 	return this->singleShape;
 }
 
-childId RigidBody::addChildShape(CollisionShape* shape, Transform trans)
+childId RigidBody::addChildShape(CollisionShape* shape, Transform transform, double mass, Node* node)
 {
 	if (this->type == RIGIDBODYTYPE::COMPOUND)
 	{
@@ -89,7 +90,8 @@ childId RigidBody::addChildShape(CollisionShape* shape, Transform trans)
 
 		this->childShapes[id] = ChildShape();
 		this->childShapes[id].shape = shape;
-		this->childShapes[id].transform = trans;
+		this->childShapes[id].transform = transform;
+		this->childShapes[id].node = node;
 
 		this->rebuildCompondShape();
 
@@ -97,6 +99,19 @@ childId RigidBody::addChildShape(CollisionShape* shape, Transform trans)
 	}
 
 	return -1;
+}
+
+Node * RigidBody::getChildNode(childId id)
+{
+	if (this->type == RIGIDBODYTYPE::COMPOUND)
+	{
+		if (this->childShapes.find(id) != this->childShapes.end())
+		{
+			return this->childShapes[id].node;
+		}
+	}
+
+	return nullptr;
 }
 
 void RigidBody::removeChildShape(childId id)
@@ -149,6 +164,8 @@ void RigidBody::rebuildCompondShape()
 			//Sets Parent Index
 			this->compoundShape->setUserPointer(this->parent);
 
+			double totalMass = 0.01;
+
 			ChildShape* child;
 			for (auto iter = this->childShapes.begin(); iter != this->childShapes.end(); iter++)
 			{
@@ -156,15 +173,26 @@ void RigidBody::rebuildCompondShape()
 				child->index = this->compoundShape->getNumChildShapes();
 
 				//Sets Child Index
-				child->shape->btShape->setUserIndex(child->index);
+				child->shape->btShape->setUserIndex(*&iter->first);
 				child->shape->btShape->setUserPointer(this->parent);
 
 				this->compoundShape->addChildShape(toBtTransform(child->transform), child->shape->btShape);
+
+				totalMass += child->mass;
 			}
+
+			if (this->mass == 0.0)
+			{
+				totalMass = 0.0;
+			}
+
+			this->mass = totalMass;
 
 			btVector3 inertiaTemp;
 			this->compoundShape->calculateLocalInertia(this->mass, inertiaTemp);
 			this->inertia = toVec3(inertiaTemp);
+
+			this->rigidBody->setMassProps(this->mass, toBtVec3(this->inertia));
 
 			this->rigidBody->setCollisionShape(this->compoundShape);
 		}

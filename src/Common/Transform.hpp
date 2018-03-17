@@ -27,10 +27,20 @@ public:
 	void setPositionAndRotationFromTransform(const Transform& transform);
 	Transform transformBy(const Transform&  transform1) const;
 
-
 	matrix4 getModleMatrix() const;
 	matrix4 getModleMatrix(vector3D cameraPos, double divisorPosScale = 1.0) const;
 	matrix3 getNormalMatrix() const;
+
+	inline bool operator==(const Transform& other)
+	{
+		return this->position == other.position && this->orientation == other.orientation;
+	}
+
+	inline bool operator!=(const Transform& other)
+	{
+		return !(*this == other);
+	}
+
 };
 
 #endif //TRANSFORM_HPP

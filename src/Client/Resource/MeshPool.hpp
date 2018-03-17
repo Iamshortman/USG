@@ -19,12 +19,6 @@ struct StaticMeshResource
 	Mesh* mesh;
 };
 
-struct AnimatedMeshResource
-{
-	int usingCount = 0;
-	AnimatedMesh* mesh;
-};
-
 //Loads and stores all shaders using in game.
 class MeshPool
 {
@@ -34,17 +28,20 @@ public:
 
 	MeshPool();
 	~MeshPool();
-	void loadModel(string name, string filename, bool isStatic);
-	void unloadModel(string name);
+	void loadMesh(string filename);
+	void unloadMesh(string filename);
 
-	void setUsing(string name);
-	int getUsing(string name);
-	void releaseUsing(string name);
-	Mesh* getModel(string name);
+	void setUsing(string filename);
+	int getUsing(string filename);
+	void releaseUsing(string filename);
+	Mesh* getMesh(string filename);
 
 private:
+	bool hasMesh(string filename);
+
+
 	std::unordered_map<string, StaticMeshResource> staticMeshes;
-	std::unordered_map<string, AnimatedMeshResource> animatedMesh;
+	//std::unordered_map<string, AnimatedMeshResource> animatedMesh;
 };
 
 

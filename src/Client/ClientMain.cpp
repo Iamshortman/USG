@@ -10,7 +10,6 @@
 #include "Client/Input/InputManager.hpp"
 #include "Client/Rendering/LightManager.hpp"
 
-#include "Common/Entity/EntityGridSystem.hpp"
 #include "Common/Entity/EntityCharacter.hpp"
 #include "Client/Entity/EntityPlayerClient.hpp"
 

@@ -3,9 +3,6 @@
 #include "Common/World/WorldManager.hpp"
 
 #include "Common/Entity/EntityCharacter.hpp"
-#include "Common/Entity/EntityGridSystem.hpp"
-#include "Common/Entity/EntityTempShip.hpp"
-#include "Common/Entity/EntityTempShipInside.hpp"
 #include "Common/Entity/EntityNode.hpp"
 
 EntityManager* EntityManager::instance = nullptr;
@@ -14,10 +11,7 @@ EntityManager::EntityManager()
 {
 	instance = this;
 
-	this->registerCreator(ENTITYTYPE::GRIDSYSTEM, new CreatorGridSystem());
 	this->registerCreator(ENTITYTYPE::CHARACTOR, new CreatorCharacter());
-	this->registerCreator(ENTITYTYPE::TEMPSHIP, new CreatorTempShip());
-	this->registerCreator(ENTITYTYPE::TEMPSHIPINSIDE, new CreatorTempShipInside());
 
 	this->registerCreator(ENTITYTYPE::ENTITY_NODE, new CreatorEntityNode());
 }

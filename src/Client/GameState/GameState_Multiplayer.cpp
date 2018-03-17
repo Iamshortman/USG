@@ -2,8 +2,6 @@
 #include "Client/Client.hpp"
 #include "Common/World/WorldManager.hpp"
 #include "Common/Entity/EntityManager.hpp"
-#include "Common/Entity/EntityGridSystem.hpp"
-#include "Client/Entity/EntityPlayerClient.hpp"
 
 GameState_Multiplayer::GameState_Multiplayer()
 {

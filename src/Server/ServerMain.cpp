@@ -3,8 +3,6 @@
 
 #include "Common/World/WorldManager.hpp"
 #include "Common/Entity/EntityManager.hpp"
-
-#include "Common/Entity/EntityGridSystem.hpp"
 #include "Common/Entity/EntityCharacter.hpp"
 
 double Cycles_Per_Second = 120.0;
