@@ -3,6 +3,7 @@
 
 #include "Client/Rendering/Lights.hpp"
 #include "Client/Rendering/ShaderProgram.hpp"
+#include "Common/Transform.hpp"
 
 #include <string>
 

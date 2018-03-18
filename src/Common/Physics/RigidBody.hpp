@@ -94,7 +94,7 @@ private:
 	btEmptyShape* emptyShape = nullptr;
 
 	double mass = 1.0;
-	vector3D inertia = vector3D(1.0);
+	vector3D inertia = vector3D(0.0);
 
 	PhysicsWorld* world = nullptr;
 

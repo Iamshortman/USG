@@ -102,5 +102,10 @@ ShaderProgram* ShaderPool::getShader(string name)
 		return nullptr;
 	}
 
+	if (shaders[name].usingCount <= 0)
+	{
+		printf("Error: Shader %s not loaded\n", name.c_str());
+	}
+
 	return shaders[name].program;
 }

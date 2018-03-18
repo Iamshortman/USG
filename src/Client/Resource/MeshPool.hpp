@@ -1,5 +1,5 @@
-#ifndef MODELPOOL_HPP
-#define MODELPOOL_HPP
+#ifndef MESHPOOL_HPP
+#define MESHPOOL_HPP
 
 #include <unordered_map>
 #include <string>
@@ -19,7 +19,7 @@ struct StaticMeshResource
 	Mesh* mesh;
 };
 
-//Loads and stores all shaders using in game.
+//Loads and stores all meshes using in game.
 class MeshPool
 {
 
@@ -45,4 +45,4 @@ private:
 };
 
 
-#endif //MODELPOOL_HPP
+#endif //MESHPOOL_HPP

@@ -11,6 +11,7 @@
 #include "Common/World/World.hpp"
 
 #include "Client/Rendering/Lights.hpp"
+#include "Common/Entity/ComponentModel.hpp"
 
 class RenderingManager
 {
@@ -22,10 +23,11 @@ public:
 	void setWindow(Window* win);
 	Window* getWindow();
 
-	void RenderWorld(World* world, Camera* cam);
-	void Render(World* baseWorld, Camera* cam);
+	void RenderWorld(World* world, Camera* camera);
+	void Render(World* baseWorld, Camera* camera);
 
-	void RenderMesh(Mesh* mesh, ShaderProgram* program, Transform globalPos, Camera* cam, World* world);
+	void RenderModel(ComponentModel* model, Transform globalPos, Camera* camera, World* world);
+	void RenderMesh(Mesh* mesh, ShaderProgram* program, Transform globalPos, Camera* camera, World* world);
 
 private:
 	Window* window = nullptr;

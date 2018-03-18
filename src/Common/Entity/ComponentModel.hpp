@@ -1,3 +1,6 @@
+#ifndef COMPONENT_MODEL_HPP
+#define COMPONENT_MODEL_HPP 
+
 #include "Common/Entity/Component.hpp"
 #include "Common/Types.hpp"
 
@@ -26,3 +29,5 @@ protected:
 	string lighting_shader_name;
 	string texture_name;
 };
+
+#endif //COMPONENT_MODEL_HPP

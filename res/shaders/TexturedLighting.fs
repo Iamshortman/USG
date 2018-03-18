@@ -12,32 +12,32 @@ out vec4 fragmentColor;
 uniform vec3 ambientLight = vec3(1.0f);
 uniform sampler2D texture1;
 
-uniform DirectionalLight directinalLights[8];
-uniform int directinalCount = 0;
+uniform DirectionalLight directinal_lights[8];
+uniform int directinal_count = 0;
 
-uniform PointLight pointLights[8];
-uniform int pointCount = 0;
+uniform PointLight point_lights[8];
+uniform int point_count = 0;
 
-uniform SpotLight spotLights[8];
-uniform int spotCount = 0;
+uniform SpotLight spot_lights[8];
+uniform int spot_count = 0;
 
 void main(void) 
 {
 	vec4 result = vec4(0.0f, 0.0f, 0.0f, 0.0f);
 
-	for(int i = 0; i < directinalCount; i++)
+	for(int i = 0; i < directinal_count; i++)
 	{
-		result += CalcDirectionalLight(directinalLights[i], out_Normal, out_worldPos);
+		result += CalcDirectionalLight(directinal_lights[i], out_Normal, out_worldPos);
 	}
 	
-	for(int i = 0; i < pointCount; i++)
+	for(int i = 0; i < point_count; i++)
 	{
-		result += CalcPointLight(pointLights[i], out_Normal, out_worldPos);
+		result += CalcPointLight(point_lights[i], out_Normal, out_worldPos);
 	}
 	
-	for(int i = 0; i < spotCount; i++)
+	for(int i = 0; i < spot_count; i++)
 	{
-		result += CalcSpotLight(spotLights[i], out_Normal, out_worldPos);
+		result += CalcSpotLight(spot_lights[i], out_Normal, out_worldPos);
 	}
 	
 	vec4 trueColor = texture(texture1, out_TexCoord);

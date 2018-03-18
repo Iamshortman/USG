@@ -61,14 +61,7 @@ void RigidBody::setCollisionShape(CollisionShape* shape)
 			this->singleShape->btShape->setUserPointer(this->parent);
 			this->rigidBody->setCollisionShape(this->singleShape->btShape);
 			this->setMass(this->mass);
-
-			if (this->mass != 0.0)
-			{
-				btVector3 inertiaToSet;
-				this->singleShape->btShape->calculateLocalInertia(this->mass, inertiaToSet);
-
-				this->setInertiaTensor(toVec3(inertiaToSet));
-			}
+			this->setInertiaTensor(vector3D(0.0));
 		}
 		else
 		{
@@ -92,6 +85,7 @@ childId RigidBody::addChildShape(CollisionShape* shape, Transform transform, dou
 		this->childShapes[id].shape = shape;
 		this->childShapes[id].transform = transform;
 		this->childShapes[id].node = node;
+		this->childShapes[id].mass = mass;
 
 		this->rebuildCompondShape();
 
@@ -187,10 +181,6 @@ void RigidBody::rebuildCompondShape()
 			}
 
 			this->mass = totalMass;
-
-			btVector3 inertiaTemp;
-			this->compoundShape->calculateLocalInertia(this->mass, inertiaTemp);
-			this->inertia = toVec3(inertiaTemp);
 
 			this->rigidBody->setMassProps(this->mass, toBtVec3(this->inertia));
 

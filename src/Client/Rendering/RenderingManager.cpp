@@ -5,30 +5,31 @@
 #include "Client/Resource/MeshPool.hpp"
 #include "Client/Resource/ShaderPool.hpp"
 #include "Client/Resource/TexturePool.hpp"
+#include "Client/Rendering/LightManager.hpp"
+#include "Client/Rendering/LightShaderUtil.hpp"
 
 #include <stack>
 #include "Common/Entity/EntityNode.hpp"
-#include "Common/Entity/ComponentModel.hpp"
 
 RenderingManager::RenderingManager()
 {
 	ShaderPool::instance->loadShader("Textured", "res/shaders/Textured.vs", "res/shaders/Textured.fs", { { 0, "in_Position" },{ 1, "in_Normal" },{ 2, "in_TexCoord" } });
+	ShaderPool::instance->loadShader("Textured_Lighting", "res/shaders/Textured.vs", "res/shaders/TexturedLighting.fs", { { 0, "in_Position" },{ 1, "in_Normal" },{ 2, "in_TexCoord" } });
+	ShaderPool::instance->setUsing("Textured_Lighting");
+	
+	//ShaderPool::instance->loadShader("Textured_Shadow", "res/shaders/Textured.vs", "res/shaders/Textured.fs", { { 0, "in_Position" },{ 1, "in_Normal" },{ 2, "in_TexCoord" } });
 
 	MeshPool::instance->loadMesh("res/models/SmallCube.obj");
 	MeshPool::instance->loadMesh("res/models/CubeShip1.obj");
 	MeshPool::instance->loadMesh("res/models/Player_Capsule.obj");
-
-	//MeshPool::instance->loadModel("tempShipOut", "res/models/ship/outside.obj");
-	//MeshPool::instance->loadModel("tempShipIn", "res/models/ship/inside.obj");
-
-	TexturePool::instance->loadTexture("res/textures/1K_Grid.png");
-
-
 	MeshPool::instance->loadMesh("res/models/Cobra/Hull.obj");
 	MeshPool::instance->loadMesh("res/models/Cobra/Engine.obj");
 	MeshPool::instance->loadMesh("res/models/Cobra/Wing.obj");
 	MeshPool::instance->loadMesh("res/models/Cobra/Canopy_Outside.obj");
 	MeshPool::instance->loadMesh("res/models/Cobra/Cockpit.obj");
+	MeshPool::instance->loadMesh("res/models/plane.obj");
+
+	TexturePool::instance->loadTexture("res/textures/1K_Grid.png");
 }
 
 RenderingManager::~RenderingManager()
@@ -58,7 +59,7 @@ void RenderingManager::Render(World* baseWorld, Camera* cam)
 	this->RenderWorld(world, cam);
 }
 
-void RenderingManager::RenderWorld(World* world, Camera* cam)
+void RenderingManager::RenderWorld(World* world, Camera* camera)
 {
 	if (world == nullptr)
 	{
@@ -100,27 +101,90 @@ void RenderingManager::RenderWorld(World* world, Camera* cam)
 				break;*/
 			case ENTITYTYPE::ENTITY_NODE:
 				EntityNode* node = (EntityNode*) entity;
+				Transform renderTransform = node->getRenderTransform();
 				for (ComponentModel* model : node->models)
 				{
-					this->RenderMesh(MeshPool::instance->getMesh(model->getMesh()), ShaderPool::instance->getShader(model->getShader()), model->getParentNode()->getTransform().transformBy(entity->getRenderTransform()), cam, world);
+					this->RenderModel(model, renderTransform, camera, world);
 				}
 			}
 		}
-
 	}
 
-	//TODO Rendering Sub Worlds
 	auto subWorlds = world->getSubWorlds();
-
 	for (auto it = subWorlds->begin(); it != subWorlds->end(); it++)
 	{
 		World* subWorld = *it;
-		this->RenderWorld(subWorld, cam);
+		this->RenderWorld(subWorld, camera);
 	}
 
 }
 
-void RenderingManager::RenderMesh(Mesh* mesh, ShaderProgram* program, Transform globalPos, Camera* cam, World* world)
+void RenderingManager::RenderModel(ComponentModel * model, Transform globalPos, Camera * camera, World * world)
+{
+	Transform renderTransform = model->getParentNode()->getTransform().transformBy(globalPos);
+	matrix4 projection = camera->getProjectionMatrix(this->window);
+	matrix4 view = camera->getOriginViewMatrix();
+	matrix4 modelMatrix = renderTransform.getModleMatrix(camera->getPosition());
+	matrix4 mvp = projection * view * modelMatrix;
+
+	vector3F ambientLight = world->ambientLight;
+	Mesh* mesh = MeshPool::instance->getMesh(model->getMesh());
+
+	glBindTexture(GL_TEXTURE_2D, TexturePool::instance->getTexture(model->getTexture()));
+
+	//Ambient pass
+	ShaderProgram* ambient_shader = ShaderPool::instance->getShader(model->getShader());
+
+	ambient_shader->setActiveProgram();
+	ambient_shader->setUniform("MVP", mvp);
+	ambient_shader->setUniform("modelMatrix", modelMatrix);
+	ambient_shader->setUniform("normalMatrix", renderTransform.getNormalMatrix());
+	ambient_shader->setUniform("ambientLight", ambientLight);
+
+	mesh->draw(ambient_shader);
+
+	ambient_shader->deactivateProgram();
+
+	//Lighting pass
+	if (true)
+	{
+		glEnable(GL_BLEND);
+		glBlendFunc(GL_ONE, GL_ONE);
+		glDepthMask(GL_FALSE);
+		glDepthFunc(GL_EQUAL);
+
+		LightSet* set = LightManager::instance->getLightsForWorld(world->worldId);
+		DirectionalLight* light1 = set->directionalLights[0];
+		PointLight* light2 = set->pointLights[0];
+		ShaderProgram* lighting_shader = ShaderPool::instance->getShader("Textured_Lighting");
+
+		lighting_shader->setActiveProgram();
+		lighting_shader->setUniform("MVP", mvp);
+		lighting_shader->setUniform("modelMatrix", modelMatrix);
+		lighting_shader->setUniform("normalMatrix", renderTransform.getNormalMatrix());
+		lighting_shader->setUniform("ambientLight", ambientLight);
+
+		setDirectionalLight("directinal_lights[0]", lighting_shader, light1, Transform());
+		//lighting_shader->setUniform("directinal_count", 1);
+
+		setPointLight("point_lights[0]", lighting_shader, light2, Transform(), camera->getPosition());
+		lighting_shader->setUniform("point_count", 1);
+
+
+		mesh->draw(lighting_shader);
+
+		lighting_shader->deactivateProgram();
+
+		glDepthMask(GL_TRUE);
+		glDepthFunc(GL_LESS);
+		glDisable(GL_BLEND);
+	}
+	
+	glBindTexture(GL_TEXTURE_2D, 0);
+}
+
+//deprecated this render funcion
+void RenderingManager::RenderMesh(Mesh* mesh, ShaderProgram* program, Transform globalPos, Camera* camera, World* world)
 {
 	if (mesh == nullptr || program == nullptr)
 	{
@@ -129,9 +193,9 @@ void RenderingManager::RenderMesh(Mesh* mesh, ShaderProgram* program, Transform 
 
 	vector3F ambientLight = world->ambientLight;
 
-	matrix4 projection = cam->getProjectionMatrix(this->window);
-	matrix4 view = cam->getOriginViewMatrix();
-	matrix4 modelMatrix = globalPos.getModleMatrix(cam->getPosition());
+	matrix4 projection = camera->getProjectionMatrix(this->window);
+	matrix4 view = camera->getOriginViewMatrix();
+	matrix4 modelMatrix = globalPos.getModleMatrix(camera->getPosition());
 	matrix4 mvp = projection * view * modelMatrix;
 
 	program->setActiveProgram();
@@ -145,4 +209,7 @@ void RenderingManager::RenderMesh(Mesh* mesh, ShaderProgram* program, Transform 
 	mesh->draw(program);
 
 	program->deactivateProgram();
+
+
+
 }
