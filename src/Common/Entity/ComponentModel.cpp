@@ -8,12 +8,14 @@
 #include "Client/Resource/TexturePool.hpp"
 #endif
 
-ComponentModel::ComponentModel(string mesh, string shader, string lighting_shader, string texture)
+ComponentModel::ComponentModel(string mesh, string texture, string ambient_shader, string lighting_shader, string shadow_shader)
 {
 	this->mesh_file_path = mesh;
-	this->shader_name = shader;
-	this->lighting_shader_name = lighting_shader;
 	this->texture_name = texture;
+
+	this->ambient_shader_name = ambient_shader;
+	this->lighting_shader_name = lighting_shader;
+	this->shadow_shader_name = shadow_shader;
 }
 
 ComponentModel::~ComponentModel()
@@ -32,9 +34,11 @@ void ComponentModel::enable()
 
 #ifdef CLIENT
 		MeshPool::instance->setUsing(this->mesh_file_path);
-		ShaderPool::instance->setUsing(this->shader_name);
-		ShaderPool::instance->setUsing(this->lighting_shader_name);
 		TexturePool::instance->setUsing(this->texture_name);
+
+		ShaderPool::instance->setUsing(this->ambient_shader_name);
+		ShaderPool::instance->setUsing(this->lighting_shader_name);
+		ShaderPool::instance->setUsing(this->shadow_shader_name);
 #endif
 		Component::enable();
 	}
@@ -51,9 +55,11 @@ void ComponentModel::disable()
 
 #ifdef CLIENT
 		MeshPool::instance->releaseUsing(this->mesh_file_path);
-		ShaderPool::instance->releaseUsing(this->shader_name);
-		ShaderPool::instance->releaseUsing(this->lighting_shader_name);
 		TexturePool::instance->releaseUsing(this->texture_name);
+
+		ShaderPool::instance->releaseUsing(this->ambient_shader_name);
+		ShaderPool::instance->releaseUsing(this->lighting_shader_name);
+		ShaderPool::instance->releaseUsing(this->shadow_shader_name);
 #endif
 		Component::disable();
 	}

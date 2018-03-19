@@ -9,10 +9,14 @@ class Camera
 {
 public:
 	Camera();
-	matrix4 getViewMatrix();
-	matrix4 getOriginViewMatrix();
+	Camera(vector3D position, vector3F forward, vector3F up);
+
 	matrix4 getProjectionMatrix(int screenWidth, int screenheight);
 	matrix4 getProjectionMatrix(Window* window);
+	matrix4 getOrthographicMatrix(float x_bounds, float y_bounds);
+
+	matrix4 getViewMatrix();
+	matrix4 getOriginViewMatrix();
 	matrix4 getModelMatrix();
 
     void moveCameraPos(const vector3D& dist);
@@ -35,7 +39,6 @@ private:
     vector3D position;
 
 	//Perspective varables
-	float isPerspective = true;
 	float frameOfView = 45.0f;
 	float nearClipping = 0.1f;
 	float farClipping = 1000.0f;

@@ -3,9 +3,61 @@
 
 Camera::Camera()
 {
-	this->position = vector3F(0.0F, 0.0F, 0.0F);
-	this->forward = vector3F(0.0F, 0.0F, 1.0F);
-	this->up = vector3F(0.0F, 1.0F, 0.0F);
+	this->position = vector3D(0.0, 0.0, 0.0);
+	this->forward = vector3F(0.0f, 0.0f, 1.0F);
+	this->up = vector3F(0.0f, 1.0F, 0.0f);
+}
+
+Camera::Camera(vector3D position, vector3F forward, vector3F up)
+{
+	this->position = position;
+	this->forward = forward;
+	this->up = up;
+}
+
+matrix4 Camera::getProjectionMatrix(int screenWidth, int screenHeight)
+{
+	float aspectRatio = ((float)screenWidth) / ((float)screenHeight);
+
+	//float fovY = abs((frameOfView * (float)height) / ((float)width));
+
+	return glm::tweakedInfinitePerspective(this->frameOfView, aspectRatio, this->nearClipping);
+}
+
+matrix4 Camera::getProjectionMatrix(Window* window)
+{
+	int width, height;
+	window->getWindowSize(width, height);
+	return this->getProjectionMatrix(width, height);
+}
+
+matrix4 Camera::getOrthographicMatrix(float x_bounds, float y_bounds)
+{
+	return glm::ortho(-x_bounds, x_bounds, -y_bounds, y_bounds, this->nearClipping, this->farClipping);
+}
+
+matrix4 Camera::getViewMatrix()
+{
+	return glm::lookAt((vector3F)this->position, (vector3F)(this->position + this->forward), (vector3F)this->up);
+}
+
+matrix4 Camera::getOriginViewMatrix()
+{
+	vector3F forwardVec = (vector3F)this->forward;
+	vector3F upVec = (vector3F)this->up;
+
+	return glm::lookAt(vector3F(0.0f), forwardVec, upVec);
+}
+
+matrix4 Camera::getModelMatrix()
+{
+	matrix4 positionMatrix = matrix4();
+	matrix4 rotationMatrix = matrix4();
+
+	positionMatrix = glm::translate(matrix4(1.0F), (vector3F)this->position);
+	rotationMatrix = glm::toMat4(this->getOrientation());
+
+	return positionMatrix * rotationMatrix;
 }
 
 void Camera::setCameraPos(vector3D& pos)
@@ -28,8 +80,8 @@ void Camera::rotateCamera(const vector3D& direction, double angle)
 void Camera::setCameraTransform(vector3D pos, quaternionD orientation)
 {
 	this->position = pos;
-	this->forward = glm::normalize(orientation * vector3D(0.0F, 0.0F, 1.0F));
-	this->up = glm::normalize(orientation * vector3D(0.0F, 1.0F, 0.0F));
+	this->forward = glm::normalize(orientation * vector3D(0.0f, 0.0f, 1.0F));
+	this->up = glm::normalize(orientation * vector3D(0.0f, 1.0F, 0.0f));
 }
 
 void Camera::setCameraTransform(Transform& transform)
@@ -76,53 +128,6 @@ quaternionF Camera::getOrientation()
 	rotationMatrix[2][2] = (float) this->forward.z;
 
 	return glm::toQuat(rotationMatrix);
-}
-
-matrix4 Camera::getViewMatrix()
-{
-	return glm::lookAt((vector3F) this->position, (vector3F)(this->position + this->forward), (vector3F)this->up);
-}
-
-matrix4 Camera::getOriginViewMatrix()
-{
-	vector3F forwardVec = (vector3F)this->forward;
-	vector3F upVec = (vector3F)this->up;
-
-	return glm::lookAt(vector3F(0.0f), forwardVec, upVec);
-}
-
-matrix4 Camera::getProjectionMatrix(int screenWidth, int screenHeight)
-{
-	float aspectRatio = ((float)screenWidth) / ((float)screenHeight);
-	
-	//float fovY = abs((frameOfView * (float)height) / ((float)width));
-
-	return glm::tweakedInfinitePerspective(this->frameOfView, aspectRatio, this->nearClipping);
-
-	/*float f = 1.0f / tan(this->frameOfView / 2.0f);
-	return glm::mat4(
-		f / aspectRatio, 0.0f, 0.0f, 0.0f,
-		0.0f, f, 0.0f, 0.0f,
-		0.0f, 0.0f, 0.0f, -1.0f,
-		0.0f, 0.0f, this->nearClipping, 0.0f);*/
-}
-
-matrix4 Camera::getProjectionMatrix(Window* window)
-{
-	int width, height;
-	window->getWindowSize(width, height);
-	return this->getProjectionMatrix(width, height);
-}
-
-matrix4 Camera::getModelMatrix()
-{
-	matrix4 positionMatrix = matrix4();
-	matrix4 rotationMatrix = matrix4();
-
-	positionMatrix = glm::translate(matrix4(1.0F), (vector3F)this->position);
-	rotationMatrix = glm::toMat4(this->getOrientation());
-
-	return positionMatrix * rotationMatrix;
 }
 
 void Camera::setProjection(float frameOfView, float nearClipping, float farClipping)

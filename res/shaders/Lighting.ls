@@ -103,3 +103,17 @@ vec4 CalcSpotLight(SpotLight spotLight, vec3 normal, vec3 worldPos)
     
     return color;
 }
+
+float CalcShadow(sampler2D shadow_map, vec4 fragPosLightSpace)
+{
+    // perform perspective divide
+    vec3 projCoords = ((fragPosLightSpace.xyz / fragPosLightSpace.w) * 0.5) + 0.5;
+
+	float currentDepth = projCoords.z;
+	float closestDepth = texture2D(shadow_map, projCoords.xy).r;
+	
+	float bias = 0.005;
+	float shadow = currentDepth - bias > closestDepth  ? 0.0 : 1.0;  
+
+    return shadow;
+}  

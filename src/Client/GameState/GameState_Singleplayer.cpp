@@ -17,7 +17,7 @@ GameState_Singleplayer::GameState_Singleplayer()
 {
 	this->mainWorld = WorldManager::instance->createWorld(WORLDTYPE::SOLAR);
 
-	this->mainWorld->ambientLight = vector3F(0.01f);
+	this->mainWorld->ambientLight = vector3F(0.05f);
 
 	EntityPlayerClient* player = (EntityPlayerClient*)EntityManager::instance->createEntity(ENTITYTYPE::PLAYER_THIS);
 	this->playerInterface.bindCharacter(player);
@@ -32,17 +32,17 @@ GameState_Singleplayer::GameState_Singleplayer()
 		cobra->addToWorld(this->mainWorld);
 
 		Node* rootNode = cobra->rootNode;
-		rootNode->addComponent(new ComponentModel("res/models/Cobra/Hull.obj", "Textured", "", "res/textures/1K_Grid.png"));
+		rootNode->addComponent(new ComponentModel("res/models/Cobra/Hull.obj", "res/textures/1K_Grid.png", "Textured", "Textured_Lighting", "Textured_Shadow"));
 		rootNode->addComponent(new ComponentCollisionShape(new ConvexMeshShape("res/models/Cobra/Hull.obj"), 10000.0));
 
 		Node* right_engine = new Node();
 		right_engine->setLocalTransform(Transform(vector3D(-1.7, 0.0, -4.25)));
-		right_engine->addComponent(new ComponentModel("res/models/Cobra/Engine.obj", "Textured", "", "res/textures/1K_Grid.png"));
+		right_engine->addComponent(new ComponentModel("res/models/Cobra/Engine.obj", "res/textures/1K_Grid.png", "Textured", "Textured_Lighting", "Textured_Shadow"));
 		right_engine->addComponent(new ComponentCollisionShape(new ConvexMeshShape("res/models/Cobra/Engine.obj"), 5000.0));
 		{
 			Node* right_wing = new Node();
 			right_wing->setLocalTransform(Transform(vector3D(-2.5, 0.0, 0.7)));
-			right_wing->addComponent(new ComponentModel("res/models/Cobra/Wing.obj", "Textured", "", "res/textures/1K_Grid.png"));
+			right_wing->addComponent(new ComponentModel("res/models/Cobra/Wing.obj", "res/textures/1K_Grid.png", "Textured", "Textured_Lighting", "Textured_Shadow"));
 			right_wing->addComponent(new ComponentCollisionShape(new ConvexMeshShape("res/models/Cobra/Wing.obj"), 500.0));
 			right_engine->addChild(right_wing);
 		}
@@ -50,12 +50,12 @@ GameState_Singleplayer::GameState_Singleplayer()
 
 		Node* left_engine = new Node();
 		left_engine->setLocalTransform(Transform(vector3D(1.7, 0.0, -4.25), quaternionD(0.0, 0.0, 0.0, 1.0)));
-		left_engine->addComponent(new ComponentModel("res/models/Cobra/Engine.obj", "Textured", "", "res/textures/1K_Grid.png"));
+		left_engine->addComponent(new ComponentModel("res/models/Cobra/Engine.obj", "res/textures/1K_Grid.png", "Textured", "Textured_Lighting", "Textured_Shadow"));
 		left_engine->addComponent(new ComponentCollisionShape(new ConvexMeshShape("res/models/Cobra/Engine.obj"), 5000.0));
 		{
 			Node* left_wing = new Node();
 			left_wing->setLocalTransform(Transform(vector3D(-2.5, 0.0, 0.7)));
-			left_wing->addComponent(new ComponentModel("res/models/Cobra/Wing.obj", "Textured", "", "res/textures/1K_Grid.png"));
+			left_wing->addComponent(new ComponentModel("res/models/Cobra/Wing.obj", "res/textures/1K_Grid.png", "Textured", "Textured_Lighting", "Textured_Shadow"));
 			left_wing->addComponent(new ComponentCollisionShape(new ConvexMeshShape("res/models/Cobra/Wing.obj"), 500.0));
 			left_engine->addChild(left_wing);
 		}
@@ -63,13 +63,13 @@ GameState_Singleplayer::GameState_Singleplayer()
 
 		Node* canopy = new Node();
 		canopy->setLocalTransform(Transform(vector3D(0.0, 1.3, -2.6)));
-		canopy->addComponent(new ComponentModel("res/models/Cobra/Canopy_Outside.obj", "Textured", "", "res/textures/1K_Grid.png"));
+		canopy->addComponent(new ComponentModel("res/models/Cobra/Canopy_Outside.obj", "res/textures/1K_Grid.png", "Textured", "Textured_Lighting", "Textured_Shadow"));
 		//canopy->addComponent(new ComponentRotate(quaternionD(), quaternionD(0.906, -0.423, 0.0, 0.0), 5.0));
 		canopy->addComponent(new ComponentCollisionShape(new ConvexMeshShape("res/models/Cobra/Canopy_Outside.obj"), 100.0));
 		rootNode->addChild(canopy);
 
 		Node* cockpit = new Node();
-		cockpit->addComponent(new ComponentModel("res/models/Cobra/Cockpit.obj", "Textured", "", "res/textures/1K_Grid.png"));
+		cockpit->addComponent(new ComponentModel("res/models/Cobra/Cockpit.obj", "res/textures/1K_Grid.png", "Textured", "Textured_Lighting", "Textured_Shadow"));
 		rootNode->addChild(cockpit);
 	}
 
@@ -78,14 +78,16 @@ GameState_Singleplayer::GameState_Singleplayer()
 		EntityNode* plane = (EntityNode*)EntityManager::instance->createEntity(ENTITYTYPE::ENTITY_NODE);
 		plane->setTransform(Transform(vector3D(0.0, -2.0, 0.0)));
 		plane->addToWorld(this->mainWorld);
-		plane->rootNode->addComponent(new ComponentModel("res/models/plane.obj", "Textured", "", "res/textures/1K_Grid.png"));
+		plane->rootNode->addComponent(new ComponentModel("res/models/plane.obj", "res/textures/1K_Grid.png", "Textured", "Textured_Lighting", "Textured_Shadow"));
+		//plane->rootNode->addComponent(new ComponentModel("res/models/plane.obj", "shadow_map", "Textured", "Textured_Lighting", "Textured_Shadow"));
+		((ComponentModel*)plane->rootNode->getComponent(ComponentModel::Type))->setCastShadows(false);
 	}
 
-	DirectionalLight* light1 = new DirectionalLight(vector3F(0.09656, 0.96561, -0.24140), vector3F(0.25, 0.61f, 1.0f), 0.9f);
-	//LightManager::instance->addDirectionalLight(this->mainWorld->worldId, light1);
+	DirectionalLight* light1 = new DirectionalLight(vector3F(0.0f, 1.0f, 0.0f), vector3F(1.0f), 0.8f);
+	LightManager::instance->addDirectionalLight(this->mainWorld->worldId, light1);
 
-	PointLight* light2 = new PointLight(vector3D(5.0, 5.0, 5.0), 50.0f, vector3F(0.0f, 0.05f, 0.0f), vector3F(1.0f), 0.4f);
-	LightManager::instance->addPointLight(this->mainWorld->worldId, light2);
+	//PointLight* light2 = new PointLight(vector3D(0.0, 7.0, 0.0), 50.0f, vector3F(0.0f, 0.05f, 0.0f), vector3F(1.0f), 0.4f);
+	//LightManager::instance->addPointLight(this->mainWorld->worldId, light2);
 }
 
 GameState_Singleplayer::~GameState_Singleplayer()

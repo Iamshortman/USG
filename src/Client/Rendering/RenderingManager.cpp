@@ -13,12 +13,27 @@
 
 RenderingManager::RenderingManager()
 {
-	ShaderPool::instance->loadShader("Textured", "res/shaders/Textured.vs", "res/shaders/Textured.fs", { { 0, "in_Position" },{ 1, "in_Normal" },{ 2, "in_TexCoord" } });
-	ShaderPool::instance->loadShader("Textured_Lighting", "res/shaders/Textured.vs", "res/shaders/TexturedLighting.fs", { { 0, "in_Position" },{ 1, "in_Normal" },{ 2, "in_TexCoord" } });
-	ShaderPool::instance->setUsing("Textured_Lighting");
-	
-	//ShaderPool::instance->loadShader("Textured_Shadow", "res/shaders/Textured.vs", "res/shaders/Textured.fs", { { 0, "in_Position" },{ 1, "in_Normal" },{ 2, "in_TexCoord" } });
+	glGenFramebuffers(1, &shadow_map_fbo);
 
+	glGenTextures(1, &shadow_map);
+	glBindTexture(GL_TEXTURE_2D, shadow_map);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, shadow_map_size, shadow_map_size, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+
+	glBindFramebuffer(GL_FRAMEBUFFER, shadow_map_fbo);
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, shadow_map, 0);
+	glDrawBuffer(GL_NONE);
+	glReadBuffer(GL_NONE);
+
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+	ShaderPool::instance->loadShader("Textured", "res/shaders/Textured.vs", "res/shaders/Textured.fs", { { 0, "in_Position" },{ 1, "in_Normal" },{ 2, "in_TexCoord" } });
+	ShaderPool::instance->loadShader("Textured_Lighting", "res/shaders/Textured.vs", "res/shaders/Textured_Lighting.fs", { { 0, "in_Position" },{ 1, "in_Normal" },{ 2, "in_TexCoord" } });
+	ShaderPool::instance->loadShader("Textured_Shadow", "res/shaders/Textured_Shadow.vs", "res/shaders/Textured_Shadow.fs", { { 0, "in_Position" } });
+	
 	MeshPool::instance->loadMesh("res/models/SmallCube.obj");
 	MeshPool::instance->loadMesh("res/models/CubeShip1.obj");
 	MeshPool::instance->loadMesh("res/models/Player_Capsule.obj");
@@ -66,27 +81,50 @@ void RenderingManager::RenderWorld(World* world, Camera* camera)
 		return;
 	}
 
-	if (world->getWorldType() == WORLDTYPE::SOLAR)
-	{
-		WorldSolarSystem* solarSystem = (WorldSolarSystem*)world;
-
-		/*for (Star* star : solarSystem->stars)
-		{
-			//TODO Render Stars
-		}
-
-		for (Planet* planet : solarSystem->planets)
-		{
-			//TODO Render Planets
-		}*/
-	}
-	else if (world->getWorldType() == WORLDTYPE::WARP)
-	{
-
-	}
+	DirectionalLight* light = LightManager::instance->getLightsForWorld(world->worldId)->directionalLights[0];
 
 	//Now render world
 	auto entities = world->getEntitiesInWorld();
+
+	//Shadow Pass
+	glViewport(0, 0, this->shadow_map_size, this->shadow_map_size);
+	glBindFramebuffer(GL_FRAMEBUFFER, this->shadow_map_fbo);
+	glClear(GL_DEPTH_BUFFER_BIT);
+
+	Camera light_camera = Camera(vector3D(0.0, 20.0, 0.0), vector3F(0.0, -1.0f, 0.0f), vector3F(0.0f, 0.0, 1.0f));
+	light_camera.setProjection(0.0, 0.1, 100.0);
+
+	//Directional placed off original camera + light direction;
+	//vector3D new_camera_pos = vector3D(0.0, 20.0, 0.0);//camera->getPosition() + ((vector3D)light->getDirection() * 20.0);
+	//quaternionD orientation = quaternionD(0.0, 0.707107, -0.707107, 0.0); //glm::conjugate(glm::toQuat(glm::lookAt(new_camera_pos, camera->getPosition(), camera->getUp())));
+	//light_camera.setCameraTransform(new_camera_pos, orientation);
+
+	lightSpaceMatrix = light_camera.getOrthographicMatrix(20.0f, 20.0f) * light_camera.getOriginViewMatrix();
+	lightCameraPosition = light_camera.getPosition();
+
+	for (auto it = entities->begin(); it != entities->end(); it++)
+	{
+		Entity* entity = *it;
+		if (entity != nullptr)
+		{
+			switch (entity->getEntityType())
+			{
+			case ENTITYTYPE::ENTITY_NODE:
+				EntityNode * node = (EntityNode*)entity;
+				Transform renderTransform = node->getRenderTransform();
+				for (ComponentModel* model : node->models)
+				{
+					if (model->castShadows())
+					{
+						this->RenderModelShadow(model, renderTransform, &light_camera, world);
+					}
+				}
+			}
+		}
+	}
+
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	this->window->resetGlViewport();
 
 	for (auto it = entities->begin(); it != entities->end(); it++)
 	{
@@ -96,9 +134,6 @@ void RenderingManager::RenderWorld(World* world, Camera* camera)
 		{
 			switch (entity->getEntityType())
 			{
-			/*case ENTITYTYPE::CHARACTOR:
-				this->RenderMesh(this->playerModel, entity->getRenderTransform(), cam, world);
-				break;*/
 			case ENTITYTYPE::ENTITY_NODE:
 				EntityNode* node = (EntityNode*) entity;
 				Transform renderTransform = node->getRenderTransform();
@@ -119,10 +154,11 @@ void RenderingManager::RenderWorld(World* world, Camera* camera)
 
 }
 
-void RenderingManager::RenderModel(ComponentModel * model, Transform globalPos, Camera * camera, World * world)
+void RenderingManager::RenderModel(ComponentModel* model, Transform globalPos, Camera * camera, World * world)
 {
 	Transform renderTransform = model->getParentNode()->getTransform().transformBy(globalPos);
 	matrix4 projection = camera->getProjectionMatrix(this->window);
+	//matrix4 projection = camera->getOrthographicMatrix(20.0f, 20.0f);
 	matrix4 view = camera->getOriginViewMatrix();
 	matrix4 modelMatrix = renderTransform.getModleMatrix(camera->getPosition());
 	matrix4 mvp = projection * view * modelMatrix;
@@ -130,10 +166,17 @@ void RenderingManager::RenderModel(ComponentModel * model, Transform globalPos, 
 	vector3F ambientLight = world->ambientLight;
 	Mesh* mesh = MeshPool::instance->getMesh(model->getMesh());
 
+	/*string texture = model->getTexture();
+	if (texture == "shadow_map")
+	{
+		glBindTexture(GL_TEXTURE_2D, this->shadow_map);
+	}*/
+
 	glBindTexture(GL_TEXTURE_2D, TexturePool::instance->getTexture(model->getTexture()));
 
+
 	//Ambient pass
-	ShaderProgram* ambient_shader = ShaderPool::instance->getShader(model->getShader());
+	ShaderProgram* ambient_shader = ShaderPool::instance->getShader(model->getAmbientShader());
 
 	ambient_shader->setActiveProgram();
 	ambient_shader->setUniform("MVP", mvp);
@@ -146,7 +189,7 @@ void RenderingManager::RenderModel(ComponentModel * model, Transform globalPos, 
 	ambient_shader->deactivateProgram();
 
 	//Lighting pass
-	if (true)
+	if (this->use_lighting)
 	{
 		glEnable(GL_BLEND);
 		glBlendFunc(GL_ONE, GL_ONE);
@@ -159,7 +202,7 @@ void RenderingManager::RenderModel(ComponentModel * model, Transform globalPos, 
 		size_t point_count = set->pointLights.size();
 		size_t spot_count = set->spotLights.size();
 
-		ShaderProgram* lighting_shader = ShaderPool::instance->getShader("Textured_Lighting");
+		ShaderProgram* lighting_shader = ShaderPool::instance->getShader(model->getLightingShader());
 
 		lighting_shader->setActiveProgram();
 		lighting_shader->setUniform("MVP", mvp);
@@ -167,7 +210,7 @@ void RenderingManager::RenderModel(ComponentModel * model, Transform globalPos, 
 		lighting_shader->setUniform("normalMatrix", renderTransform.getNormalMatrix());
 		lighting_shader->setUniform("ambientLight", ambientLight);
 
-		while (directional_count > 0 || point_count > 0 || spot_count > 0)
+		/*while (directional_count > 0 || point_count > 0 || spot_count > 0)
 		{
 			int num_directional = 0;
 			for (num_directional = 0; num_directional < 8 && directional_count > 0; num_directional++)
@@ -195,7 +238,18 @@ void RenderingManager::RenderModel(ComponentModel * model, Transform globalPos, 
 			lighting_shader->setUniform("spot_count", num_spot);
 
 			mesh->draw(lighting_shader);
-		}
+		}*/
+
+		setDirectionalLight("directinal_lights[0]", lighting_shader, set->directionalLights[0], Transform());
+		lighting_shader->setUniform("directinal_count", 1);
+		lighting_shader->setUniform("lightSpaceMatrix", this->lightSpaceMatrix);
+		lighting_shader->setUniform("lightModelMatrix", renderTransform.getModleMatrix(this->lightCameraPosition));
+
+		glActiveTexture(GL_TEXTURE1);
+		glBindTexture(GL_TEXTURE_2D, this->shadow_map);
+		lighting_shader->setUniform("shadow_map", 1);
+
+		mesh->draw(lighting_shader);
 
 		lighting_shader->deactivateProgram();
 
@@ -207,7 +261,27 @@ void RenderingManager::RenderModel(ComponentModel * model, Transform globalPos, 
 	glBindTexture(GL_TEXTURE_2D, 0);
 }
 
-//deprecated this render funcion
+void RenderingManager::RenderModelShadow(ComponentModel * model, Transform globalPos, Camera * camera, World * world)
+{
+	Transform renderTransform = model->getParentNode()->getTransform().transformBy(globalPos);
+
+	matrix4 modelMatrix = renderTransform.getModleMatrix(camera->getPosition());
+	matrix4 mvp = lightSpaceMatrix * modelMatrix;
+
+	Mesh* mesh = MeshPool::instance->getMesh(model->getMesh());
+
+	//Ambient pass
+	ShaderProgram* shadow_shader = ShaderPool::instance->getShader(model->getShadowShader());
+
+	shadow_shader->setActiveProgram();
+	shadow_shader->setUniform("MVP", mvp);
+
+	mesh->draw(shadow_shader);
+
+	shadow_shader->deactivateProgram();
+}
+
+//Dont use, to be deprecated
 void RenderingManager::RenderMesh(Mesh* mesh, ShaderProgram* program, Transform globalPos, Camera* camera, World* world)
 {
 	if (mesh == nullptr || program == nullptr)
@@ -233,7 +307,5 @@ void RenderingManager::RenderMesh(Mesh* mesh, ShaderProgram* program, Transform 
 	mesh->draw(program);
 
 	program->deactivateProgram();
-
-
 
 }

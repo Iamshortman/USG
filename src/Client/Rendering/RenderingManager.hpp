@@ -27,12 +27,23 @@ public:
 	void Render(World* baseWorld, Camera* camera);
 
 	void RenderModel(ComponentModel* model, Transform globalPos, Camera* camera, World* world);
+	void RenderModelShadow(ComponentModel* model, Transform globalPos, Camera* camera, World* world);
+
 	void RenderMesh(Mesh* mesh, ShaderProgram* program, Transform globalPos, Camera* camera, World* world);
 
 private:
 	Window* window = nullptr;
 
-	bool useLighting = false;
+	bool use_lighting = true;
+
+	GLuint shadow_map_fbo;
+	GLuint shadow_map;
+	uint shadow_map_size = 2048;
+
+	double directional_light_camera_offset = 100.0;
+
+	matrix4 lightSpaceMatrix;
+	vector3D lightCameraPosition;
 };
 
 #endif //RENDERINGMANAGER_HPP

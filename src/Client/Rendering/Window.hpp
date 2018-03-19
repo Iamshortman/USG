@@ -32,6 +32,7 @@ GLclampf alpha);
 		int getVsync();
 		void set3dRendering();
 		void set2dRendering();
+		void resetGlViewport();
 
 	private:
         bool keyboardFocus;
