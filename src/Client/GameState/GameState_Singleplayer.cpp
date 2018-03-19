@@ -82,7 +82,7 @@ GameState_Singleplayer::GameState_Singleplayer()
 	}
 
 	DirectionalLight* light1 = new DirectionalLight(vector3F(0.09656, 0.96561, -0.24140), vector3F(0.25, 0.61f, 1.0f), 0.9f);
-	LightManager::instance->addDirectionalLight(this->mainWorld->worldId, light1);
+	//LightManager::instance->addDirectionalLight(this->mainWorld->worldId, light1);
 
 	PointLight* light2 = new PointLight(vector3D(5.0, 5.0, 5.0), 50.0f, vector3F(0.0f, 0.05f, 0.0f), vector3F(1.0f), 0.4f);
 	LightManager::instance->addPointLight(this->mainWorld->worldId, light2);

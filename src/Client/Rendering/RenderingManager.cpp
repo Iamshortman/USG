@@ -154,8 +154,11 @@ void RenderingManager::RenderModel(ComponentModel * model, Transform globalPos, 
 		glDepthFunc(GL_EQUAL);
 
 		LightSet* set = LightManager::instance->getLightsForWorld(world->worldId);
-		DirectionalLight* light1 = set->directionalLights[0];
-		PointLight* light2 = set->pointLights[0];
+
+		size_t directional_count = set->directionalLights.size();
+		size_t point_count = set->pointLights.size();
+		size_t spot_count = set->spotLights.size();
+
 		ShaderProgram* lighting_shader = ShaderPool::instance->getShader("Textured_Lighting");
 
 		lighting_shader->setActiveProgram();
@@ -164,14 +167,35 @@ void RenderingManager::RenderModel(ComponentModel * model, Transform globalPos, 
 		lighting_shader->setUniform("normalMatrix", renderTransform.getNormalMatrix());
 		lighting_shader->setUniform("ambientLight", ambientLight);
 
-		setDirectionalLight("directinal_lights[0]", lighting_shader, light1, Transform());
-		//lighting_shader->setUniform("directinal_count", 1);
+		while (directional_count > 0 || point_count > 0 || spot_count > 0)
+		{
+			int num_directional = 0;
+			for (num_directional = 0; num_directional < 8 && directional_count > 0; num_directional++)
+			{
+				setDirectionalLight("directinal_lights[" + std::to_string(num_directional) + "]", lighting_shader, set->directionalLights[directional_count - 1], Transform());
+				directional_count--;
+			}
+			lighting_shader->setUniform("directinal_count", num_directional);
 
-		setPointLight("point_lights[0]", lighting_shader, light2, Transform(), camera->getPosition());
-		lighting_shader->setUniform("point_count", 1);
+			int num_point = 0;
+			for (num_point = 0; num_point < 8 && point_count > 0; num_point++)
+			{
+				setPointLight("point_lights[" + std::to_string(num_point) + "]", lighting_shader, set->pointLights[point_count - 1], Transform(), camera->getPosition());
+				point_count--;
+			}
+			lighting_shader->setUniform("point_count", num_point);
 
 
-		mesh->draw(lighting_shader);
+			int num_spot = 0;
+			for (num_spot = 0; num_spot < 8 && spot_count > 0; num_spot++)
+			{
+				setSpotLight("spot_lights[" + std::to_string(num_spot) + "]", lighting_shader, set->spotLights[spot_count - 1], Transform(), camera->getPosition());
+				spot_count--;
+			}
+			lighting_shader->setUniform("spot_count", num_spot);
+
+			mesh->draw(lighting_shader);
+		}
 
 		lighting_shader->deactivateProgram();
 
