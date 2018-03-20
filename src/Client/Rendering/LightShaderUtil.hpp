@@ -1,8 +1,8 @@
 #ifndef LIGHTSHADERUTIL_HPP
 #define LIGHTSHADERUTIL_HPP
 
-#include "Client/Rendering/Lights.hpp"
 #include "Client/Rendering/ShaderProgram.hpp"
+#include "Common/Rendering/Lights.hpp"
 #include "Common/Transform.hpp"
 
 #include <string>

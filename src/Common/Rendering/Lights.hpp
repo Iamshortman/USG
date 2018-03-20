@@ -22,7 +22,9 @@ public:
 	void setColor(vector3F color);
 	void setIntensity(float intensity);
 	void setEnabled(bool enabled);
-	 
+	
+	virtual LightType getLightType() = 0;
+
 private:
 	vector3F m_color;
 	float m_intensity;
@@ -37,6 +39,8 @@ public:
 	vector3F getDirection();
 
 	void setDirection(vector3F direction);
+
+	virtual LightType getLightType() { return LightType::Directional; };
 
 private:
 	vector3F m_direction;
@@ -55,6 +59,7 @@ public:
 	void setRange(float range);
 	void setAttenuation(vector3F attenuation);
 
+	virtual LightType getLightType() { return LightType::Point; };
 
 private:
 	vector3D m_position;
@@ -72,6 +77,8 @@ public:
 
 	void setDirection(vector3F direction);
 	void setCutoff(float cutoff);
+
+	virtual LightType getLightType() { return LightType::Spot; };
 
 private:
 	vector3F m_direction;

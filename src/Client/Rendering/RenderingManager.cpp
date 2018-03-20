@@ -24,7 +24,7 @@ RenderingManager::RenderingManager()
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 
 	glBindFramebuffer(GL_FRAMEBUFFER, shadow_map_fbo);
-	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, shadow_map, 0);
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT , GL_TEXTURE_2D, shadow_map, 0);
 	glDrawBuffer(GL_NONE);
 	glReadBuffer(GL_NONE);
 
@@ -91,16 +91,13 @@ void RenderingManager::RenderWorld(World* world, Camera* camera)
 	glBindFramebuffer(GL_FRAMEBUFFER, this->shadow_map_fbo);
 	glClear(GL_DEPTH_BUFFER_BIT);
 
-	Camera light_camera = Camera(vector3D(0.0, 20.0, 0.0), vector3F(0.0, -1.0f, 0.0f), vector3F(0.0f, 0.0, 1.0f));
-	light_camera.setProjection(0.0, 0.1, 100.0);
-
 	//Directional placed off original camera + light direction;
-	//vector3D new_camera_pos = vector3D(0.0, 20.0, 0.0);//camera->getPosition() + ((vector3D)light->getDirection() * 20.0);
-	//quaternionD orientation = quaternionD(0.0, 0.707107, -0.707107, 0.0); //glm::conjugate(glm::toQuat(glm::lookAt(new_camera_pos, camera->getPosition(), camera->getUp())));
-	//light_camera.setCameraTransform(new_camera_pos, orientation);
-
-	lightSpaceMatrix = light_camera.getOrthographicMatrix(20.0f, 20.0f) * light_camera.getOriginViewMatrix();
+	vector3D new_camera_pos = camera->getPosition() + ((vector3D)light->getDirection() * 20.0);
+	Camera light_camera = Camera(new_camera_pos, light->getDirection() * -1.0f, vector3F(0.0f, 0.0, 1.0f));
+	light_camera.setProjection(0.0f, 0.1f, 100.0f);
+	lightSpaceMatrix = light_camera.getOrthographicMatrix(50.0f, 50.0f) * light_camera.getOriginViewMatrix();
 	lightCameraPosition = light_camera.getPosition();
+
 
 	for (auto it = entities->begin(); it != entities->end(); it++)
 	{
@@ -145,6 +142,11 @@ void RenderingManager::RenderWorld(World* world, Camera* camera)
 		}
 	}
 
+	if (this->use_lighting)
+	{
+
+	}
+
 	auto subWorlds = world->getSubWorlds();
 	for (auto it = subWorlds->begin(); it != subWorlds->end(); it++)
 	{
@@ -157,21 +159,11 @@ void RenderingManager::RenderWorld(World* world, Camera* camera)
 void RenderingManager::RenderModel(ComponentModel* model, Transform globalPos, Camera * camera, World * world)
 {
 	Transform renderTransform = model->getParentNode()->getTransform().transformBy(globalPos);
-	matrix4 projection = camera->getProjectionMatrix(this->window);
-	//matrix4 projection = camera->getOrthographicMatrix(20.0f, 20.0f);
-	matrix4 view = camera->getOriginViewMatrix();
 	matrix4 modelMatrix = renderTransform.getModleMatrix(camera->getPosition());
-	matrix4 mvp = projection * view * modelMatrix;
+	matrix4 mvp = camera->getProjectionMatrix(this->window) * camera->getOriginViewMatrix() * modelMatrix;
 
 	vector3F ambientLight = world->ambientLight;
 	Mesh* mesh = MeshPool::instance->getMesh(model->getMesh());
-
-	/*string texture = model->getTexture();
-	if (texture == "shadow_map")
-	{
-		glBindTexture(GL_TEXTURE_2D, this->shadow_map);
-	}*/
-
 	glBindTexture(GL_TEXTURE_2D, TexturePool::instance->getTexture(model->getTexture()));
 
 
@@ -187,81 +179,42 @@ void RenderingManager::RenderModel(ComponentModel* model, Transform globalPos, C
 	mesh->draw(ambient_shader);
 
 	ambient_shader->deactivateProgram();
-
-	//Lighting pass
-	if (this->use_lighting)
-	{
-		glEnable(GL_BLEND);
-		glBlendFunc(GL_ONE, GL_ONE);
-		glDepthMask(GL_FALSE);
-		glDepthFunc(GL_EQUAL);
-
-		LightSet* set = LightManager::instance->getLightsForWorld(world->worldId);
-
-		size_t directional_count = set->directionalLights.size();
-		size_t point_count = set->pointLights.size();
-		size_t spot_count = set->spotLights.size();
-
-		ShaderProgram* lighting_shader = ShaderPool::instance->getShader(model->getLightingShader());
-
-		lighting_shader->setActiveProgram();
-		lighting_shader->setUniform("MVP", mvp);
-		lighting_shader->setUniform("modelMatrix", modelMatrix);
-		lighting_shader->setUniform("normalMatrix", renderTransform.getNormalMatrix());
-		lighting_shader->setUniform("ambientLight", ambientLight);
-
-		/*while (directional_count > 0 || point_count > 0 || spot_count > 0)
-		{
-			int num_directional = 0;
-			for (num_directional = 0; num_directional < 8 && directional_count > 0; num_directional++)
-			{
-				setDirectionalLight("directinal_lights[" + std::to_string(num_directional) + "]", lighting_shader, set->directionalLights[directional_count - 1], Transform());
-				directional_count--;
-			}
-			lighting_shader->setUniform("directinal_count", num_directional);
-
-			int num_point = 0;
-			for (num_point = 0; num_point < 8 && point_count > 0; num_point++)
-			{
-				setPointLight("point_lights[" + std::to_string(num_point) + "]", lighting_shader, set->pointLights[point_count - 1], Transform(), camera->getPosition());
-				point_count--;
-			}
-			lighting_shader->setUniform("point_count", num_point);
-
-
-			int num_spot = 0;
-			for (num_spot = 0; num_spot < 8 && spot_count > 0; num_spot++)
-			{
-				setSpotLight("spot_lights[" + std::to_string(num_spot) + "]", lighting_shader, set->spotLights[spot_count - 1], Transform(), camera->getPosition());
-				spot_count--;
-			}
-			lighting_shader->setUniform("spot_count", num_spot);
-
-			mesh->draw(lighting_shader);
-		}*/
-
-		setDirectionalLight("directinal_lights[0]", lighting_shader, set->directionalLights[0], Transform());
-		lighting_shader->setUniform("directinal_count", 1);
-		lighting_shader->setUniform("lightSpaceMatrix", this->lightSpaceMatrix);
-		lighting_shader->setUniform("lightModelMatrix", renderTransform.getModleMatrix(this->lightCameraPosition));
-
-		glActiveTexture(GL_TEXTURE1);
-		glBindTexture(GL_TEXTURE_2D, this->shadow_map);
-		lighting_shader->setUniform("shadow_map", 1);
-
-		mesh->draw(lighting_shader);
-
-		lighting_shader->deactivateProgram();
-
-		glDepthMask(GL_TRUE);
-		glDepthFunc(GL_LESS);
-		glDisable(GL_BLEND);
-	}
-	
-	glBindTexture(GL_TEXTURE_2D, 0);
 }
 
-void RenderingManager::RenderModelShadow(ComponentModel * model, Transform globalPos, Camera * camera, World * world)
+void RenderingManager::RenderModelLight(ComponentLight* light, ComponentModel* model, Transform globalPos, Camera* camera, World* world)
+{
+	Transform renderTransform = model->getParentNode()->getTransform().transformBy(globalPos);
+	matrix4 modelMatrix = renderTransform.getModleMatrix(camera->getPosition());
+	matrix4 mvp = camera->getProjectionMatrix(this->window) * camera->getOriginViewMatrix() * modelMatrix;
+
+	vector3F ambientLight = world->ambientLight;
+
+	Mesh* mesh = MeshPool::instance->getMesh(model->getMesh());
+	glBindTexture(GL_TEXTURE_2D, TexturePool::instance->getTexture(model->getTexture()));
+	ShaderProgram* lighting_shader = ShaderPool::instance->getShader(model->getLightingShader());
+
+	lighting_shader->setActiveProgram();
+	lighting_shader->setUniform("MVP", mvp);
+	lighting_shader->setUniform("modelMatrix", modelMatrix);
+	lighting_shader->setUniform("normalMatrix", renderTransform.getNormalMatrix());
+	lighting_shader->setUniform("ambientLight", ambientLight);
+
+	//setDirectionalLight("directinal_lights[0]", lighting_shader, set->directionalLights[0], Transform());
+	//lighting_shader->setUniform("directinal_count", 1);
+	//lighting_shader->setUniform("lightSpaceMatrix", this->lightSpaceMatrix);
+	//lighting_shader->setUniform("lightModelMatrix", renderTransform.getModleMatrix(this->lightCameraPosition));
+
+	glActiveTexture(GL_TEXTURE1);
+	glBindTexture(GL_TEXTURE_2D, this->shadow_map);
+	lighting_shader->setUniform("shadow_map", 1);
+
+	mesh->draw(lighting_shader);
+
+	lighting_shader->deactivateProgram();
+
+}
+
+void RenderingManager::RenderModelShadow(ComponentModel* model, Transform globalPos, Camera* camera, World* world)
 {
 	Transform renderTransform = model->getParentNode()->getTransform().transformBy(globalPos);
 

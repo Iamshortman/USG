@@ -9,6 +9,7 @@ enum ComponentType
 	DEFAULT,
 	MODEL,
 	COLLISIONSHAPE,
+	LIGHT,
 };
 
 class Component 

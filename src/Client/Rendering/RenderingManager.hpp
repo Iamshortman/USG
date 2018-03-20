@@ -10,8 +10,12 @@
 #include "Common/GLM_Include.hpp"
 #include "Common/World/World.hpp"
 
-#include "Client/Rendering/Lights.hpp"
+#include "Common/Rendering/Lights.hpp"
 #include "Common/Entity/ComponentModel.hpp"
+#include "Common/Entity/ComponentLight.hpp"
+
+//prototype
+class ComponentLight;
 
 class RenderingManager
 {
@@ -27,6 +31,7 @@ public:
 	void Render(World* baseWorld, Camera* camera);
 
 	void RenderModel(ComponentModel* model, Transform globalPos, Camera* camera, World* world);
+	void RenderModelLight(ComponentLight* light, ComponentModel* model, Transform globalPos, Camera* camera, World* world);
 	void RenderModelShadow(ComponentModel* model, Transform globalPos, Camera* camera, World* world);
 
 	void RenderMesh(Mesh* mesh, ShaderProgram* program, Transform globalPos, Camera* camera, World* world);

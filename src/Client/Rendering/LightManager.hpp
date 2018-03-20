@@ -5,7 +5,7 @@
 #include <unordered_map>
 #include <algorithm>
 #include "Common/World/World.hpp"
-#include "Client/Rendering/Lights.hpp"
+#include "Common/Rendering/Lights.hpp"
 
 struct LightSet
 {

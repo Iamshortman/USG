@@ -1,4 +1,4 @@
-#include "Client/Rendering/Lights.hpp"
+#include "Lights.hpp"
 
 BaseLight::BaseLight(vector3F color, float intensity)
 {
