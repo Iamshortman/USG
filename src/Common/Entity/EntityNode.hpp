@@ -9,6 +9,7 @@
 
 //prototype class
 class ComponentModel;
+class ComponentLight;
 
 class EntityNode: public Entity
 {
@@ -17,6 +18,7 @@ public:
 	~EntityNode();
 
 	virtual void update(double deltaTime);
+	virtual void addToWorld(World* world);
 
 	virtual void interactRay(Entity* entity, vector3D localStartPos, vector3D localHitPos, vector3D localHitNormal, int bodyId = -1);
 
@@ -27,7 +29,11 @@ public:
 
 	Node* rootNode = nullptr;
 
+	void addModel(ComponentModel* model);
+	void removeModel(ComponentModel* model);
+
 	std::set<ComponentModel*> models;
+	std::set<ComponentLight*> lights;
 
 protected:
 };

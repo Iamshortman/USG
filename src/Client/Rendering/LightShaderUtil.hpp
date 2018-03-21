@@ -21,11 +21,9 @@ void setDirectionalLight(std::string prefix, ShaderProgram* program, Directional
 
 void setPointLight(std::string prefix, ShaderProgram* program, PointLight* light, Transform worldTransform, vector3D camPos)
 {
-	vector3D pos = worldTransform.getPosition() + (worldTransform.getOrientation() * light->getPosition());
-
 	setBaseLight(prefix + ".base", program, light);
 	program->setUniform(prefix + ".atten", light->getAttenuation());
-	program->setUniform(prefix + ".position", (vector3F)(pos - camPos));
+	program->setUniform(prefix + ".position", (vector3F)(worldTransform.getPosition() - camPos));
 	program->setUniform(prefix + ".range", light->getRange());
 };
 

@@ -11,7 +11,9 @@ class ComponentLight : public Component
 public:
 	static const ComponentType Type = ComponentType::LIGHT;
 
-	ComponentLight();
+	ComponentLight(float range, vector3F attenuation, vector3F color, float intensity); //Point Light
+	ComponentLight(vector3F direction, float cutoff, float range, vector3F attenuation, vector3F color, float intensity); //Spot Light
+
 	virtual ~ComponentLight();
 
 	virtual void enable() override;
@@ -27,11 +29,16 @@ public:
 	void setLightOn(bool light_on) { this->light_on = light_on; };
 	bool getLightOn() { return this->light_on; };
 
+	void setPointLight(float range, vector3F attenuation, vector3F color, float intensity);
+	void setSpotLight(vector3F direction, float cutoff, float range, vector3F attenuation, vector3F color, float intensity);
+
+	vector3D getLightPostion();
+	matrix4 getLightSpaceMatrix();
+
 protected:
 
-
-	PointLight point_light;
-	SpotLight spot_light;
+	LightType light_type;
+	BaseLight* light;
 
 	bool cast_shadows;
 	bool light_on;

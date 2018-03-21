@@ -11,8 +11,6 @@
 #include "Common/Physics/CollisionShapes/ConvexMeshShape.hpp"
 #include "Common/Entity/ComponentRotate.hpp"
 
-#include "Client/Rendering/LightManager.hpp"
-
 GameState_Singleplayer::GameState_Singleplayer()
 {
 	this->mainWorld = WorldManager::instance->createWorld(WORLDTYPE::SOLAR);
@@ -83,8 +81,8 @@ GameState_Singleplayer::GameState_Singleplayer()
 		((ComponentModel*)plane->rootNode->getComponent(ComponentModel::Type))->setCastShadows(false);
 	}
 
-	DirectionalLight* light1 = new DirectionalLight(vector3F(0.0f, 1.0f, 0.0f), vector3F(1.0f), 0.8f);
-	LightManager::instance->addDirectionalLight(this->mainWorld->worldId, light1);
+	//DirectionalLight* light1 = new DirectionalLight(vector3F(0.0f, 1.0f, 0.0f), vector3F(1.0f), 0.8f);
+	//LightManager::instance->addDirectionalLight(this->mainWorld->worldId, light1);
 
 	//PointLight* light2 = new PointLight(vector3D(0.0, 7.0, 0.0), 50.0f, vector3F(0.0f, 0.05f, 0.0f), vector3F(1.0f), 0.4f);
 	//LightManager::instance->addPointLight(this->mainWorld->worldId, light2);

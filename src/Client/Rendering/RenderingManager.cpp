@@ -5,8 +5,6 @@
 #include "Client/Resource/MeshPool.hpp"
 #include "Client/Resource/ShaderPool.hpp"
 #include "Client/Resource/TexturePool.hpp"
-#include "Client/Rendering/LightManager.hpp"
-#include "Client/Rendering/LightShaderUtil.hpp"
 
 #include <stack>
 #include "Common/Entity/EntityNode.hpp"
@@ -81,48 +79,8 @@ void RenderingManager::RenderWorld(World* world, Camera* camera)
 		return;
 	}
 
-	DirectionalLight* light = LightManager::instance->getLightsForWorld(world->worldId)->directionalLights[0];
-
 	//Now render world
 	auto entities = world->getEntitiesInWorld();
-
-	//Shadow Pass
-	glViewport(0, 0, this->shadow_map_size, this->shadow_map_size);
-	glBindFramebuffer(GL_FRAMEBUFFER, this->shadow_map_fbo);
-	glClear(GL_DEPTH_BUFFER_BIT);
-
-	//Directional placed off original camera + light direction;
-	vector3D new_camera_pos = camera->getPosition() + ((vector3D)light->getDirection() * 20.0);
-	Camera light_camera = Camera(new_camera_pos, light->getDirection() * -1.0f, vector3F(0.0f, 0.0, 1.0f));
-	light_camera.setProjection(0.0f, 0.1f, 100.0f);
-	lightSpaceMatrix = light_camera.getOrthographicMatrix(50.0f, 50.0f) * light_camera.getOriginViewMatrix();
-	lightCameraPosition = light_camera.getPosition();
-
-
-	for (auto it = entities->begin(); it != entities->end(); it++)
-	{
-		Entity* entity = *it;
-		if (entity != nullptr)
-		{
-			switch (entity->getEntityType())
-			{
-			case ENTITYTYPE::ENTITY_NODE:
-				EntityNode * node = (EntityNode*)entity;
-				Transform renderTransform = node->getRenderTransform();
-				for (ComponentModel* model : node->models)
-				{
-					if (model->castShadows())
-					{
-						this->RenderModelShadow(model, renderTransform, &light_camera, world);
-					}
-				}
-			}
-		}
-	}
-
-	glBindFramebuffer(GL_FRAMEBUFFER, 0);
-	this->window->resetGlViewport();
-
 	for (auto it = entities->begin(); it != entities->end(); it++)
 	{
 		Entity* entity = *it;
@@ -142,10 +100,74 @@ void RenderingManager::RenderWorld(World* world, Camera* camera)
 		}
 	}
 
-	if (this->use_lighting)
+	/*if (this->use_lighting)
 	{
+		for (ComponentLight* light : world->lightsInWorld)
+		{
+			if (light->getLightOn() == true)
+			{
+				matrix4 lightSpaceMatrix = matrix4(1.0f);
+				vector3D lightCameraPosition = vector3D(1.0f);
 
-	}
+				if (light->getCastShadows() == true)
+				{
+					Transform lightPosition = light->getParentNode()->getTransform().transformBy(light->getParentNode()->getParentEntity()->getRenderTransform());
+
+					TODO light projection matrix
+					lightSpaceMatrix = lightPosition.getOriginViewMatrix();
+					lightCameraPosition = lightPosition.getPosition();
+
+					//Shadow Pass
+					glViewport(0, 0, this->shadow_map_size, this->shadow_map_size);
+					glBindFramebuffer(GL_FRAMEBUFFER, this->shadow_map_fbo);
+					glClear(GL_DEPTH_BUFFER_BIT);
+
+					auto entities = world->getEntitiesInWorld();
+					for (auto it = entities->begin(); it != entities->end(); it++)
+					{
+						Entity* entity = *it;
+
+						if (entity != nullptr)
+						{
+							switch (entity->getEntityType())
+							{
+							case ENTITYTYPE::ENTITY_NODE:
+								EntityNode * node = (EntityNode*)entity;
+								Transform renderTransform = node->getRenderTransform();
+								for (ComponentModel* model : node->models)
+								{
+									this->RenderModelShadow(model, renderTransform, lightSpaceMatrix, lightCameraPosition);
+								}
+							}
+						}
+					}
+
+					glBindFramebuffer(GL_FRAMEBUFFER, 0);
+					this->window->resetGlViewport();
+				}
+
+				auto entities = world->getEntitiesInWorld();
+				for (auto it = entities->begin(); it != entities->end(); it++)
+				{
+					Entity* entity = *it;
+
+					if (entity != nullptr)
+					{
+						switch (entity->getEntityType())
+						{
+						case ENTITYTYPE::ENTITY_NODE:
+							EntityNode * node = (EntityNode*)entity;
+							Transform renderTransform = node->getRenderTransform();
+							for (ComponentModel* model : node->models)
+							{
+								this->RenderModelLight(light, model, renderTransform, camera, world, lightSpaceMatrix, lightCameraPosition);
+							}
+						}
+					}
+				}
+			}
+		}
+	}*/
 
 	auto subWorlds = world->getSubWorlds();
 	for (auto it = subWorlds->begin(); it != subWorlds->end(); it++)
@@ -156,7 +178,7 @@ void RenderingManager::RenderWorld(World* world, Camera* camera)
 
 }
 
-void RenderingManager::RenderModel(ComponentModel* model, Transform globalPos, Camera * camera, World * world)
+void RenderingManager::RenderModel(ComponentModel* model, Transform globalPos, Camera* camera, World* world)
 {
 	Transform renderTransform = model->getParentNode()->getTransform().transformBy(globalPos);
 	matrix4 modelMatrix = renderTransform.getModleMatrix(camera->getPosition());
@@ -181,7 +203,7 @@ void RenderingManager::RenderModel(ComponentModel* model, Transform globalPos, C
 	ambient_shader->deactivateProgram();
 }
 
-void RenderingManager::RenderModelLight(ComponentLight* light, ComponentModel* model, Transform globalPos, Camera* camera, World* world)
+void RenderingManager::RenderModelLight(ComponentLight* light, ComponentModel* model, Transform globalPos, Camera* camera, World* world, matrix4 lightSpaceMatrix, vector3D lightCameraPosition)
 {
 	Transform renderTransform = model->getParentNode()->getTransform().transformBy(globalPos);
 	matrix4 modelMatrix = renderTransform.getModleMatrix(camera->getPosition());
@@ -199,27 +221,16 @@ void RenderingManager::RenderModelLight(ComponentLight* light, ComponentModel* m
 	lighting_shader->setUniform("normalMatrix", renderTransform.getNormalMatrix());
 	lighting_shader->setUniform("ambientLight", ambientLight);
 
-	//setDirectionalLight("directinal_lights[0]", lighting_shader, set->directionalLights[0], Transform());
-	//lighting_shader->setUniform("directinal_count", 1);
-	//lighting_shader->setUniform("lightSpaceMatrix", this->lightSpaceMatrix);
-	//lighting_shader->setUniform("lightModelMatrix", renderTransform.getModleMatrix(this->lightCameraPosition));
-
-	glActiveTexture(GL_TEXTURE1);
-	glBindTexture(GL_TEXTURE_2D, this->shadow_map);
-	lighting_shader->setUniform("shadow_map", 1);
-
 	mesh->draw(lighting_shader);
 
 	lighting_shader->deactivateProgram();
 
 }
 
-void RenderingManager::RenderModelShadow(ComponentModel* model, Transform globalPos, Camera* camera, World* world)
+void RenderingManager::RenderModelShadow(ComponentModel* model, Transform globalPos, matrix4 lightSpaceMatrix, vector3D lightCameraPosition)
 {
 	Transform renderTransform = model->getParentNode()->getTransform().transformBy(globalPos);
-
-	matrix4 modelMatrix = renderTransform.getModleMatrix(camera->getPosition());
-	matrix4 mvp = lightSpaceMatrix * modelMatrix;
+	matrix4 mvp = lightSpaceMatrix * renderTransform.getModleMatrix(lightCameraPosition);
 
 	Mesh* mesh = MeshPool::instance->getMesh(model->getMesh());
 

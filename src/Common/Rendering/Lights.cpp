@@ -53,17 +53,11 @@ void DirectionalLight::setDirection(vector3F direction)
 	m_direction = direction;
 }
 
-PointLight::PointLight(vector3D position, float range, vector3F attenuation, vector3F color, float intensity)
+PointLight::PointLight(float range, vector3F attenuation, vector3F color, float intensity)
 	:BaseLight(color, intensity)
 {
-	this->setPosition(position);
 	this->setRange(range);
 	this->setAttenuation(attenuation);
-}
-
-vector3D PointLight::getPosition()
-{
-	return this->m_position;
 }
 
 float PointLight::getRange()
@@ -76,11 +70,6 @@ vector3F PointLight::getAttenuation()
 	return this->m_attenuation;
 }
 
-void PointLight::setPosition(vector3D position)
-{
-	this->m_position = position;
-}
-
 void PointLight::setRange(float range)
 {
 	this->m_range = range;
@@ -91,8 +80,8 @@ void PointLight::setAttenuation(vector3F attenuation)
 	this->m_attenuation = attenuation;
 }
 
-SpotLight::SpotLight(vector3F direction, float cutoff, vector3D position, float range, vector3F attenuation, vector3F color, float intensity)
-	:PointLight(position, range, attenuation, color, intensity)
+SpotLight::SpotLight(vector3F direction, float cutoff, float range, vector3F attenuation, vector3F color, float intensity)
+	:PointLight(range, attenuation, color, intensity)
 {
 	this->setDirection(direction);
 }

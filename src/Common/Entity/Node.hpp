@@ -35,6 +35,8 @@ public:
 
 	//void interactRay(Entity* entity, vector3D localStartPos, vector3D localHitPos, vector3D localHitNormal);
 
+	EntityNode* getParentEntity();
+
 protected:
 	EntityNode* parent_entity = nullptr;
 

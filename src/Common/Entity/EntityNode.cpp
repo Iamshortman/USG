@@ -1,4 +1,5 @@
 #include "Common/Entity/EntityNode.hpp"
+#include "Common/World/World.hpp"
 
 EntityNode::EntityNode(EntityId id)
 	:Entity(id)
@@ -22,10 +23,13 @@ void EntityNode::update(double deltaTime)
 	}
 }
 
+void EntityNode::addToWorld(World* world)
+{
+	Entity::addToWorld(world);
+}
+
 void EntityNode::interactRay(Entity* entity, vector3D localStartPos, vector3D localHitPos, vector3D localHitNormal, int bodyId)
 {
-	//printf("BodyId: %d\n", bodyId);
-
 	Node* node = this->rigidBody->getChildNode(bodyId);
 	if (node != nullptr)
 	{
@@ -50,4 +54,20 @@ void EntityNode::interactRay(Entity* entity, vector3D localStartPos, vector3D lo
 ENTITYTYPE EntityNode::getEntityType() const
 {
 	return ENTITYTYPE::ENTITY_NODE;
+}
+
+void EntityNode::addModel(ComponentModel* model)
+{
+	if (this->models.find(model) == this->models.end())
+	{
+		this->models.insert(model);
+	}
+}
+
+void EntityNode::removeModel(ComponentModel* model)
+{
+	if (this->models.find(model) != this->models.end())
+	{
+		this->models.erase(model);
+	}
 }

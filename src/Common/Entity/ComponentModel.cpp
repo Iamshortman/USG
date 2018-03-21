@@ -27,10 +27,7 @@ void ComponentModel::enable()
 {
 	if (!this->enabled && this->parent_entity != nullptr)
 	{
-		if (this->parent_entity->models.find(this) == this->parent_entity->models.end())
-		{
-			this->parent_entity->models.insert(this);
-		}
+		this->parent_entity->addModel(this);
 
 #ifdef CLIENT
 		MeshPool::instance->setUsing(this->mesh_file_path);
@@ -48,10 +45,7 @@ void ComponentModel::disable()
 {
 	if (this->enabled && this->parent_entity != nullptr)
 	{
-		if (this->parent_entity->models.find(this) != this->parent_entity->models.end())
-		{
-			this->parent_entity->models.erase(this);
-		}
+		this->parent_entity->removeModel(this);
 
 #ifdef CLIENT
 		MeshPool::instance->releaseUsing(this->mesh_file_path);

@@ -31,8 +31,8 @@ public:
 	void Render(World* baseWorld, Camera* camera);
 
 	void RenderModel(ComponentModel* model, Transform globalPos, Camera* camera, World* world);
-	void RenderModelLight(ComponentLight* light, ComponentModel* model, Transform globalPos, Camera* camera, World* world);
-	void RenderModelShadow(ComponentModel* model, Transform globalPos, Camera* camera, World* world);
+	void RenderModelLight(ComponentLight* light, ComponentModel* model, Transform globalPos, Camera* camera, World* world, matrix4 lightSpaceMatrix, vector3D lightCameraPosition);
+	void RenderModelShadow(ComponentModel* model, Transform globalPos, matrix4 lightSpaceMatrix, vector3D lightCameraPosition);
 
 	void RenderMesh(Mesh* mesh, ShaderProgram* program, Transform globalPos, Camera* camera, World* world);
 
@@ -46,9 +46,6 @@ private:
 	uint shadow_map_size = 2048;
 
 	double directional_light_camera_offset = 100.0;
-
-	matrix4 lightSpaceMatrix;
-	vector3D lightCameraPosition;
 };
 
 #endif //RENDERINGMANAGER_HPP

@@ -10,6 +10,7 @@ class World;
 
 #include "Common/Entity/Entity.hpp"
 #include "Common/Physics/PhysicsWorld.hpp"
+#include "Common/Entity/ComponentLight.hpp"
 
 typedef uint32_t WorldId;
 

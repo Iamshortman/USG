@@ -1,4 +1,4 @@
-#include "Common/Entity/Node.hpp"
+#include "Node.hpp"
 
 #include "Common/Entity/EntityNode.hpp"
 
@@ -132,6 +132,11 @@ void Node::removeComponent(ComponentType type)
 		delete this->componentMap[type];
 		this->componentMap.erase(this->componentMap.find(type));
 	}
+}
+
+EntityNode * Node::getParentEntity()
+{
+	return this->parent_entity;
 }
 
 /*void Node::interactRay(Entity * entity, vector3D localStartPos, vector3D localHitPos, vector3D localHitNormal)

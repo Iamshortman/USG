@@ -49,20 +49,17 @@ private:
 class PointLight : public BaseLight
 {
 public:
-	PointLight(vector3D position, float range, vector3F attenuation, vector3F color, float intensity);
+	PointLight(float range, vector3F attenuation, vector3F color, float intensity);
 
-	vector3D getPosition();
 	float getRange();
 	vector3F getAttenuation();
 
-	void setPosition(vector3D position);
 	void setRange(float range);
 	void setAttenuation(vector3F attenuation);
 
 	virtual LightType getLightType() { return LightType::Point; };
 
 private:
-	vector3D m_position;
 	float m_range;
 	vector3F m_attenuation;
 };
@@ -70,7 +67,7 @@ private:
 class SpotLight : public PointLight
 {
 public:
-	SpotLight(vector3F direction, float cutoff, vector3D position, float range, vector3F attenuation, vector3F color, float intensity);
+	SpotLight(vector3F direction, float cutoff, float range, vector3F attenuation, vector3F color, float intensity);
 
 	vector3F getDirection();
 	float getCutoff();
