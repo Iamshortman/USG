@@ -79,6 +79,11 @@ GameState_Singleplayer::GameState_Singleplayer()
 		plane->rootNode->addComponent(new ComponentModel("res/models/plane.obj", "res/textures/1K_Grid.png", "Textured", "Textured_Lighting", "Textured_Shadow"));
 		//plane->rootNode->addComponent(new ComponentModel("res/models/plane.obj", "shadow_map", "Textured", "Textured_Lighting", "Textured_Shadow"));
 		((ComponentModel*)plane->rootNode->getComponent(ComponentModel::Type))->setCastShadows(false);
+
+		Node* lightPoint = new Node();
+		lightPoint->setLocalTransform(Transform(vector3D(0.0, 10.0, 0.0)));
+		lightPoint->addComponent(new ComponentLight(vector3F(0.0f, -1.0f, 0.0f), 10.0f, 50.0f, vector3F(0.0f, 0.1f, 0.0f), vector3F(1.0f), 0.4f));
+		plane->rootNode->addChild(lightPoint);
 	}
 
 	//DirectionalLight* light1 = new DirectionalLight(vector3F(0.0f, 1.0f, 0.0f), vector3F(1.0f), 0.8f);

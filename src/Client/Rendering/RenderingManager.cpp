@@ -9,6 +9,8 @@
 #include <stack>
 #include "Common/Entity/EntityNode.hpp"
 
+#include "Client/Rendering/LightShaderUtil.hpp"
+
 RenderingManager::RenderingManager()
 {
 	glGenFramebuffers(1, &shadow_map_fbo);
@@ -100,7 +102,7 @@ void RenderingManager::RenderWorld(World* world, Camera* camera)
 		}
 	}
 
-	/*if (this->use_lighting)
+	if (this->use_lighting)
 	{
 		for (ComponentLight* light : world->lightsInWorld)
 		{
@@ -111,11 +113,8 @@ void RenderingManager::RenderWorld(World* world, Camera* camera)
 
 				if (light->getCastShadows() == true)
 				{
-					Transform lightPosition = light->getParentNode()->getTransform().transformBy(light->getParentNode()->getParentEntity()->getRenderTransform());
-
-					TODO light projection matrix
-					lightSpaceMatrix = lightPosition.getOriginViewMatrix();
-					lightCameraPosition = lightPosition.getPosition();
+					lightSpaceMatrix = light->getLightSpaceMatrix();
+					lightCameraPosition = light->getLightPostion();
 
 					//Shadow Pass
 					glViewport(0, 0, this->shadow_map_size, this->shadow_map_size);
@@ -146,6 +145,11 @@ void RenderingManager::RenderWorld(World* world, Camera* camera)
 					this->window->resetGlViewport();
 				}
 
+				glEnable(GL_BLEND);
+				glBlendFunc(GL_ONE, GL_ONE);
+				glDepthMask(GL_FALSE);
+				glDepthFunc(GL_EQUAL);
+
 				auto entities = world->getEntitiesInWorld();
 				for (auto it = entities->begin(); it != entities->end(); it++)
 				{
@@ -165,9 +169,13 @@ void RenderingManager::RenderWorld(World* world, Camera* camera)
 						}
 					}
 				}
+
+				glDepthMask(GL_TRUE);
+				glDepthFunc(GL_LESS);
+				glDisable(GL_BLEND);
 			}
 		}
-	}*/
+	}
 
 	auto subWorlds = world->getSubWorlds();
 	for (auto it = subWorlds->begin(); it != subWorlds->end(); it++)
@@ -220,6 +228,27 @@ void RenderingManager::RenderModelLight(ComponentLight* light, ComponentModel* m
 	lighting_shader->setUniform("modelMatrix", modelMatrix);
 	lighting_shader->setUniform("normalMatrix", renderTransform.getNormalMatrix());
 	lighting_shader->setUniform("ambientLight", ambientLight);
+
+	glActiveTexture(GL_TEXTURE1);
+	glBindTexture(GL_TEXTURE_2D, this->shadow_map);
+	lighting_shader->setUniform("shadow_map", 1);
+	lighting_shader->setUniform("lightSpaceMVP", lightSpaceMatrix * renderTransform.getModleMatrix(lightCameraPosition));
+
+	LightType type = light->getLightType();
+	lighting_shader->setUniform("lightType", type);
+	
+	if (type == LightType::Directional)
+	{
+		setDirectionalLight("directinal_light", lighting_shader, (DirectionalLight*) light->getLight(), light->getLightTransform());
+	}
+	else if (type == LightType::Point)
+	{
+		setPointLight("point_light", lighting_shader, (PointLight*)light->getLight(), light->getLightTransform(), camera->getPosition());
+	}
+	else if (type == LightType::Spot)
+	{
+		setSpotLight("spot_light", lighting_shader, (SpotLight*)light->getLight(), light->getLightTransform(), camera->getPosition());
+	}
 
 	mesh->draw(lighting_shader);
 

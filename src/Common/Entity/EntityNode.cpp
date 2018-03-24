@@ -25,7 +25,17 @@ void EntityNode::update(double deltaTime)
 
 void EntityNode::addToWorld(World* world)
 {
+	if (this->world != nullptr)
+	{
+		this->world->lightsInWorld.erase(this->lights.begin(), this->lights.end());
+	}
+
 	Entity::addToWorld(world);
+
+	if (this->world != nullptr)
+	{
+		this->world->lightsInWorld.insert(this->lights.begin(), this->lights.end());
+	}
 }
 
 void EntityNode::interactRay(Entity* entity, vector3D localStartPos, vector3D localHitPos, vector3D localHitNormal, int bodyId)
@@ -69,5 +79,34 @@ void EntityNode::removeModel(ComponentModel* model)
 	if (this->models.find(model) != this->models.end())
 	{
 		this->models.erase(model);
+	}
+}
+
+void EntityNode::addLight(ComponentLight* light)
+{
+	if (this->lights.find(light) == this->lights.end())
+	{
+		this->lights.insert(light);
+	
+		if (this->world != nullptr)
+		{
+			this->world->lightsInWorld.insert(light);
+		}
+	}
+}
+
+void EntityNode::removeLight(ComponentLight* light)
+{
+	if (this->lights.find(light) != this->lights.end())
+	{
+		this->lights.erase(light);
+
+		if (this->world != nullptr)
+		{
+			if (this->world->lightsInWorld.find(light) != this->world->lightsInWorld.end())
+			{
+				this->world->lightsInWorld.erase(light);
+			}
+		}
 	}
 }

@@ -14,8 +14,7 @@ uniform mat4 modelMatrix;
 uniform mat3 normalMatrix; 
 uniform mat4 localOffset = mat4(1.0); 
  
-uniform mat4 lightSpaceMatrix = mat4(1.0); 
-uniform mat4 lightModelMatrix = mat4(1.0);  
+uniform mat4 lightSpaceMVP = mat4(1.0); 
  
 void main(void) 
 {	
@@ -25,5 +24,5 @@ void main(void)
 	out_TexCoord = in_TexCoord;
 	out_worldPos = (modelMatrix * offsetPosition).xyz;
 	
-	out_lightPos = lightSpaceMatrix * (lightModelMatrix * offsetPosition);
+	out_lightPos = lightSpaceMVP * offsetPosition;
 }

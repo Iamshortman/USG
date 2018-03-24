@@ -33,7 +33,7 @@ void Node::update(double deltaTime)
 	}
 }
 
-Node * Node::getParent()
+Node* Node::getParent()
 {
 	return this->parent;
 }

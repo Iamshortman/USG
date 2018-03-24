@@ -32,6 +32,9 @@ public:
 	void addModel(ComponentModel* model);
 	void removeModel(ComponentModel* model);
 
+	void addLight(ComponentLight* light);
+	void removeLight(ComponentLight* light);
+
 	std::set<ComponentModel*> models;
 	std::set<ComponentLight*> lights;
 

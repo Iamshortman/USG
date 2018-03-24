@@ -60,6 +60,8 @@ public:
 
 	virtual WORLDTYPE getWorldType() const;
 
+	std::set<ComponentLight*> lightsInWorld;
+
 protected:
 	PhysicsWorld* physicsWorld = nullptr;
 

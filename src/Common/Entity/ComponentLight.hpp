@@ -3,7 +3,7 @@
 
 #include "Common/Entity/Component.hpp"
 #include "Common/Rendering/Lights.hpp"
-
+#include "Common/Transform.hpp"
 
 
 class ComponentLight : public Component
@@ -34,14 +34,18 @@ public:
 
 	vector3D getLightPostion();
 	matrix4 getLightSpaceMatrix();
+	Transform getLightTransform();
+
+	LightType getLightType();
+	BaseLight* getLight();
 
 protected:
 
 	LightType light_type;
-	BaseLight* light;
+	BaseLight* light = nullptr;
 
-	bool cast_shadows;
-	bool light_on;
+	bool cast_shadows = true;
+	bool light_on = true;
 
 };
 

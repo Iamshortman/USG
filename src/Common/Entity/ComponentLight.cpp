@@ -25,7 +25,7 @@ void ComponentLight::enable()
 {
 	if (!this->enabled && this->parent_entity != nullptr)
 	{
-		//this->parent_entity->addLight(this);
+		this->parent_entity->addLight(this);
 
 		Component::enable();
 	}
@@ -35,13 +35,13 @@ void ComponentLight::disable()
 {
 	if (this->enabled && this->parent_entity != nullptr)
 	{
-		//this->parent_entity->removeLight(this);
+		this->parent_entity->removeLight(this);
 
 		Component::disable();
 	}
 }
 
-void ComponentLight::addtoEntity(EntityNode * entity)
+void ComponentLight::addtoEntity(EntityNode* entity)
 {
 	this->disable();
 
@@ -71,3 +71,40 @@ void ComponentLight::setSpotLight(vector3F direction, float cutoff, float range,
 	this->light_type = LightType::Spot;
 	this->light = new SpotLight(direction, cutoff, range, attenuation, color, intensity);
 }
+
+vector3D ComponentLight::getLightPostion()
+{
+	return this->getParentNode()->getTransform().transformBy(this->getParentNode()->getParentEntity()->getRenderTransform()).getPosition();
+}
+
+matrix4 ComponentLight::getLightSpaceMatrix()
+{
+	quaternionD orientation = this->getParentNode()->getParentEntity()->getRenderTransform().orientation * this->getParentNode()->getTransform().orientation;
+
+	matrix4 viewMatrix = glm::inverse(glm::toMat4((quaternionF)orientation));
+	matrix4 projectionMatrix = matrix4(1.0f);
+
+	if (this->Type == LightType::Spot)
+	{
+		SpotLight* spot = (SpotLight*)this->light;
+		projectionMatrix = glm::perspective(spot->getCutoff(), 1.0f, 0.1f, 1000.0f);
+	}
+
+	return projectionMatrix * viewMatrix;
+}
+
+Transform ComponentLight::getLightTransform()
+{
+	return this->getParentNode()->getTransform().transformBy(this->getParentNode()->getParentEntity()->getRenderTransform());
+}
+
+LightType ComponentLight::getLightType()
+{
+	return this->light_type;
+}
+
+BaseLight* ComponentLight::getLight()
+{
+	return this->light;
+}
+
