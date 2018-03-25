@@ -1,6 +1,4 @@
-#include "Common/Entity/ComponentModel.hpp"
-
-#include "Common/Entity/EntityNode.hpp"
+#include "ComponentModel.hpp"
 
 #ifdef CLIENT
 #include "Client/Resource/MeshPool.hpp"
@@ -25,50 +23,32 @@ ComponentModel::~ComponentModel()
 
 void ComponentModel::enable()
 {
-	if (!this->enabled && this->parent_entity != nullptr)
-	{
-		this->parent_entity->addModel(this);
-
 #ifdef CLIENT
+	if (!this->enabled)
+	{
 		MeshPool::instance->setUsing(this->mesh_file_path);
 		TexturePool::instance->setUsing(this->texture_name);
 
 		ShaderPool::instance->setUsing(this->ambient_shader_name);
 		ShaderPool::instance->setUsing(this->lighting_shader_name);
 		ShaderPool::instance->setUsing(this->shadow_shader_name);
-#endif
-		Component::enable();
 	}
+#endif
+	Component::enable();
 }
 
 void ComponentModel::disable()
 {
-	if (this->enabled && this->parent_entity != nullptr)
-	{
-		this->parent_entity->removeModel(this);
-
 #ifdef CLIENT
+	if (this->enabled)
+	{
 		MeshPool::instance->releaseUsing(this->mesh_file_path);
 		TexturePool::instance->releaseUsing(this->texture_name);
 
 		ShaderPool::instance->releaseUsing(this->ambient_shader_name);
 		ShaderPool::instance->releaseUsing(this->lighting_shader_name);
 		ShaderPool::instance->releaseUsing(this->shadow_shader_name);
-#endif
-		Component::disable();
 	}
-}
-
-void ComponentModel::addtoEntity(EntityNode* entity)
-{
-	this->disable();
-
-	Component::addtoEntity(entity);
-
-	this->enable();
-}
-
-ComponentType ComponentModel::getComponentType() const
-{
-	return ComponentType::MODEL;
+#endif
+	Component::disable();
 }

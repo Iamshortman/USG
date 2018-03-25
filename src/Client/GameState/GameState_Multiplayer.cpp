@@ -1,7 +1,5 @@
 #include "Client/GameState/GameState.hpp"
 #include "Client/Client.hpp"
-#include "Common/World/WorldManager.hpp"
-#include "Common/Entity/EntityManager.hpp"
 
 GameState_Multiplayer::GameState_Multiplayer()
 {
@@ -15,22 +13,18 @@ GameState_Multiplayer::GameState_Multiplayer()
 		address = temp;
 	}*/
 
-	this->networkManager = new ClientNetworkManager(address, 60000, this);
+	//this->networkManager = new ClientNetworkManager(address, 60000, this);
 }
 
 GameState_Multiplayer::~GameState_Multiplayer()
 {
-	if (this->mainWorld != nullptr)
-	{
-		delete this->mainWorld;
-	}
-	delete this->networkManager;
+	//delete this->networkManager;
 }
 
 void GameState_Multiplayer::update(Client* client, double deltaTime)
 {
 	//Update from network
-	if (this->networkManager->isConnected == false)
+	/*if (this->networkManager->isConnected == false)
 	{
 		//Draw Black Screen
 		client->window->clearBuffer();
@@ -61,5 +55,5 @@ void GameState_Multiplayer::update(Client* client, double deltaTime)
 	{
 		client->renderingManager->Render(player->getWorld(), &cam);
 	}
-	client->window->updateBuffer();
+	client->window->updateBuffer();*/
 }

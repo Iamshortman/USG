@@ -5,13 +5,7 @@
 #include "Client/Resource/ShaderPool.hpp"
 #include "Client/Resource/MeshPool.hpp"
 
-#include "Common/Entity/EntityManager.hpp"
-#include "Common/World/WorldManager.hpp"
 #include "Client/Input/InputManager.hpp"
-#include "Client/Rendering/LightManager.hpp"
-
-#include "Common/Entity/EntityCharacter.hpp"
-#include "Client/Entity/EntityPlayerClient.hpp"
 
 int main()
 {
@@ -22,12 +16,7 @@ int main()
 	ShaderPool* shaderPool = new ShaderPool();
 	MeshPool* meshPool = new MeshPool();
 
-	EntityManager* entityManager = new EntityManager();
-	entityManager->registerCreator(ENTITYTYPE::PLAYER_THIS, new CreatorPlayerClient());
-
-	WorldManager* worldManager = new WorldManager();
 	InputManager* inputManager = new InputManager();
-	LightManager* lightManager = new LightManager();
 
 	Client* game = new Client();
 

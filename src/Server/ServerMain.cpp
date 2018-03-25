@@ -1,18 +1,12 @@
 #include "Server/Server.hpp"
-#include <chrono>
 
-#include "Common/World/WorldManager.hpp"
-#include "Common/Entity/EntityManager.hpp"
-#include "Common/Entity/EntityCharacter.hpp"
+#include <chrono>
+#include <thread>
 
 double Cycles_Per_Second = 120.0;
 
 int main()
 {
-	EntityManager* entityManager = new EntityManager();
-
-	WorldManager* worldManager = new WorldManager();
-
 	Server* server = new Server();
 
 	std::chrono::high_resolution_clock::time_point last_time, current_time, last_frame_time;

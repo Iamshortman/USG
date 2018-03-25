@@ -3,9 +3,6 @@
 
 #include <set>
 
-#include "Server/Networking/ServerNetworkManager.hpp"
-#include "Server/Networking/ClientConnection.hpp"
-
 class Server
 {
 public:
@@ -18,15 +15,7 @@ public:
 	void update(double deltaTime);
 	void exitGame();
 	const bool getShouldClose();
-
-	ServerNetworkManager* networkManager;
-	vector<World*> rootWorlds;
-
-	void addClient(RakNet::SystemAddress);
-	void removeClient(RakNet::SystemAddress);
-
 private:
-	std::set<ClientConnection*> clients;
 
 	bool shouldClose = false;
 };

@@ -1,19 +1,15 @@
 #include "Common/Physics/RigidBody.hpp"
-#include "Common/Entity/Entity.hpp"
-#include "Common/Entity/Node.hpp"
 
-RigidBody::RigidBody(Entity* entity, RIGIDBODYTYPE type)
+#include "Common/GameObject.hpp"
+#include "Common/Physics/PhysicsWorld.hpp"
+
+RigidBody::RigidBody()
 {
 	emptyShape = new btEmptyShape();
 
 	btDefaultMotionState* motionState = new btDefaultMotionState();
 	btRigidBody::btRigidBodyConstructionInfo boxRigidBodyCI(mass, motionState, emptyShape, btVector3(0.0, 0.0, 0.0));
 	this->rigidBody = new btRigidBody(boxRigidBodyCI);
-
-	this->parent = entity;
-	this->rigidBody->setUserPointer(entity);
-
-	this->type = type;
 }
 
 RigidBody::~RigidBody()
@@ -21,11 +17,6 @@ RigidBody::~RigidBody()
 	if (this->rigidBody != nullptr)
 	{
 		delete this->rigidBody;
-	}
-
-	if (this->singleShape != nullptr)
-	{
-		delete this->singleShape;
 	}
 
 	if (this->compoundShape != nullptr)
@@ -44,65 +35,26 @@ RigidBody::~RigidBody()
 	}
 }
 
-void RigidBody::setCollisionShape(CollisionShape* shape)
+childId RigidBody::addChildShape(CollisionShape* shape, Transform transform, double mass, GameObject* gameObject)
 {
-	if (this->type == RIGIDBODYTYPE::SINGLE)
-	{
-		if (this->singleShape != nullptr)
-		{
-			delete this->singleShape;
-		}
+	childId id = getNextId();
 
-		this->singleShape = shape;
+	this->childShapes[id] = ChildShape();
+	this->childShapes[id].shape = shape;
+	this->childShapes[id].transform = transform;
+	this->childShapes[id].gameObject = gameObject;
+	this->childShapes[id].mass = mass;
 
-		if (this->singleShape != nullptr)
-		{
-			this->singleShape->btShape->setUserIndex(-1);
-			this->singleShape->btShape->setUserPointer(this->parent);
-			this->rigidBody->setCollisionShape(this->singleShape->btShape);
-			this->setMass(this->mass);
-			this->setInertiaTensor(vector3D(0.0));
-		}
-		else
-		{
-			this->rigidBody->setCollisionShape(this->emptyShape);
-		}
-	}
+	this->rebuildCompondShape();
+
+	return id;
 }
 
-CollisionShape* RigidBody::getCollisionShape()
+GameObject* RigidBody::getChildNode(childId id)
 {
-	return this->singleShape;
-}
-
-childId RigidBody::addChildShape(CollisionShape* shape, Transform transform, double mass, Node* node)
-{
-	if (this->type == RIGIDBODYTYPE::COMPOUND)
+	if (this->childShapes.find(id) != this->childShapes.end())
 	{
-		childId id = getNextId();
-
-		this->childShapes[id] = ChildShape();
-		this->childShapes[id].shape = shape;
-		this->childShapes[id].transform = transform;
-		this->childShapes[id].node = node;
-		this->childShapes[id].mass = mass;
-
-		this->rebuildCompondShape();
-
-		return id;
-	}
-
-	return -1;
-}
-
-Node * RigidBody::getChildNode(childId id)
-{
-	if (this->type == RIGIDBODYTYPE::COMPOUND)
-	{
-		if (this->childShapes.find(id) != this->childShapes.end())
-		{
-			return this->childShapes[id].node;
-		}
+		return this->childShapes[id].gameObject;
 	}
 
 	return nullptr;
@@ -110,86 +62,77 @@ Node * RigidBody::getChildNode(childId id)
 
 void RigidBody::removeChildShape(childId id)
 {
-	if (this->type == RIGIDBODYTYPE::COMPOUND)
-	{
-		this->childShapes.erase(id);
-		this->rebuildCompondShape();
-	}
+	this->childShapes.erase(id);
+	this->rebuildCompondShape();
 }
 
 
 void RigidBody::updateChildTransform(childId id, Transform transform)
 {
-	if (this->type == RIGIDBODYTYPE::COMPOUND)
+	if (this->childShapes.find(id) != this->childShapes.end())
 	{
-		if (this->childShapes.find(id) != this->childShapes.end())
-		{
-			ChildShape* child = &this->childShapes[id];
-			child->transform = transform;
+		ChildShape* child = &this->childShapes[id];
+		child->transform = transform;
 
-			if (this->compoundShape != nullptr)
-			{
-				this->compoundShape->updateChildTransform(child->index, toBtTransform(transform), true);
-			}
+		if (this->compoundShape != nullptr)
+		{
+			this->compoundShape->updateChildTransform(child->index, toBtTransform(transform), true);
 		}
 	}
 }
 
 void RigidBody::rebuildCompondShape()
 {
-	if (this->type == RIGIDBODYTYPE::COMPOUND)
+	btCollisionShape* oldShape = this->rigidBody->getCollisionShape();
+
+	if (oldShape != nullptr && oldShape != this->emptyShape)
 	{
-		btCollisionShape* oldShape = this->rigidBody->getCollisionShape();
+		delete this->rigidBody->getCollisionShape();
 
-		if (oldShape != nullptr && oldShape != this->emptyShape)
+		if (oldShape == this->compoundShape)
 		{
-			delete this->rigidBody->getCollisionShape();
+			this->compoundShape = nullptr;
+		}
+	}
 
-			if (oldShape == this->compoundShape)
-			{
-				this->compoundShape = nullptr;
-			}
+	if (this->childShapes.size() > 0)
+	{
+		this->compoundShape = new btCompoundShape(true, (int) this->childShapes.size());
+
+		//Sets Parent Index
+		//this->compoundShape->setUserPointer(this->parent);
+
+		double totalMass = 0.01;
+
+		ChildShape* child;
+		for (auto iter = this->childShapes.begin(); iter != this->childShapes.end(); iter++)
+		{
+			child = &iter->second;
+			child->index = this->compoundShape->getNumChildShapes();
+
+			//Sets Child Index
+			child->shape->btShape->setUserIndex(*&iter->first);
+			//child->shape->btShape->setUserPointer(this->parent);
+
+			this->compoundShape->addChildShape(toBtTransform(child->transform), child->shape->btShape);
+
+			totalMass += child->mass;
 		}
 
-		if (this->childShapes.size() > 0)
+		if (this->mass == 0.0)
 		{
-			this->compoundShape = new btCompoundShape(true, (int) this->childShapes.size());
-
-			//Sets Parent Index
-			this->compoundShape->setUserPointer(this->parent);
-
-			double totalMass = 0.01;
-
-			ChildShape* child;
-			for (auto iter = this->childShapes.begin(); iter != this->childShapes.end(); iter++)
-			{
-				child = &iter->second;
-				child->index = this->compoundShape->getNumChildShapes();
-
-				//Sets Child Index
-				child->shape->btShape->setUserIndex(*&iter->first);
-				child->shape->btShape->setUserPointer(this->parent);
-
-				this->compoundShape->addChildShape(toBtTransform(child->transform), child->shape->btShape);
-
-				totalMass += child->mass;
-			}
-
-			if (this->mass == 0.0)
-			{
-				totalMass = 0.0;
-			}
-
-			this->mass = totalMass;
-
-			this->rigidBody->setMassProps(this->mass, toBtVec3(this->inertia));
-
-			this->rigidBody->setCollisionShape(this->compoundShape);
+			totalMass = 0.0;
 		}
-		else
-		{
-			this->rigidBody->setCollisionShape(this->emptyShape);
-		}
+
+		this->mass = totalMass;
+
+		this->rigidBody->setMassProps(this->mass, toBtVec3(this->inertia));
+
+		this->rigidBody->setCollisionShape(this->compoundShape);
+	}
+	else
+	{
+		this->rigidBody->setCollisionShape(this->emptyShape);
 	}
 }
 
@@ -288,6 +231,44 @@ void RigidBody::setDampening(double linear, double angular)
 btRigidBody* RigidBody::getRigidBody()
 {
 	return this->rigidBody;
+}
+
+void RigidBody::enable()
+{
+	if (!this->enabled)
+	{
+		if (this->parent->parent != nullptr)
+		{
+			if (this->parent->parent->hasComponent<PhysicsWorld>())
+			{
+				this->world = parent->parent->getComponent<PhysicsWorld>();
+				this->world->addRigidBody(this);
+				this->rigidBody->setUserPointer(this->parent);
+				Component::enable();
+			}
+			else
+			{
+				printf("Error: No World\n");
+			}
+		}
+		else
+		{
+			printf("Error: No Parent\n");
+		}
+	}
+}
+
+void RigidBody::disable()
+{
+	if (this->enabled)
+	{
+		if (this->world != nullptr)
+		{
+			this->world->removeRigidBody(this);
+			this->world = nullptr;
+		}
+		Component::disable();
+	}
 }
 
 childId RigidBody::getNextId()

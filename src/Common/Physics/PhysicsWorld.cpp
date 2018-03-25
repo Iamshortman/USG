@@ -1,10 +1,7 @@
 #include "Common/Physics/PhysicsWorld.hpp"
-#include "Common/World/World.hpp"
 
-PhysicsWorld::PhysicsWorld(World* world)
+PhysicsWorld::PhysicsWorld()
 {
-	this->parent = world;
-
 	// Build the broadphase
 	broadphase = new btDbvtBroadphase();
 
@@ -30,39 +27,13 @@ PhysicsWorld::~PhysicsWorld()
 	delete broadphase;
 }
 
-void PhysicsWorld::update(double timeStep)
+void PhysicsWorld::update(double delta_time)
 {
-	//Run Physics Simulation
-	this->dynamicsWorld->stepSimulation(timeStep, 8, 1.0 / 120.0);
-
-
-	/*int numManifolds = this->dynamicsWorld->getDispatcher()->getNumManifolds();
-	for (int i = 0; i < numManifolds; i++)
+	if (this->enabled)
 	{
-		btPersistentManifold* contactManifold = this->dynamicsWorld->getDispatcher()->getManifoldByIndexInternal(i);
-		const btCollisionObject* obA = contactManifold->getBody0();
-		const btCollisionObject* obB = contactManifold->getBody1();
-
-		Entity* ptr1 = (Entity*)obA->getUserPointer();
-		Entity* ptr2 = (Entity*)obB->getUserPointer();
-
-		if (ptr->getEntityType() == ENTITYTYPE::GRIDSYSTEM)
-		{
-			printf("Hit: %d\n", ptr->entityId);
-		}
-
-		int numContacts = contactManifold->getNumContacts();
-		for (int j = 0; j < numContacts; j++)
-		{
-			btManifoldPoint& pt = contactManifold->getContactPoint(j);
-			if (pt.getDistance() < 0.f)
-			{
-				const btVector3& ptA = pt.getPositionWorldOnA();
-				const btVector3& ptB = pt.getPositionWorldOnB();
-				const btVector3& normalOnB = pt.m_normalWorldOnB;
-			}
-		}
-	}*/
+		//Run Physics Simulation
+		this->dynamicsWorld->stepSimulation(delta_time, 8, 1.0 / 120.0);
+	}
 }
 
 void PhysicsWorld::addRigidBody(RigidBody* rigidBody)
@@ -94,7 +65,7 @@ SingleRayTestResult PhysicsWorld::singleRayTest(vector3D startPos, vector3D endP
 		result.hitBody = hitBody;
 		result.hitPosition = toVec3(rayCallback.m_hitPointWorld);
 		result.hitNormal = toVec3(rayCallback.m_hitNormalWorld);
-		result.entity = (Entity*)hitBody->getUserPointer();
+		result.gameObject = (GameObject*)hitBody->getUserPointer();
 
 		if (rayCallback.m_bodyId != -1)
 		{
@@ -120,7 +91,7 @@ SingleRayTestResult PhysicsWorld::singleRayTest(vector3D startPos, vector3D endP
 	return result;
 }
 
-SingleRayTestResult PhysicsWorld::singleRayTestNotMe(vector3D startPos, vector3D endPos, Entity* me)
+SingleRayTestResult PhysicsWorld::singleRayTestNotMe(vector3D startPos, vector3D endPos, GameObject* me)
 {
 	btVector3 start = toBtVec3(startPos);
 	btVector3 end = toBtVec3(endPos);
@@ -164,7 +135,7 @@ SingleRayTestResult PhysicsWorld::singleRayTestNotMe(vector3D startPos, vector3D
 			result.hitBody = hitBody;
 			result.hitPosition = toVec3(rayCallback.m_hitPointWorld[closestHitIndex]);
 			result.hitNormal = toVec3(rayCallback.m_hitNormalWorld[closestHitIndex]);
-			result.entity = (Entity*)hitBody->getUserPointer();
+			result.gameObject = (GameObject*)hitBody->getUserPointer();
 		}
 
 	}

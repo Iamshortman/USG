@@ -1,17 +1,14 @@
 #ifndef PHYSICSWORLD_HPP
 #define PHYSICSWORLD_HPP
 
+#include "Common/Component.hpp"
 #include "Common/Physics/Bullet_Include.hpp"
 #include "Common/Physics/RigidBody.hpp"
-#include "Common/Entity/Entity.hpp"
-
-//Prototype Classes
-class World;
 
 struct SingleRayTestResult
 {
 	bool hasHit = false;
-	Entity* entity = nullptr;
+	GameObject* gameObject = nullptr;
 	const btRigidBody* hitBody;
 	vector3D hitPosition;
 	vector3D hitNormal;
@@ -19,23 +16,22 @@ struct SingleRayTestResult
 	int bodyId = 0;
 };
 
-class PhysicsWorld
+class PhysicsWorld : public Component
 {
 
 public:
-	PhysicsWorld(World* world);
+	PhysicsWorld();
 	virtual ~PhysicsWorld();
 
-	void update(double deltaTime);
+	virtual void update(double delta_time) override;
 	void addRigidBody(RigidBody* rigidBody);
 	void removeRigidBody(RigidBody* rigidBody);
 
 	SingleRayTestResult singleRayTest(vector3D startPos, vector3D endPos);
-	SingleRayTestResult singleRayTestNotMe(vector3D startPos, vector3D endPos, Entity* me);
+	SingleRayTestResult singleRayTestNotMe(vector3D startPos, vector3D endPos, GameObject* me);
 	btDiscreteDynamicsWorld* dynamicsWorld = nullptr;
 
 protected:
-	World* parent = nullptr;
 
 	btBroadphaseInterface* broadphase = nullptr;
 	btDefaultCollisionConfiguration* collisionConfiguration = nullptr;

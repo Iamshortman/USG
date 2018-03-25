@@ -1,25 +1,18 @@
 #ifndef RIGIDBODY_HPP
 #define RIGIDBODY_HPP
 
+#include "Common/Component.hpp"
+
 #include <unordered_map>
 
 #include "Common/Physics/Bullet_Include.hpp"
 #include "Common/Physics/CollisionShape.hpp"
-
 #include "Common/GLM_Include.hpp"
 #include "Common/Transform.hpp"
 
 
 //Prototype Class
 class PhysicsWorld;
-class Entity;
-class Node;
-
-enum RIGIDBODYTYPE
-{
-	SINGLE,
-	COMPOUND,
-};
 
 typedef unsigned int childId;
 
@@ -27,24 +20,20 @@ struct ChildShape
 {
 	CollisionShape* shape;
 	double mass;
-
 	Transform transform;
 	childId index;
-	Node* node;
+	GameObject* gameObject;
 };
 
-class RigidBody
+class RigidBody : public Component
 {
 public:
-	RigidBody(Entity* entity, RIGIDBODYTYPE type);
+	RigidBody();
 
 	virtual ~RigidBody();
 
-	void setCollisionShape(CollisionShape* shape);
-	CollisionShape* getCollisionShape();
-
-	childId addChildShape(CollisionShape* shape, Transform transform, double mass, Node* node = nullptr);
-	Node* getChildNode(childId id);
+	childId addChildShape(CollisionShape* shape, Transform transform, double mass, GameObject* node = nullptr);
+	GameObject* getChildNode(childId id);
 	void removeChildShape(childId id);
 	void updateChildTransform(childId id, Transform transform);
 	void rebuildCompondShape();
@@ -79,18 +68,13 @@ public:
 
 	btRigidBody* getRigidBody();
 
+	virtual void enable() override;
+	virtual void disable() override;
+
 private:
-	Entity* parent = nullptr;
-
 	btRigidBody* rigidBody = nullptr;
-
-	RIGIDBODYTYPE type = RIGIDBODYTYPE::SINGLE;
-
-	CollisionShape* singleShape = nullptr;
-
 	btCompoundShape* compoundShape = nullptr;
 	std::unordered_map<int, ChildShape> childShapes;
-
 	btEmptyShape* emptyShape = nullptr;
 
 	double mass = 1.0;

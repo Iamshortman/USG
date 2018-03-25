@@ -1,14 +1,12 @@
 #ifndef COMPONENT_MODEL_HPP
 #define COMPONENT_MODEL_HPP 
 
-#include "Common/Entity/Component.hpp"
+#include "Common/Component.hpp"
 #include "Common/Types.hpp"
 
 class ComponentModel : public Component
 {
 public:
-	static const ComponentType Type = ComponentType::MODEL;
-
 	ComponentModel(string mesh, string texture, string ambient_shader, string lighting_shader, string shadow_shader);
 	virtual ~ComponentModel();
 
@@ -21,10 +19,6 @@ public:
 
 	virtual void enable() override;
 	virtual void disable() override;
-
-	virtual void addtoEntity(EntityNode* entity);
-
-	virtual ComponentType getComponentType() const override;
 
 	void setCastShadows(bool cast_shadow) { this->cast_shadows = cast_shadow; };
 	bool castShadows() const { return this->cast_shadows; };

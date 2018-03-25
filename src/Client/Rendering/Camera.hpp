@@ -39,7 +39,7 @@ private:
     vector3D position;
 
 	//Perspective varables
-	float frameOfView = 45.0f;
+	float frameOfView = 90.0f;
 	float nearClipping = 0.1f;
 	float farClipping = 1000.0f;
 

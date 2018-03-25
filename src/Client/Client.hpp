@@ -3,7 +3,6 @@
 
 #include "Client/Rendering/RenderingManager.hpp"
 #include "Client/Rendering/Window.hpp"
-#include "Client/Networking/ClientNetworkManager.hpp"
 
 #include "Client/GameState/GameState.hpp"
 
