@@ -2,6 +2,7 @@
 #include "Client/Client.hpp"
 
 #include "Common/GameObject.hpp"
+#include "Client/Rendering/Camera.hpp"
 #include "Common/Component/ComponentModel.hpp"
 #include "Common/Physics/PhysicsWorld.hpp"
 
@@ -15,6 +16,12 @@ GameState_Singleplayer::GameState_Singleplayer()
 
 	ship->addComponent<RigidBody>();
 	ship->addComponent<ComponentModel>("res/models/Cobra/Hull.obj", "res/textures/1K_Grid.png", "Textured", "Textured_Lighting", "Textured_Shadow");
+
+	GameObject* camera = new GameObject(3);
+	this->scene_root->addChild(camera);
+	camera->addComponent<Camera>();
+	scene_camera = camera->getComponent<Camera>();
+	camera->setLocalTransform(Transform(vector3D(0.0, 3.0, -8.0)));
 }
 
 GameState_Singleplayer::~GameState_Singleplayer()
@@ -26,8 +33,5 @@ void GameState_Singleplayer::update(Client* client, double delta_time)
 {
 	this->scene_root->update(delta_time);
 
-	Camera camera;
-	camera.setCameraPos(vector3D(0.0, 0.0, -10.0));
-
-	client->renderingManager->renderScene(scene_root, &camera);
+	client->renderingManager->renderScene(scene_root, scene_camera);
 }

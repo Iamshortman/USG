@@ -1,13 +1,10 @@
 #ifndef GAMESTATE_HPP
 #define GAMESTATE_HPP
 
-//#include "Common/World/World.hpp"
-//#include "Client/Networking/ClientNetworkManager.hpp"
-//#include "Client/Entity/PlayerController.hpp"
-
 //Prototype class
 class Client;
 class GameObject;
+class Camera;
 
 class GameState
 {
@@ -32,6 +29,7 @@ public:
 	virtual void update(Client* client, double delta_time);
 
 private:
+	Camera* scene_camera;
 	GameObject* scene_root;
 };
 
@@ -42,11 +40,7 @@ public:
 	virtual ~GameState_Multiplayer();
 	virtual void update(Client* client, double delta_time);
 
-	//PlayerController playerInterface;
-
 private:
-	//World* mainWorld = nullptr;
-	//ClientNetworkManager* networkManager = nullptr;
 };
 
 #endif //GAMESTATE_HPP

@@ -86,6 +86,11 @@
 		return positionMatrix * rotationMatrix * scaleMatrix;
 	}
 
+	matrix4 Transform::getOriginViewMatrix() const
+	{
+		return glm::lookAt(vector3F(0.0), (vector3F)this->getForward(), (vector3F)this->getUp());
+	}
+
 	matrix3 Transform::getNormalMatrix() const
 	{
 		return glm::toMat3((quaternionF)this->orientation);
@@ -97,6 +102,5 @@
 		Transform result;
 		result.setOrientation(transform1.getOrientation() * this->getOrientation());
 		result.setPosition(transform1.getPosition() + (transform1.getOrientation() * this->getPosition()));
-
 		return result;
 	}
