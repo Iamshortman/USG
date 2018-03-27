@@ -56,6 +56,12 @@ void RenderingManager::renderScene(GameObject* scene_root, Camera* camera)
 		GameObject* node = nodes.top();
 		nodes.pop();
 
+
+		if (node->hasComponent<Component>())//TODO Distance Culling
+		{
+
+		}
+
 		if (node->hasComponent<ComponentModel>())
 		{
 			ComponentModel* model = node->getComponent<ComponentModel>();
@@ -63,11 +69,6 @@ void RenderingManager::renderScene(GameObject* scene_root, Camera* camera)
 			{
 				models.insert(model);
 			}
-		}
-
-		if (node->hasComponent<Component>())//TODO Distance Culling
-		{
-
 		}
 
 		for (GameObject* child : node->children)

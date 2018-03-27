@@ -14,6 +14,8 @@ RigidBody::RigidBody()
 
 RigidBody::~RigidBody()
 {
+	this->disable();
+
 	if (this->rigidBody != nullptr)
 	{
 		delete this->rigidBody;
@@ -32,6 +34,44 @@ RigidBody::~RigidBody()
 	if (this->emptyShape != nullptr)
 	{
 		delete this->emptyShape;
+	}
+}
+
+void RigidBody::enable()
+{
+	if (!this->enabled)
+	{
+		if (this->parent->parent != nullptr)
+		{
+			if (this->parent->parent->hasComponent<PhysicsWorld>())
+			{
+				this->world = parent->parent->getComponent<PhysicsWorld>();
+				this->world->addRigidBody(this);
+				this->rigidBody->setUserPointer(this->parent);
+				Component::enable();
+			}
+			else
+			{
+				printf("Error: No World\n");
+			}
+		}
+		else
+		{
+			printf("Error: No Parent\n");
+		}
+	}
+}
+
+void RigidBody::disable()
+{
+	if (this->enabled)
+	{
+		if (this->world != nullptr)
+		{
+			this->world->removeRigidBody(this);
+			this->world = nullptr;
+		}
+		Component::disable();
 	}
 }
 
@@ -231,44 +271,6 @@ void RigidBody::setDampening(double linear, double angular)
 btRigidBody* RigidBody::getRigidBody()
 {
 	return this->rigidBody;
-}
-
-void RigidBody::enable()
-{
-	if (!this->enabled)
-	{
-		if (this->parent->parent != nullptr)
-		{
-			if (this->parent->parent->hasComponent<PhysicsWorld>())
-			{
-				this->world = parent->parent->getComponent<PhysicsWorld>();
-				this->world->addRigidBody(this);
-				this->rigidBody->setUserPointer(this->parent);
-				Component::enable();
-			}
-			else
-			{
-				printf("Error: No World\n");
-			}
-		}
-		else
-		{
-			printf("Error: No Parent\n");
-		}
-	}
-}
-
-void RigidBody::disable()
-{
-	if (this->enabled)
-	{
-		if (this->world != nullptr)
-		{
-			this->world->removeRigidBody(this);
-			this->world = nullptr;
-		}
-		Component::disable();
-	}
 }
 
 childId RigidBody::getNextId()

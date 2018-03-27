@@ -7,6 +7,8 @@
 
 #include "Client/Input/InputManager.hpp"
 
+#include "Common/GameObjectManager.hpp"
+
 int main()
 {
 	SDL_Init(SDL_INIT_EVERYTHING);
@@ -17,6 +19,8 @@ int main()
 	MeshPool* meshPool = new MeshPool();
 
 	InputManager* inputManager = new InputManager();
+
+	GameObjectManager* gameObjectManager = new GameObjectManager();
 
 	Client* game = new Client();
 

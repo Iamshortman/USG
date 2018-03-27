@@ -4,6 +4,7 @@
 #include "Common/Component.hpp"
 #include "Common/Physics/Bullet_Include.hpp"
 #include "Common/Physics/RigidBody.hpp"
+#include <set>
 
 struct SingleRayTestResult
 {
@@ -24,6 +25,9 @@ public:
 	virtual ~PhysicsWorld();
 
 	virtual void update(double delta_time) override;
+	virtual void enable() override;
+	virtual void disable() override;
+
 	void addRigidBody(RigidBody* rigidBody);
 	void removeRigidBody(RigidBody* rigidBody);
 
@@ -32,6 +36,7 @@ public:
 	btDiscreteDynamicsWorld* dynamicsWorld = nullptr;
 
 protected:
+	std::set<RigidBody*> rigid_bodies;
 
 	btBroadphaseInterface* broadphase = nullptr;
 	btDefaultCollisionConfiguration* collisionConfiguration = nullptr;

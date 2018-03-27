@@ -19,6 +19,8 @@ PhysicsWorld::PhysicsWorld()
 
 PhysicsWorld::~PhysicsWorld()
 {
+	this->disable();
+
 	// Clean up behind ourselves like good little programmers
 	delete dynamicsWorld;
 	delete solver;
@@ -36,14 +38,31 @@ void PhysicsWorld::update(double delta_time)
 	}
 }
 
+void PhysicsWorld::enable()
+{
+	Component::enable();
+}
+
+void PhysicsWorld::disable()
+{
+	for (RigidBody* right_body : this->rigid_bodies)
+	{
+		right_body->disable();
+	}
+
+	Component::disable();
+}
+
 void PhysicsWorld::addRigidBody(RigidBody* rigidBody)
 {
 	this->dynamicsWorld->addRigidBody(rigidBody->getRigidBody());
+	this->rigid_bodies.insert(rigidBody);
 }
 
 void PhysicsWorld::removeRigidBody(RigidBody* rigidBody)
 {
 	this->dynamicsWorld->removeRigidBody(rigidBody->getRigidBody());
+	this->rigid_bodies.erase(rigidBody);
 }
 
 SingleRayTestResult PhysicsWorld::singleRayTest(vector3D startPos, vector3D endPos)

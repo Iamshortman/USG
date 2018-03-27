@@ -2,22 +2,23 @@
 #include "Client/Client.hpp"
 
 #include "Common/GameObject.hpp"
+#include "Common/GameObjectManager.hpp"
 #include "Client/Rendering/Camera.hpp"
 #include "Common/Component/ComponentModel.hpp"
 #include "Common/Physics/PhysicsWorld.hpp"
 
 GameState_Singleplayer::GameState_Singleplayer()
 {
-	this->scene_root = new GameObject(1);
+	this->scene_root = GameObjectManager::createGameObject();
 	this->scene_root->addComponent<PhysicsWorld>();
 
-	GameObject* ship = new GameObject(2);
+	GameObject* ship = GameObjectManager::createGameObject();
 	this->scene_root->addChild(ship);
 
 	ship->addComponent<RigidBody>();
 	ship->addComponent<ComponentModel>("res/models/Cobra/Hull.obj", "res/textures/1K_Grid.png", "Textured", "Textured_Lighting", "Textured_Shadow");
 
-	GameObject* camera = new GameObject(3);
+	GameObject* camera = GameObjectManager::createGameObject();
 	this->scene_root->addChild(camera);
 	camera->addComponent<Camera>();
 	scene_camera = camera->getComponent<Camera>();

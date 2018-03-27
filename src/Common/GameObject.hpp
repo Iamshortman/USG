@@ -12,7 +12,6 @@ typedef uint32_t GameObjectId;
 class GameObject
 {
 public:
-	GameObject(GameObjectId objectId); //TODO make private only for factory use
 	~GameObject();
 
 	void update(double delta_Time);
@@ -72,7 +71,8 @@ public:
 protected:
 	Transform local_transform;
 
-private:
+	GameObject(GameObjectId objectId); //protected for GameObjectManager use only
+	friend class GameObjectManager;
 };
 
 

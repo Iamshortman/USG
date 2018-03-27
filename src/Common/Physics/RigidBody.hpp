@@ -10,7 +10,6 @@
 #include "Common/GLM_Include.hpp"
 #include "Common/Transform.hpp"
 
-
 //Prototype Class
 class PhysicsWorld;
 
@@ -29,8 +28,10 @@ class RigidBody : public Component
 {
 public:
 	RigidBody();
-
 	virtual ~RigidBody();
+
+	virtual void enable() override;
+	virtual void disable() override;
 
 	childId addChildShape(CollisionShape* shape, Transform transform, double mass, GameObject* node = nullptr);
 	GameObject* getChildNode(childId id);
@@ -67,9 +68,6 @@ public:
 	void setDampening(double linear, double angular);
 
 	btRigidBody* getRigidBody();
-
-	virtual void enable() override;
-	virtual void disable() override;
 
 private:
 	btRigidBody* rigidBody = nullptr;
