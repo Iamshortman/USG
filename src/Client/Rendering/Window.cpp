@@ -52,8 +52,7 @@ Window::Window(int width, int height, string windowTitle)
 	GLint major, minor;
 	glGetIntegerv(GL_MAJOR_VERSION, &major);
 	glGetIntegerv(GL_MINOR_VERSION, &minor);
-	if ((major > 4 || (major == 4 && minor >= 5)) ||
-		SDL_GL_ExtensionSupported("GL_ARB_clip_control"))
+	if ((major > 4 || (major == 4 && minor >= 5)) || SDL_GL_ExtensionSupported("GL_ARB_clip_control"))
 	{
 		glClipControl(GL_LOWER_LEFT, GL_ZERO_TO_ONE);
 	}
@@ -63,8 +62,8 @@ Window::Window(int width, int height, string windowTitle)
 		exit(1);
 	}
 
+	printf("OpenGL Version: %d.%d\n", major, minor);
 }
-
 
 Window::~Window()
 {
