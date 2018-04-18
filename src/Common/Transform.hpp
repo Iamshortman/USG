@@ -17,7 +17,6 @@ public:
 	vector3D getPosition() const;
 	vector3D getForward() const;
 	vector3D getUp() const;
-	vector3D getRight() const;
 	vector3D getLeft() const;
 	quaternionD getOrientation() const;
 

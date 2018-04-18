@@ -23,7 +23,7 @@ public:
 
 private:
 	//Perspective varables
-	float frame_of_view = 90.0f;
+	float frame_of_view = 70.0f;
 	float z_near = 0.1f;
 	float z_far = 1000.0f;
 };

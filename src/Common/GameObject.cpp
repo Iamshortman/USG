@@ -54,7 +54,10 @@ Transform GameObject::getLocalTransform()
 	RigidBody* rigidBody = this->getComponent<RigidBody>();
 	if (rigidBody != nullptr)
 	{
-		this->local_transform = rigidBody->getWorldTransform();
+		if (rigidBody->enabled)
+		{
+			this->local_transform = rigidBody->getWorldTransform();
+		}
 	}
 
 	return this->local_transform;

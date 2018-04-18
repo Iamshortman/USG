@@ -31,7 +31,6 @@ GLclampf alpha);
 		void setVsync(int syncRate);
 		int getVsync();
 		void set3dRendering();
-		void set2dRendering();
 		void resetGlViewport();
 
 	private:

@@ -16,32 +16,41 @@ InputManager::InputManager()
 	this->device_map = unordered_map<void*, InputDevice*>();
 
 	keyboardMouse = new KeyboardMouseDevice();
-	keyboardMouse->addButton("DebugForward", KeyboardMouseButton(KEYBOARD, SDL_SCANCODE_W));
+
+	/*keyboardMouse->addButton("DebugForward", KeyboardMouseButton(KEYBOARD, SDL_SCANCODE_W));
 	keyboardMouse->addButton("DebugBackward", KeyboardMouseButton(KEYBOARD, SDL_SCANCODE_S));
 	keyboardMouse->addButton("DebugLeft", KeyboardMouseButton(KEYBOARD, SDL_SCANCODE_A));
 	keyboardMouse->addButton("DebugRight", KeyboardMouseButton(KEYBOARD, SDL_SCANCODE_D));
 	keyboardMouse->addButton("DebugUp", KeyboardMouseButton(KEYBOARD, SDL_SCANCODE_SPACE));
-	keyboardMouse->addButton("DebugDown", KeyboardMouseButton(KEYBOARD, SDL_SCANCODE_LSHIFT));
-
+	keyboardMouse->addButton("DebugDown", KeyboardMouseButton(KEYBOARD, SDL_SCANCODE_LSHIFT));*/
+	keyboardMouse->addButton("DebugForward", KeyboardMouseButton(KEYBOARD, SDL_SCANCODE_UP));
+	keyboardMouse->addButton("DebugBackward", KeyboardMouseButton(KEYBOARD, SDL_SCANCODE_DOWN));
+	keyboardMouse->addButton("DebugLeft", KeyboardMouseButton(KEYBOARD, SDL_SCANCODE_LEFT));
+	keyboardMouse->addButton("DebugRight", KeyboardMouseButton(KEYBOARD, SDL_SCANCODE_RIGHT));
+	keyboardMouse->addButton("DebugUp", KeyboardMouseButton(KEYBOARD, SDL_SCANCODE_PAGEUP));
+	keyboardMouse->addButton("DebugDown", KeyboardMouseButton(KEYBOARD, SDL_SCANCODE_PAGEDOWN));
 	keyboardMouse->addButton("DebugRollLeft", KeyboardMouseButton(KEYBOARD, SDL_SCANCODE_Q));
 	keyboardMouse->addButton("DebugRollRight", KeyboardMouseButton(KEYBOARD, SDL_SCANCODE_E));
-
 	keyboardMouse->addAxis("DebugPitch", MouseAxis(MouseDirection::Mouse_Y, 0.05, 0.01, false));
 	keyboardMouse->addAxis("DebugYaw", MouseAxis(MouseDirection::Mouse_X, 0.05, 0.01, false));
-
 	keyboardMouse->addButton("DebugInteract", KeyboardMouseButton(KEYBOARD, SDL_SCANCODE_F));
 
-	/*keyboardMouse->addAxis("DebugPitch", new MouseAxis(MouseDirection::Mouse_Y, 10.0, 0.01, false));
-	keyboardMouse->addAxis("DebugYaw", new MouseAxis(MouseDirection::Mouse_X, 10.0, 0.01, true));
-	keyboardMouse->addAxis("DebugRoll", new ButtonAxis(new KeyboardButton(SDL_SCANCODE_E), new KeyboardButton(SDL_SCANCODE_Q)));*/
+
+	keyboardMouse->addButton("editor_forward", KeyboardMouseButton(KEYBOARD, SDL_SCANCODE_W));
+	keyboardMouse->addButton("editor_backward", KeyboardMouseButton(KEYBOARD, SDL_SCANCODE_S));
+	keyboardMouse->addButton("editor_left", KeyboardMouseButton(KEYBOARD, SDL_SCANCODE_A));
+	keyboardMouse->addButton("editor_right", KeyboardMouseButton(KEYBOARD, SDL_SCANCODE_D));
+	keyboardMouse->addButton("editor_up", KeyboardMouseButton(KEYBOARD, SDL_SCANCODE_LSHIFT));
+	keyboardMouse->addButton("editor_down", KeyboardMouseButton(KEYBOARD, SDL_SCANCODE_LCTRL));
+	keyboardMouse->addButton("editor_place", KeyboardMouseButton(KEYBOARD, SDL_SCANCODE_SPACE));
 }
 
 InputManager::~InputManager()
 {
-	/*if (this->keyboardMouse)
+	if (this->keyboardMouse)
 	{
 		delete this->keyboardMouse;
-	}*/
+	}
 
 	for (std::pair<void*, InputDevice*> it : this->device_map)
 	{

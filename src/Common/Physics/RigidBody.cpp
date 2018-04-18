@@ -41,6 +41,8 @@ void RigidBody::enable()
 {
 	if (!this->enabled)
 	{
+		this->rigidBody->setWorldTransform(toBtTransform(this->parent->getLocalTransform()));
+
 		if (this->parent->parent != nullptr)
 		{
 			if (this->parent->parent->hasComponent<PhysicsWorld>())
@@ -59,6 +61,8 @@ void RigidBody::enable()
 		{
 			printf("Error: No Parent\n");
 		}
+
+		Component::enable();
 	}
 }
 

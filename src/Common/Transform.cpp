@@ -31,11 +31,6 @@
 		return this->orientation * vector3D(0.0f, 1.0f, 0.0f); 
 	}
 
-	vector3D Transform::getRight() const 
-	{ 
-		return this->orientation * vector3D(-1.0f, 0.0f, 0.0f); 
-	}
-
 	vector3D Transform::getLeft() const 
 	{ 
 		return this->orientation * vector3D(1.0f, 0.0f, 0.0f); 

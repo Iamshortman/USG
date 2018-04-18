@@ -81,20 +81,27 @@ void RenderingManager::renderScene(GameObject* scene_root, Camera* camera)
 
 	for (ComponentModel* model : models)
 	{
-		this->RenderModel(model, model->getParent()->getGlobalTransform(), camera);
+		this->RenderModel(model, camera);
 	}
 
 	this->window->updateBuffer();
 }
 
-void RenderingManager::RenderModel(ComponentModel* model, Transform globalTransform, Camera* camera)
+void RenderingManager::RenderModel(ComponentModel* model, Camera* camera)
 {
+	Transform globalTransform = model->getParent()->getGlobalTransform();
 	matrix4 modelMatrix = globalTransform.getModleMatrix(camera->getPosition());
 	matrix4 mvp = camera->getProjectionMatrix(this->window) * camera->getOriginViewMatrix() * modelMatrix;
 
 	vector3F ambientLight = vector3F(1.0f);//TODO ambient Light
 
 	Mesh* mesh = MeshPool::instance->getMesh(model->getMesh());
+
+	if (model->temp_mesh != nullptr)
+	{
+		mesh = (Mesh*)model->temp_mesh;
+	}
+
 	glBindTexture(GL_TEXTURE_2D, TexturePool::instance->getTexture(model->getTexture()));
 
 	//Ambient pass

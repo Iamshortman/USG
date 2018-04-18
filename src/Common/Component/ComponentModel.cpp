@@ -18,6 +18,10 @@ ComponentModel::ComponentModel(string mesh, string texture, string ambient_shade
 
 ComponentModel::~ComponentModel()
 {
+	if (this->temp_mesh != nullptr)
+	{
+		delete this->temp_mesh;
+	}
 	this->disable();
 }
 

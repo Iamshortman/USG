@@ -1,5 +1,7 @@
 #include "Client/Client.hpp"
 
+#include "Client/GameState/GameState_Editor.hpp"
+
 #include "Client/Input/InputManager.hpp"
 
 #include "Client/Resource/ShaderPool.hpp"
@@ -19,7 +21,8 @@ Client::Client()
 	this->renderingManager->setWindow(this->window);
 
 	//this->setGameState(new GameState_Multiplayer());
-	this->setGameState(new GameState_Singleplayer());
+	//this->setGameState(new GameState_Singleplayer());
+	this->setGameState(new GameState_Editor());
 }
 
 Client::~Client()

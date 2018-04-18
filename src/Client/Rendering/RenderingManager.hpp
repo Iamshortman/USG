@@ -23,7 +23,7 @@ public:
 
 	void renderScene(GameObject* scene_root, Camera* camera);
 
-	void RenderModel(ComponentModel* model, Transform globalTransform, Camera* camera);
+	void RenderModel(ComponentModel* model, Camera* camera);
 
 
 private:
