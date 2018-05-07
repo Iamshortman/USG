@@ -133,5 +133,12 @@ GameObject* parseGameObject(json json_game_object)
 GameObject* GameObjectManager::createGameObjectFromJson(string file)
 {
 	json json_file = json::parse_file(file);
-	return parseGameObject(json_file);
+
+	if (json_file.has_member("GameObject"))
+	{
+		json game_object = json_file["GameObject"];
+		return parseGameObject(game_object);
+	}
+
+	return nullptr;
 }
