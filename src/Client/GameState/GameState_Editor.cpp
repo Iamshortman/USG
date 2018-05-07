@@ -12,22 +12,22 @@
 
 GameState_Editor::GameState_Editor()
 {
-	this->scene_root = GameObjectManager::createGameObject();
+	this->scene_root = GameObjectManager::getInstance()->createGameObject();
 
-	scene_camera = GameObjectManager::createGameObject();
+	scene_camera = GameObjectManager::getInstance()->createGameObject();
 	this->scene_root->addChild(scene_camera);
 	scene_camera->addComponent<Camera>();
 	scene_camera->addComponent<DebugCamera>(5.0, 1.0);
 	scene_camera->setLocalTransform(Transform(vector3D(0.0, 2.0, -8.0)));
 
-	cursor = GameObjectManager::createGameObject();
+	cursor = GameObjectManager::getInstance()->createGameObject();
 
 	MeshPool::instance->loadMesh("res/editor/cursor.obj");
 	cursor->addComponent<ComponentModel>("res/editor/cursor.obj", "res/textures/1K_Grid.png", "Textured", "Textured_Lighting", "Textured_Shadow");
 
 	this->scene_root->addChild(cursor);
 
-	this->ship_template = new ShipTemplate(this->cube_size);
+	this->ship_template = new ShipTemplate((float)this->cube_size);
 }
 
 GameState_Editor::~GameState_Editor()
@@ -37,27 +37,27 @@ GameState_Editor::~GameState_Editor()
 
 void GameState_Editor::update(Client* client, double delta_time)
 {
-	if (InputManager::instance->getButtonPressed("editor_forward"))
+	if (InputManager::getInstance()->getButtonPressed("editor_forward"))
 	{
 		this->cursor_position.z++;
 	}
-	if (InputManager::instance->getButtonPressed("editor_backward"))
+	if (InputManager::getInstance()->getButtonPressed("editor_backward"))
 	{
 		this->cursor_position.z--;
 	}
-	if (InputManager::instance->getButtonPressed("editor_left"))
+	if (InputManager::getInstance()->getButtonPressed("editor_left"))
 	{
 		this->cursor_position.x++;
 	}
-	if (InputManager::instance->getButtonPressed("editor_right"))
+	if (InputManager::getInstance()->getButtonPressed("editor_right"))
 	{
 		this->cursor_position.x--;
 	}
-	if (InputManager::instance->getButtonPressed("editor_up"))
+	if (InputManager::getInstance()->getButtonPressed("editor_up"))
 	{
 		this->cursor_position.y++;
 	}
-	if (InputManager::instance->getButtonPressed("editor_down"))
+	if (InputManager::getInstance()->getButtonPressed("editor_down"))
 	{
 		this->cursor_position.y--;
 	}
@@ -65,7 +65,7 @@ void GameState_Editor::update(Client* client, double delta_time)
 	vector3D position = ((vector3D)this->cursor_position) * this->cube_size;
 	this->cursor->setLocalTransform(Transform(position));
 
-	if (InputManager::instance->getButtonPressed("editor_place"))
+	if (InputManager::getInstance()->getButtonPressed("editor_place"))
 	{
 		if (!this->ship_template->hasCellAt(this->cursor_position))
 		{

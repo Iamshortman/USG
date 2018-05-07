@@ -1,12 +1,14 @@
 #include "Client/Rendering/Window.hpp"
 
+#include "Common/Logger/Logger.hpp"
+
 Window::Window(int width, int height, string windowTitle)
 {
 	//SDL_InitSubSystem(SDL_INIT_VIDEO);
 
 	//Anti Aliasing
-	SDL_GL_SetAttribute(SDL_GL_MULTISAMPLEBUFFERS, 1);
-	SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, 8);
+	//SDL_GL_SetAttribute(SDL_GL_MULTISAMPLEBUFFERS, 1);
+	//SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, 8);
 
 	// Create an application window with the following settings:
     window = SDL_CreateWindow(
@@ -31,7 +33,7 @@ Window::Window(int width, int height, string windowTitle)
 
 	if (glcontext == NULL)
 	{
-		printf("Error: Failed to initialize OpenGL\n");
+		Logger::getInstance()->logError("Failed to initialize OpenGL\n");
 		exit(1);
 	}
 
@@ -40,12 +42,10 @@ Window::Window(int width, int height, string windowTitle)
     // Initialize GLEW
 	if (glewInit() != GLEW_OK)
 	{
-		printf("Error: Failed to initialize GLEW\n");
+		Logger::getInstance()->logError("Failed to initialize GLEW\n");
 		exit(1);
 	}
 
-	initGL();
-	set3dRendering();
 	resizeWindow(width, height);
 
 	setVsync(1);
@@ -53,7 +53,7 @@ Window::Window(int width, int height, string windowTitle)
 	GLint major, minor;
 	glGetIntegerv(GL_MAJOR_VERSION, &major);
 	glGetIntegerv(GL_MINOR_VERSION, &minor);
-	printf("OpenGL Version: %d.%d\n", major, minor);
+	Logger::getInstance()->log("OpenGL Version: %d.%d\n", major, minor);
 
 	if ((major > 4 || (major == 4 && minor >= 5)) || SDL_GL_ExtensionSupported("GL_ARB_clip_control"))
 	{
@@ -61,7 +61,7 @@ Window::Window(int width, int height, string windowTitle)
 	}
 	else
 	{
-		fprintf(stderr, "glClipControl required, sorry.\n");
+		Logger::getInstance()->logError("glClipControl required, sorry.\n");
 		exit(1);
 	}
 }
@@ -74,34 +74,6 @@ Window::~Window()
 	}
 }
 
-void Window::initGL()
-{
-    // init OpenGL here
-    glShadeModel(GL_SMOOTH);
-    glClearDepth(1.0f);
-}
-
-void Window::set3dRendering()
-{
-	glEnable(GL_DEPTH_TEST);
-
-	//Reverse Z
-	glDepthFunc(GL_GREATER);
-
-	//glDepthFunc(GL_LESS);
-
-	glEnable(GL_CULL_FACE);
-	glFrontFace(GL_CCW);
-	glCullFace(GL_BACK);
-}
-
-void Window::resetGlViewport()
-{
-	int width, height;
-	this->getWindowSize(width, height);
-	this->resizeWindow(width, height);
-}
-
 //Needs to be renamed
 void Window::resizeWindow(int width, int height)
 {
@@ -110,7 +82,6 @@ void Window::resizeWindow(int width, int height)
         height = 1;// Making Height Equal One
     }
 
-	glBindFramebuffer(GL_FRAMEBUFFER, 0);
     glViewport(0, 0, width, height); // Reset The Current Viewport
 
 }
@@ -147,16 +118,9 @@ void Window::updateBuffer()
 
 void Window::clearBuffer()
 {
-	//Reverse Z
-	glClearDepth(0.0f);
-
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	glClearDepth(0.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-}
-
-void Window::setBufferClearColor(GLclampf red, GLclampf green, GLclampf blue, GLclampf alpha)
-{
-	glClearColor(red, green, blue, alpha);
 }
 
 void Window::setTitleString(string title)

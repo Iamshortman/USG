@@ -19,8 +19,6 @@ class Window
 		void HandleEvent(SDL_Event& e);
 		void updateBuffer();
 		void clearBuffer();
-		void setBufferClearColor(GLclampf red, GLclampf green, GLclampf blue,
-GLclampf alpha);
         void resizeWindow(int width, int height);
         void getWindowSize(int &width, int &height);
         SDL_Window *window;
@@ -30,13 +28,10 @@ GLclampf alpha);
 		void getCenteredMousePos(int &x, int &y);
 		void setVsync(int syncRate);
 		int getVsync();
-		void set3dRendering();
-		void resetGlViewport();
 
 	private:
         bool keyboardFocus;
 		SDL_GLContext glcontext;
-		void initGL();
 		GLuint fbo;
 };
 

@@ -98,10 +98,10 @@ void ShipTemplate::rebuildRenderObject()
 
 		if (this->render_object != nullptr)
 		{
-			GameObjectManager::destroyGameObject(this->render_object->object_Id);
+			GameObjectManager::getInstance()->destroyGameObject(this->render_object->object_Id);
 		}
 
-		this->render_object = GameObjectManager::instance->createGameObject();
+		this->render_object = GameObjectManager::getInstance()->createGameObject();
 
 		vector3F vertsCube[] =
 		{
@@ -138,7 +138,7 @@ void ShipTemplate::rebuildRenderObject()
 
 			if (cell.second->mesh != "")
 			{
-				GameObject* object =  GameObjectManager::instance->createGameObject();
+				GameObject* object = GameObjectManager::getInstance()->createGameObject();
 				object->addComponent<ComponentModel>("cell.second->mesh", "res/textures/1K_Grid.png", "Textured", "Textured_Lighting", "Textured_Shadow");
 				object->setLocalTransform(Transform((vector3D)cell.second->center_pos * (double)this->cell_size));
 				this->render_object->addChild(object);

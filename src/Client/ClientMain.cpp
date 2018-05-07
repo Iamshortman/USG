@@ -9,8 +9,12 @@
 
 #include "Common/GameObjectManager.hpp"
 
+#include "Common/Logger/Logger.hpp"
+
 int main()
 {
+	Logger::getInstance()->openLogFile("Log.txt");
+
 	SDL_Init(SDL_INIT_EVERYTHING);
 
 	//Create Singletons
@@ -18,13 +22,9 @@ int main()
 	ShaderPool* shaderPool = new ShaderPool();
 	MeshPool* meshPool = new MeshPool();
 
-	InputManager* inputManager = new InputManager();
-
-	GameObjectManager* gameObjectManager = new GameObjectManager();
-
 	Client* game = new Client();
 
-	inputManager->centerMouse();
+	InputManager::getInstance()->centerMouse();
 
 	double deltaTime = 0.;
 
@@ -55,6 +55,8 @@ int main()
 	}
 
 	delete game;
+
+	Logger::getInstance()->closeLogFile();
 
 	//Requires the enter button to be hit before we end.
 	cin.get();

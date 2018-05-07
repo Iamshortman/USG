@@ -6,7 +6,19 @@
 #include "Client/Input/InputDevice.hpp"
 #include "Client/Input/JoystickDevice.hpp"
 
+#include "Common/Logger/Logger.hpp"
+
 InputManager* InputManager::instance = nullptr;
+
+InputManager* InputManager::getInstance()
+{
+	if (InputManager::instance == nullptr)
+	{
+		InputManager::instance = new InputManager();
+	}
+	
+	return InputManager::instance;
+}
 
 InputManager::InputManager()
 {
@@ -17,32 +29,17 @@ InputManager::InputManager()
 
 	keyboardMouse = new KeyboardMouseDevice();
 
-	/*keyboardMouse->addButton("DebugForward", KeyboardMouseButton(KEYBOARD, SDL_SCANCODE_W));
+	keyboardMouse->addButton("DebugForward", KeyboardMouseButton(KEYBOARD, SDL_SCANCODE_W));
 	keyboardMouse->addButton("DebugBackward", KeyboardMouseButton(KEYBOARD, SDL_SCANCODE_S));
 	keyboardMouse->addButton("DebugLeft", KeyboardMouseButton(KEYBOARD, SDL_SCANCODE_A));
 	keyboardMouse->addButton("DebugRight", KeyboardMouseButton(KEYBOARD, SDL_SCANCODE_D));
 	keyboardMouse->addButton("DebugUp", KeyboardMouseButton(KEYBOARD, SDL_SCANCODE_SPACE));
-	keyboardMouse->addButton("DebugDown", KeyboardMouseButton(KEYBOARD, SDL_SCANCODE_LSHIFT));*/
-	keyboardMouse->addButton("DebugForward", KeyboardMouseButton(KEYBOARD, SDL_SCANCODE_UP));
-	keyboardMouse->addButton("DebugBackward", KeyboardMouseButton(KEYBOARD, SDL_SCANCODE_DOWN));
-	keyboardMouse->addButton("DebugLeft", KeyboardMouseButton(KEYBOARD, SDL_SCANCODE_LEFT));
-	keyboardMouse->addButton("DebugRight", KeyboardMouseButton(KEYBOARD, SDL_SCANCODE_RIGHT));
-	keyboardMouse->addButton("DebugUp", KeyboardMouseButton(KEYBOARD, SDL_SCANCODE_PAGEUP));
-	keyboardMouse->addButton("DebugDown", KeyboardMouseButton(KEYBOARD, SDL_SCANCODE_PAGEDOWN));
+	keyboardMouse->addButton("DebugDown", KeyboardMouseButton(KEYBOARD, SDL_SCANCODE_LSHIFT));
 	keyboardMouse->addButton("DebugRollLeft", KeyboardMouseButton(KEYBOARD, SDL_SCANCODE_Q));
 	keyboardMouse->addButton("DebugRollRight", KeyboardMouseButton(KEYBOARD, SDL_SCANCODE_E));
 	keyboardMouse->addAxis("DebugPitch", MouseAxis(MouseDirection::Mouse_Y, 0.05, 0.01, false));
 	keyboardMouse->addAxis("DebugYaw", MouseAxis(MouseDirection::Mouse_X, 0.05, 0.01, false));
 	keyboardMouse->addButton("DebugInteract", KeyboardMouseButton(KEYBOARD, SDL_SCANCODE_F));
-
-
-	keyboardMouse->addButton("editor_forward", KeyboardMouseButton(KEYBOARD, SDL_SCANCODE_W));
-	keyboardMouse->addButton("editor_backward", KeyboardMouseButton(KEYBOARD, SDL_SCANCODE_S));
-	keyboardMouse->addButton("editor_left", KeyboardMouseButton(KEYBOARD, SDL_SCANCODE_A));
-	keyboardMouse->addButton("editor_right", KeyboardMouseButton(KEYBOARD, SDL_SCANCODE_D));
-	keyboardMouse->addButton("editor_up", KeyboardMouseButton(KEYBOARD, SDL_SCANCODE_LSHIFT));
-	keyboardMouse->addButton("editor_down", KeyboardMouseButton(KEYBOARD, SDL_SCANCODE_LCTRL));
-	keyboardMouse->addButton("editor_place", KeyboardMouseButton(KEYBOARD, SDL_SCANCODE_SPACE));
 }
 
 InputManager::~InputManager()
@@ -305,7 +302,7 @@ void InputManager::loadJoystick(SDL_Joystick* joystick)
 	JoystickDevice* device = new JoystickDevice(SDL_JoystickName(joystick), joystick);
 
 	//Load Config
-	printf("Loaded Joystick: %s\n", SDL_JoystickName(joystick));
+	Logger::getInstance()->logDebug("Loaded Joystick: %s\n", SDL_JoystickName(joystick));
 	if (device->name == "CH PRO THROTTLE USB ")
 	{
 		JoystickButton axis(0);

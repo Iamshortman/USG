@@ -7,8 +7,14 @@
 #include <stack>
 #include <set>
 
-RenderingManager::RenderingManager()
+RenderingManager::RenderingManager(Window* window)
 {
+	this->window = window;
+
+	int windowWidth, windowHeight;
+	this->window->getWindowSize(windowWidth, windowHeight);
+	this->g_buffer = new G_Buffer(windowWidth, windowHeight);
+
 	ShaderPool::instance->loadShader("Textured", "res/shaders/Textured.vs", "res/shaders/Textured.fs", { { 0, "in_Position" },{ 1, "in_Normal" },{ 2, "in_TexCoord" } });
 	ShaderPool::instance->loadShader("Textured_Lighting", "res/shaders/Textured.vs", "res/shaders/Textured_Lighting.fs", { { 0, "in_Position" },{ 1, "in_Normal" },{ 2, "in_TexCoord" } });
 	ShaderPool::instance->loadShader("Textured_Shadow", "res/shaders/Textured_Shadow.vs", "res/shaders/Textured_Shadow.fs", { { 0, "in_Position" } });
@@ -24,6 +30,13 @@ RenderingManager::RenderingManager()
 	MeshPool::instance->loadMesh("res/models/plane.obj");
 
 	TexturePool::instance->loadTexture("res/textures/1K_Grid.png");
+
+
+	glEnable(GL_DEPTH_TEST);
+	glDepthFunc(GL_GREATER);
+	glEnable(GL_CULL_FACE);
+	glFrontFace(GL_CCW);
+	glCullFace(GL_BACK);
 }
 
 RenderingManager::~RenderingManager()
@@ -31,18 +44,18 @@ RenderingManager::~RenderingManager()
 
 }
 
-void RenderingManager::setWindow(Window* win)
-{
-	this->window = win;
-}
-
-Window* RenderingManager::getWindow()
-{
-	return this->window;
-}
-
 void RenderingManager::renderScene(GameObject* scene_root, Camera* camera)
 {
+	int windowWidth, windowHeight, bufferWidth, bufferHeight;
+	this->window->getWindowSize(windowWidth, windowHeight);
+	this->g_buffer->getBufferSize(bufferWidth, bufferHeight);
+	if ((windowWidth != bufferWidth) || (windowHeight != bufferHeight))
+	{
+		//Window Size changed, rebuild Gbuffer
+		delete this->g_buffer;
+		this->g_buffer = new G_Buffer(windowWidth, windowHeight);
+	}
+
 	//discovery mode
 	std::stack<GameObject*> nodes;
 	nodes.push(scene_root);
@@ -77,12 +90,25 @@ void RenderingManager::renderScene(GameObject* scene_root, Camera* camera)
 		}
 	}
 
-	this->window->clearBuffer();
+
+	glBindFramebuffer(GL_FRAMEBUFFER, this->g_buffer->getFBO());
+	this->g_buffer->clearBuffer();
 
 	for (ComponentModel* model : models)
 	{
 		this->RenderModel(model, camera);
 	}
+
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	this->window->clearBuffer();
+
+	glBindFramebuffer(GL_READ_FRAMEBUFFER, this->g_buffer->getFBO());
+	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0); // default FBO
+	glBlitFramebuffer(
+		0, 0, windowWidth, windowHeight,
+		0, 0, windowWidth, windowHeight,
+		GL_COLOR_BUFFER_BIT, GL_LINEAR);
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
 	this->window->updateBuffer();
 }

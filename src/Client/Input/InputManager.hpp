@@ -15,21 +15,17 @@ using std::unordered_map;
 class InputManager
 {
 public:
-	//Instance for the Singleton design pattern;
-	static InputManager* instance;
-
-	InputManager();
-	~InputManager();
-	void update(double deltaTime);
-	void resetPreviousValues();
+	static InputManager* getInstance();
 
 	bool hasAxis(string name);
 	double getAxis(string name);
-
 	bool getButtonDown(string name);
 	bool getButtonPressed(string name);
-
 	double getButtonAxisCombo(string axis_name, string pos_button_name, string neg_button_name);
+
+	~InputManager();
+	void update(double deltaTime);
+	void resetPreviousValues();
 
 	void processEvent(SDL_Event event);
 	void loadController(SDL_GameController* controller);
@@ -43,6 +39,10 @@ public:
 	bool getMouseLock();
 
 private:
+	//Instance for the Singleton design pattern;
+	static InputManager* instance;
+	InputManager();
+
 	KeyboardMouseDevice* keyboardMouse = nullptr;
 	unordered_map<void*, InputDevice*> device_map;
 

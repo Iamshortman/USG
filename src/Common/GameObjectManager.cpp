@@ -1,10 +1,22 @@
 #include "Common/GameObjectManager.hpp"
 
+#include "jsoncons/json.hpp"
+using jsoncons::json;
+
 GameObjectManager* GameObjectManager::instance = nullptr;
+
+GameObjectManager* GameObjectManager::getInstance()
+{
+	if (GameObjectManager::instance == nullptr)
+	{
+		GameObjectManager::instance = new GameObjectManager();
+	}
+
+	return GameObjectManager::instance;
+}
 
 GameObjectManager::GameObjectManager()
 {
-	instance = this;
 }
 
 void GameObjectManager::update()
@@ -37,7 +49,7 @@ GameObjectId GameObjectManager::getNextId()
 	return game_object_id;
 }
 
-GameObject* GameObjectManager::i_createGameObject()
+GameObject* GameObjectManager::createGameObject()
 {
 	GameObjectId game_object_id = this->getNextId();
 
@@ -46,7 +58,7 @@ GameObject* GameObjectManager::i_createGameObject()
 	return game_object;
 }
 
-GameObject* GameObjectManager::i_getGameObject(GameObjectId game_object_id)
+GameObject* GameObjectManager::getGameObject(GameObjectId game_object_id)
 {
 	if (this->game_objects.find(game_object_id) == this->game_objects.end())
 	{
@@ -56,22 +68,18 @@ GameObject* GameObjectManager::i_getGameObject(GameObjectId game_object_id)
 	return this->game_objects[game_object_id];
 }
 
-void GameObjectManager::i_destroyGameObject(GameObjectId game_object_id)
+void GameObjectManager::destroyGameObject(GameObjectId game_object_id)
 {
 	this->game_objects_to_delete.push(game_object_id);
 }
 
-GameObject* GameObjectManager::createGameObject()
+GameObject * GameObjectManager::createGameObjectFromJson(string file)
 {
-	return instance->i_createGameObject();
-}
+	json json_file = json::parse_file(file);
 
-GameObject* GameObjectManager::getGameObject(GameObjectId game_object_id)
-{
-	return instance->i_getGameObject(game_object_id);
-}
+	//if(json_file)
 
-void GameObjectManager::destroyGameObject(GameObjectId game_object_id)
-{
-	return instance->i_destroyGameObject(game_object_id);
+
+
+	return nullptr;
 }

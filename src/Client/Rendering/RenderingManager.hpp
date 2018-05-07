@@ -5,6 +5,9 @@
 #include "Client/Rendering/Window.hpp"
 #include "Client/Rendering/ShaderProgram.hpp"
 #include "Client/Resource/TexturePool.hpp"
+#include "Client/Rendering/G_Buffer.hpp"
+
+
 #include "Common/Resource/Mesh.hpp"
 #include "Common/GLM_Include.hpp"
 
@@ -13,13 +16,9 @@
 
 class RenderingManager
 {
-
 public:
-	RenderingManager();
+	RenderingManager(Window* window);
 	virtual ~RenderingManager();
-
-	void setWindow(Window* win);
-	Window* getWindow();
 
 	void renderScene(GameObject* scene_root, Camera* camera);
 
@@ -28,8 +27,12 @@ public:
 
 private:
 	Window* window = nullptr;
+	G_Buffer* g_buffer = nullptr;
+
 
 	bool use_lighting = true;
+
+
 };
 
 #endif //RENDERINGMANAGER_HPP

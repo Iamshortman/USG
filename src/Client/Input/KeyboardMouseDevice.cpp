@@ -27,10 +27,6 @@ void KeyboardMouseDevice::processEvent(SDL_Event event)
 			this->keyboard_state[key].prev_value = this->keyboard_state[key].current_value;
 			this->keyboard_state[key].current_value = event.key.state;
 			this->keyboard_state[key].timestamp = event.key.timestamp;
-
-			/*printf("%d: %s\n", key, event.key.state ? "Pressed" : "Released");
-			printf("current: %s\n", this->keyboard_state[key].current_value ? "Pressed" : "Released");
-			printf("previous: %s\n\n", this->keyboard_state[key].prev_value ? "Pressed" : "Released");*/
 		}
 	}
 	else if (event.type == SDL_MOUSEBUTTONDOWN || event.type == SDL_MOUSEBUTTONUP)

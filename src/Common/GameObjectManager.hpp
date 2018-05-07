@@ -6,26 +6,26 @@
 #include <unordered_map>
 #include <algorithm>
 #include "Common/GameObject.hpp"
+#include "Common/Types.hpp"
 
 class GameObjectManager
 {
 public:
-	//Instance for the Singleton design pattern;
-	static GameObjectManager* instance;
-
-	GameObjectManager();
+	static GameObjectManager* getInstance();
 
 	void update();
 
-	GameObject* i_createGameObject();
-	GameObject* i_getGameObject(GameObjectId id);
-	void i_destroyGameObject(GameObjectId id);
+	GameObject* createGameObject();
+	GameObject* getGameObject(GameObjectId id);
+	void destroyGameObject(GameObjectId id);
 
-	static GameObject* createGameObject();
-	static GameObject* getGameObject(GameObjectId id);
-	static void destroyGameObject(GameObjectId id);
+	GameObject* createGameObjectFromJson(string file);
 
 private:
+	//Instance for the Singleton design pattern;
+	static GameObjectManager* instance;
+	GameObjectManager();
+
 	std::unordered_map<GameObjectId, GameObject*> game_objects;
 	std::stack<GameObjectId> game_objects_to_delete;
 

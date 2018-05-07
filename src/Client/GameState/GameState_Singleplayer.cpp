@@ -3,24 +3,28 @@
 
 #include "Common/GameObject.hpp"
 #include "Common/GameObjectManager.hpp"
+
+#include "Client/Component/DebugCamera.hpp"
 #include "Client/Rendering/Camera.hpp"
 #include "Common/Component/ComponentModel.hpp"
+
 #include "Common/Physics/PhysicsWorld.hpp"
 
 GameState_Singleplayer::GameState_Singleplayer()
 {
-	this->scene_root = GameObjectManager::createGameObject();
+	this->scene_root = GameObjectManager::getInstance()->createGameObject();
 	this->scene_root->addComponent<PhysicsWorld>();
 
-	GameObject* ship = GameObjectManager::createGameObject();
+	GameObject* ship = GameObjectManager::getInstance()->createGameObject();
 	ship->setLocalTransform(Transform( vector3D(0.0, 0.0, 0.0), glm::angleAxis(glm::radians(90.0), vector3D(0.0, 1.0, 0.0) )));
 	this->scene_root->addChild(ship);
 
 	ship->addComponent<ComponentModel>("res/models/Cobra/Hull.obj", "res/textures/1K_Grid.png", "Textured", "Textured_Lighting", "Textured_Shadow");
 
-	GameObject* camera = GameObjectManager::createGameObject();
+	GameObject* camera = GameObjectManager::getInstance()->createGameObject();
 	this->scene_root->addChild(camera);
 	camera->addComponent<Camera>();
+	camera->addComponent<DebugCamera>(5.0, 1.0);
 	scene_camera = camera->getComponent<Camera>();
 	camera->setLocalTransform(Transform(vector3D(0.0, 2.0, -8.0)));
 }

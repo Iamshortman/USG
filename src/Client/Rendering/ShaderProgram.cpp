@@ -1,5 +1,7 @@
 #include "ShaderProgram.hpp"
 
+#include "Common/Logger/Logger.hpp"
+
 ShaderProgram::ShaderProgram()
 {
 	//Do nothing until real constructor is called.
@@ -13,7 +15,7 @@ ShaderProgram::ShaderProgram(string VertexShader, string FragmentShader, vector<
 	fragmentID = buildShader(FragmentShader, GL_FRAGMENT_SHADER);
 	if (vertexID == 0 || fragmentID == 0)
 	{
-		printf("Error: Shaders did not compile");
+		Logger::getInstance()->logError("Shaders did not compile\n");
 	}
 
 	glAttachShader(programID, vertexID);
@@ -39,7 +41,7 @@ ShaderProgram::ShaderProgram(string VertexShader, string FragmentShader, vector<
 		glGetProgramInfoLog(programID, InfoLogLength, NULL, &ProgramErrorMessage[0]);
 		if (ProgramErrorMessage.size() > 2)
 		{
-			printf("Error: %s\n", &ProgramErrorMessage[0]);
+			Logger::getInstance()->logError("shader: %s\n", &ProgramErrorMessage[0]);
 		}
 	}
 	glDeleteShader(vertexID);
@@ -134,7 +136,7 @@ GLuint ShaderProgram::buildShader(string location, GLuint type)
 		glGetShaderInfoLog(ShaderID, InfoLogLength, NULL, &ShaderErrorMessage[0]);
 		if (ShaderErrorMessage.size() > 2)
 		{
-			printf("Error: %s\n", &ShaderErrorMessage[0]);
+			Logger::getInstance()->logError("shader: %s\n", &ShaderErrorMessage[0]);
 		}
 	}
 
@@ -174,7 +176,7 @@ string ShaderProgram::loadShaderFile(string location)
 	}
 	else
 	{
-		printf("Error: %s Shader File not found\n", file_path);
+		Logger::getInstance()->logError("%s Shader File not found\n", file_path);
 		ShaderCode = "";
 	}
 

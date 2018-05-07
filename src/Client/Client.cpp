@@ -15,14 +15,11 @@ Client::Client()
 	Client::instance = this;
 
 	this->window = new Window(800, 450, "USG");
-	this->window->set3dRendering();
 
-	this->renderingManager = new RenderingManager();
-	this->renderingManager->setWindow(this->window);
+	this->renderingManager = new RenderingManager(this->window);
 
-	//this->setGameState(new GameState_Multiplayer());
-	//this->setGameState(new GameState_Singleplayer());
-	this->setGameState(new GameState_Editor());
+	this->setGameState(new GameState_Singleplayer());
+	//this->setGameState(new GameState_Editor());
 }
 
 Client::~Client()
@@ -34,14 +31,14 @@ Client::~Client()
 
 void Client::update(double deltaTime)
 {
-	InputManager::instance->resetPreviousValues();
+	InputManager::getInstance()->resetPreviousValues();
 
 	SDL_Event event;
 	while (SDL_PollEvent(&event))
 	{
 		if (event.type == SDL_KEYDOWN && event.key.keysym.scancode == SDL_SCANCODE_ESCAPE)
 		{
-			InputManager::instance->setMouseLock(!InputManager::instance->getMouseLock());
+			InputManager::getInstance()->setMouseLock(!InputManager::getInstance()->getMouseLock());
 			continue;
 		}
 
@@ -51,12 +48,12 @@ void Client::update(double deltaTime)
 			continue;
 		}
 
-		InputManager::instance->processEvent(event);
+		InputManager::getInstance()->processEvent(event);
 
 		this->window->HandleEvent(event);
 	}
 
-	InputManager::instance->update(deltaTime);
+	InputManager::getInstance()->update(deltaTime);
 
 	if (this->previousState != nullptr)
 	{

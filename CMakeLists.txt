@@ -29,12 +29,10 @@ link_directories(lib/assimp-3.3.1/build/contrib/zlib/Debug/)
 link_directories(lib/angelscript_2.31.2/sdk/angelscript/lib/)
 link_directories(lib/RakNet-master/build/Lib/DLL/Debug/)
 
-
+#Create Projects
 add_executable(Client ${CLIENT_SOURCES} ${CLIENT_HEADERS} ${COMMON_SOURCES} ${COMMON_HEADERS})
 add_executable(Server ${SERVER_SOURCES} ${SERVER_HEADERS} ${COMMON_SOURCES} ${COMMON_HEADERS})
-
 set_target_properties(Client PROPERTIES VS_DEBUGGER_WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}")
-
 target_compile_definitions(Client PUBLIC CLIENT)
 target_compile_definitions(Server PUBLIC SERVER)
 
@@ -44,7 +42,7 @@ target_compile_definitions(Server PUBLIC SERVER)
 include_directories(lib/glm/)
 
 #jsoncons
-include_directories(lib/jsoncons-0.99.1/src/)
+include_directories(lib/jsoncons-0.104.0/include)
 
 #Bullet
 include_directories(lib/bullet3-2.86.1/src/)
