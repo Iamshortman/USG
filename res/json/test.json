@@ -1,0 +1,25 @@
+﻿{
+    "transform": {
+        "position": [
+            0,
+            0,
+            10
+        ],
+        "orientation": [
+            0,
+            0,
+            0,
+            0
+        ]
+    },
+    "components": {
+        "model": {
+            "file_path": "res/models/Cobra/Hull.obj",
+            "texture": "res/textures/1K_Grid.png",
+            "ambient_shader": "Textured"
+        }
+    },
+    "children": [
+        {}
+    ]
+}
