@@ -84,7 +84,7 @@ void Logger::logError(const char* format, ...)
 void Logger::openLogFile(std::string file_name)
 {
 	this->closeLogFile();
-	fopen_s(&this->log_file, file_name.c_str(), "a");
+	fopen_s(&this->log_file, file_name.c_str(), "w");
 }
 
 void Logger::closeLogFile()

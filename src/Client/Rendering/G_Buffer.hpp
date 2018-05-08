@@ -6,7 +6,7 @@
 class G_Buffer
 {
 public:
-	G_Buffer(int width, int height);
+	G_Buffer(int width, int height, bool multisample = false, int number_of_samples = 0);
 	~G_Buffer();
 
 	GLuint getFBO();
@@ -20,8 +20,11 @@ private:
 	GLuint normal_texture;
 	GLuint color_texture;
 	GLuint depth_texture;
+
 	int width;
 	int height;
+	bool multisample;
+	int number_of_samples;
 };
 
 #endif //G_BUFFER_HPP

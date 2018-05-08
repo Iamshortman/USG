@@ -9,11 +9,19 @@
 
 RenderingManager::RenderingManager(Window* window)
 {
+	glEnable(GL_DEPTH_TEST);
+	glDepthFunc(GL_GREATER);
+	glEnable(GL_CULL_FACE);
+	glFrontFace(GL_CCW);
+	glCullFace(GL_BACK);
+
+	glEnable(GL_MULTISAMPLE);
+
 	this->window = window;
 
 	int windowWidth, windowHeight;
 	this->window->getWindowSize(windowWidth, windowHeight);
-	this->g_buffer = new G_Buffer(windowWidth, windowHeight);
+	this->g_buffer = new G_Buffer(windowWidth, windowHeight, true, 8);
 
 	ShaderPool::instance->loadShader("Textured", "res/shaders/Textured.vs", "res/shaders/Textured.fs", { { 0, "in_Position" },{ 1, "in_Normal" },{ 2, "in_TexCoord" } });
 	ShaderPool::instance->loadShader("Textured_Lighting", "res/shaders/Textured.vs", "res/shaders/Textured_Lighting.fs", { { 0, "in_Position" },{ 1, "in_Normal" },{ 2, "in_TexCoord" } });
@@ -30,13 +38,6 @@ RenderingManager::RenderingManager(Window* window)
 	MeshPool::instance->loadMesh("res/models/plane.obj");
 
 	TexturePool::instance->loadTexture("res/textures/1K_Grid.png");
-
-
-	glEnable(GL_DEPTH_TEST);
-	glDepthFunc(GL_GREATER);
-	glEnable(GL_CULL_FACE);
-	glFrontFace(GL_CCW);
-	glCullFace(GL_BACK);
 }
 
 RenderingManager::~RenderingManager()
@@ -53,7 +54,7 @@ void RenderingManager::renderScene(GameObject* scene_root, Camera* camera)
 	{
 		//Window Size changed, rebuild Gbuffer
 		delete this->g_buffer;
-		this->g_buffer = new G_Buffer(windowWidth, windowHeight);
+		this->g_buffer = new G_Buffer(windowWidth, windowHeight, true, 8);
 	}
 
 	//discovery mode
