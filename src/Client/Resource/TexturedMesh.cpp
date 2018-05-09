@@ -71,7 +71,6 @@ void TexturedMesh::draw(ShaderProgram* program)
 		(void*)offsetof(TexturedVertex, uv) // array buffer offset
 		);
 
-
 	//Draw the mesh
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
 	glDrawElements(GL_TRIANGLES, size, GL_UNSIGNED_INT, 0);

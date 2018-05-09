@@ -1,28 +1,20 @@
-#version 130
-
-in vec3 in_Position;
-in vec3 in_Normal;
-in vec2 in_TexCoord; 
+#version 330 core
+layout (location = 0) in vec3 in_Position;
+layout (location = 1) in vec3 in_Normal;
+layout (location = 2) in vec2 in_TexCoord;
 
 out vec3 out_Normal;
 out vec2 out_TexCoord;
-out vec3 out_worldPos;
-out vec4 out_lightPos;
+out vec3 out_FragPos;
 
 uniform mat4 MVP;
-uniform mat4 modelMatrix;
-uniform mat3 normalMatrix; 
-uniform mat4 localOffset = mat4(1.0); 
- 
-uniform mat4 lightSpaceMVP = mat4(1.0); 
+uniform mat3 normalMatrix;  
  
 void main(void) 
 {	
-	vec4 offsetPosition = localOffset * vec4(in_Position, 1.0f);
-	gl_Position = MVP * offsetPosition;
-	out_Normal = normalMatrix * (localOffset * vec4(in_Normal, 1.0f)).xyz;
+	vec4 fragPos = MVP * vec4(in_Position, 1.0f);
+	out_FragPos = fragPos.xyz;
+	gl_Position = fragPos;
+	out_Normal = normalMatrix * in_Normal;
 	out_TexCoord = in_TexCoord;
-	out_worldPos = (modelMatrix * offsetPosition).xyz;
-	
-	out_lightPos = lightSpaceMVP * offsetPosition;
 }

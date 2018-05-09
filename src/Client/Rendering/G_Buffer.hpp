@@ -14,11 +14,16 @@ public:
 
 	void clearBuffer();
 
+	GLuint getPositionTexture() { return this->position_texture; };
+	GLuint getNormalTexture() { return this->normal_texture; };
+	GLuint getAlbedoTexture() { return this->albedo_texture; };
+	GLuint getDepthTexture() { return this->depth_texture; };
+
 private:
 	GLuint frame_buffer;
 	GLuint position_texture;
 	GLuint normal_texture;
-	GLuint color_texture;
+	GLuint albedo_texture;
 	GLuint depth_texture;
 
 	int width;

@@ -15,7 +15,7 @@ ShaderPool::~ShaderPool()
 	}
 }
 
-void ShaderPool::loadShader(string name, string vertex, string fragment, vector<AttributeLocation> attributeLocation)
+void ShaderPool::loadShader(string name, string vertex, string fragment)
 {
 	//Does contain
 	if (this->shaders.count(name))
@@ -29,7 +29,6 @@ void ShaderPool::loadShader(string name, string vertex, string fragment, vector<
 	shader.usingCount = 0;
 	shader.vertexPath = vertex;
 	shader.fragmentPath = fragment;
-	shader.attributeLocation = attributeLocation;
 
 	this->shaders[name] = shader;
 }
@@ -46,7 +45,7 @@ void ShaderPool::setUsing(string name)
 	
 	if (this->shaders[name].usingCount <= 0)
 	{
-		this->shaders[name].program = new ShaderProgram(this->shaders[name].vertexPath, this->shaders[name].fragmentPath, this->shaders[name].attributeLocation);
+		this->shaders[name].program = new ShaderProgram(this->shaders[name].vertexPath, this->shaders[name].fragmentPath);
 	}
 
 	this->shaders[name].usingCount++;

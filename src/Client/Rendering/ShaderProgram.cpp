@@ -8,7 +8,7 @@ ShaderProgram::ShaderProgram()
 	this->programID = 0;
 }
 
-ShaderProgram::ShaderProgram(string VertexShader, string FragmentShader, vector<AttributeLocation> attributeLocation)
+ShaderProgram::ShaderProgram(string VertexShader, string FragmentShader)
 {
 	programID = glCreateProgram();
 	vertexID = buildShader(VertexShader, GL_VERTEX_SHADER);
@@ -20,12 +20,6 @@ ShaderProgram::ShaderProgram(string VertexShader, string FragmentShader, vector<
 
 	glAttachShader(programID, vertexID);
 	glAttachShader(programID, fragmentID);
-
-	//add Attribute Locations before linking the program due to Intel driver problems
-	for (int i = 0; i < attributeLocation.size(); i++)
-	{
-		glBindAttribLocation(programID, attributeLocation[i].index, attributeLocation[i].name.c_str());
-	}
 
 	glLinkProgram(programID);
 

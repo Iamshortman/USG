@@ -5,6 +5,7 @@
 #include "Client/Rendering/Window.hpp"
 #include "Client/Rendering/ShaderProgram.hpp"
 #include "Client/Resource/TexturePool.hpp"
+#include "Client/Resource/TexturedMesh.hpp"
 #include "Client/Rendering/G_Buffer.hpp"
 
 
@@ -27,11 +28,16 @@ public:
 
 private:
 	Window* window = nullptr;
-	G_Buffer* g_buffer = nullptr;
-
 
 	bool use_lighting = true;
 
+
+	//Deferred Shading
+	G_Buffer* g_buffer = nullptr;
+	G_Buffer* ms_g_buffer = nullptr;
+
+	ShaderProgram* full_screen_quad_program = nullptr;
+	TexturedMesh* full_screen_quad = nullptr;
 
 };
 

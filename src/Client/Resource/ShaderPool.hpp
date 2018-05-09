@@ -14,7 +14,6 @@ struct ShaderResource
 	ShaderProgram* program;
 	string vertexPath;
 	string fragmentPath;
-	vector<AttributeLocation> attributeLocation;
 };
 
 //Loads and stores all shaders using in game.
@@ -26,7 +25,7 @@ public:
 
 	ShaderPool();
 	~ShaderPool();
-	void loadShader(string name, string vertex, string fragment, vector<AttributeLocation> attributeLocation);
+	void loadShader(string name, string vertex, string fragment);
 	void unloadShader(string name);
 
 	void setUsing(string name);

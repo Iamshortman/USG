@@ -27,10 +27,10 @@ G_Buffer::G_Buffer(int width, int height, bool multisample, int number_of_sample
 		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT1, GL_TEXTURE_2D_MULTISAMPLE, this->normal_texture, 0);
 
 		//color + specular color buffer
-		glGenTextures(1, &this->color_texture);
-		glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, this->color_texture);
+		glGenTextures(1, &this->albedo_texture);
+		glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, this->albedo_texture);
 		glTexImage2DMultisample(GL_TEXTURE_2D_MULTISAMPLE, this->number_of_samples, GL_RGB, this->width, this->height, true);
-		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT2, GL_TEXTURE_2D_MULTISAMPLE, this->color_texture, 0);
+		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT2, GL_TEXTURE_2D_MULTISAMPLE, this->albedo_texture, 0);
 
 		//Depth
 		glGenTextures(1, &this->depth_texture);
@@ -59,12 +59,12 @@ G_Buffer::G_Buffer(int width, int height, bool multisample, int number_of_sample
 		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT1, GL_TEXTURE_2D, this->normal_texture, 0);
 
 		//color + specular color buffer
-		glGenTextures(1, &this->color_texture);
-		glBindTexture(GL_TEXTURE_2D, this->color_texture);
+		glGenTextures(1, &this->albedo_texture);
+		glBindTexture(GL_TEXTURE_2D, this->albedo_texture);
 		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, this->width, this->height, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT2, GL_TEXTURE_2D, this->color_texture, 0);
+		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT2, GL_TEXTURE_2D, this->albedo_texture, 0);
 
 
 		//Depth
@@ -74,9 +74,8 @@ G_Buffer::G_Buffer(int width, int height, bool multisample, int number_of_sample
 		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, this->depth_texture, 0);
 	}
 
-	unsigned int attachments[3] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2 };
+	unsigned int attachments[3] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2};
 	glDrawBuffers(3, attachments);
-
 
 	GLenum fbo_error = glCheckFramebufferStatus(GL_DRAW_FRAMEBUFFER);
 	if (fbo_error != GL_FRAMEBUFFER_COMPLETE)
@@ -93,7 +92,7 @@ G_Buffer::~G_Buffer()
 {
 	glDeleteTextures(1, &this->position_texture);
 	glDeleteTextures(1, &this->normal_texture);
-	glDeleteTextures(1, &this->color_texture);
+	glDeleteTextures(1, &this->albedo_texture);
 	glDeleteTextures(1, &this->depth_texture);
 
 	glDeleteFramebuffers(1, &this->frame_buffer);

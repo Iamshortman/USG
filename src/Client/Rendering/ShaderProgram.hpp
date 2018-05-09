@@ -11,19 +11,13 @@
 
 using namespace std;
 
-struct AttributeLocation
-{
-	GLuint index;
-	string name;
-};
-
 class ShaderProgram
 {
 
 public:
     GLuint programID = 0;
 	ShaderProgram();
-	ShaderProgram(string VertexShaderLoc, string FragmentShaderLoc, vector<AttributeLocation> attributeLocation);
+	ShaderProgram(string VertexShaderLoc, string FragmentShaderLoc);
 	~ShaderProgram();
 	void setActiveProgram();
 	void deactivateProgram();
