@@ -12,7 +12,7 @@
 
 GameState_Editor::GameState_Editor()
 {
-	this->scene_root = GameObjectManager::getInstance()->createGameObject();
+	/*this->scene_root = GameObjectManager::getInstance()->createGameObject();
 
 	scene_camera = GameObjectManager::getInstance()->createGameObject();
 	this->scene_root->addChild(scene_camera);
@@ -27,7 +27,7 @@ GameState_Editor::GameState_Editor()
 
 	this->scene_root->addChild(cursor);
 
-	this->ship_template = new ShipTemplate((float)this->cube_size);
+	this->ship_template = new ShipTemplate((float)this->cube_size);*/
 }
 
 GameState_Editor::~GameState_Editor()
@@ -37,7 +37,7 @@ GameState_Editor::~GameState_Editor()
 
 void GameState_Editor::update(Client* client, double delta_time)
 {
-	if (InputManager::getInstance()->getButtonPressed("editor_forward"))
+	/*if (InputManager::getInstance()->getButtonPressed("editor_forward"))
 	{
 		this->cursor_position.z++;
 	}
@@ -104,5 +104,5 @@ void GameState_Editor::update(Client* client, double delta_time)
 
 	this->scene_root->update(delta_time);
 
-	client->renderingManager->renderScene(scene_root, scene_camera->getComponent<Camera>());
+	client->renderingManager->renderScene(scene_root, scene_camera->getComponent<Camera>());*/
 }

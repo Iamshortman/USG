@@ -21,9 +21,9 @@
 	{
       "model": 
 	  {
-        "file_path": "res/models/Cobra/Hull.obj",
-        "texture": "res/textures/1K_Grid.png",
-        "ambient_shader": "Textured"
+        "file_path": "res/models/A-Wing/a-wing-body.obj",
+        "texture": "res/textures/A-Wing/a-wing-body.png",
+        "ambient_shader": "res/shaders/Textured"
       }
     },
     "children": 

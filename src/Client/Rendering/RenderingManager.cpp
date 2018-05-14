@@ -11,6 +11,7 @@ RenderingManager::RenderingManager(Window* window)
 {
 	glEnable(GL_DEPTH_TEST);
 	glDepthFunc(GL_GREATER);
+
 	glEnable(GL_CULL_FACE);
 	glFrontFace(GL_CCW);
 	glCullFace(GL_BACK);
@@ -43,10 +44,7 @@ RenderingManager::RenderingManager(Window* window)
 	this->full_screen_quad = new TexturedMesh(vertices, indices);
 	this->full_screen_quad_program = new ShaderProgram("res/shaders/ScreenTexture.vs", "res/shaders/ScreenTexture.fs");
 
-	ShaderPool::instance->loadShader("Textured", "res/shaders/Textured.vs", "res/shaders/Textured.fs");
-	MeshPool::instance->loadMesh("res/models/Cobra/Hull.obj");
-
-	TexturePool::instance->loadTexture("res/textures/1K_Grid.png");
+	ShaderPool::getInstance()->getUsing("res/shaders/Textured");
 }
 
 RenderingManager::~RenderingManager()
@@ -149,7 +147,6 @@ void RenderingManager::renderScene(GameObject* scene_root, Camera* camera)
 
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, this->g_buffer->getPositionTexture());
-	//glBindTexture(GL_TEXTURE_2D, TexturePool::instance->getTexture("res/textures/1K_Grid.png"));
 	glActiveTexture(GL_TEXTURE1);
 	glBindTexture(GL_TEXTURE_2D, this->g_buffer->getNormalTexture());
 	glActiveTexture(GL_TEXTURE2);
@@ -176,7 +173,7 @@ void RenderingManager::RenderModel(ComponentModel* model, Camera* camera)
 
 	vector3F ambientLight = vector3F(1.0f);//TODO ambient Light
 
-	Mesh* mesh = MeshPool::instance->getMesh(model->getMesh());
+	Mesh* mesh = MeshPool::getInstance()->get(model->getMesh());
 
 	if (model->temp_mesh != nullptr)
 	{
@@ -184,10 +181,10 @@ void RenderingManager::RenderModel(ComponentModel* model, Camera* camera)
 	}
 
 	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, TexturePool::instance->getTexture(model->getTexture()));
+	glBindTexture(GL_TEXTURE_2D, TexturePool::getInstance()->get(model->getTexture()));
 
 	//Ambient pass
-	ShaderProgram* ambient_shader = ShaderPool::instance->getShader(model->getAmbientShader());
+	ShaderProgram* ambient_shader = ShaderPool::getInstance()->get(model->getAmbientShader());
 
 	ambient_shader->setActiveProgram();
 	ambient_shader->setUniform("MVP", mvp);
@@ -195,7 +192,7 @@ void RenderingManager::RenderModel(ComponentModel* model, Camera* camera)
 	ambient_shader->setUniform("normalMatrix", globalTransform.getNormalMatrix());
 	ambient_shader->setUniform("ambientLight", ambientLight);
 
-	ambient_shader->setUniform("texture1", 0);
+	//ambient_shader->setUniform("texture1", TexturePool::getInstance()->get("res/textures/1K_Grid.png"));
 
 	mesh->draw(ambient_shader);
 

@@ -9,5 +9,5 @@ uniform sampler2D gAlbedoSpec;
 
 void main(void) 
 {
-	fragmentColor = texture(gPosition, out_TexCoord);
+	fragmentColor = texture(gAlbedoSpec, out_TexCoord);
 }

@@ -1,10 +1,5 @@
 #include "Client/Client.hpp"
 
-//Singletons
-#include "Client/Resource/TexturePool.hpp"
-#include "Client/Resource/ShaderPool.hpp"
-#include "Client/Resource/MeshPool.hpp"
-
 #include "Client/Input/InputManager.hpp"
 
 #include "Common/GameObjectManager.hpp"
@@ -16,11 +11,6 @@ int main()
 	Logger::getInstance()->openLogFile("Log.txt");
 
 	SDL_Init(SDL_INIT_EVERYTHING);
-
-	//Create Singletons
-	TexturePool* texturePool = new TexturePool();
-	ShaderPool* shaderPool = new ShaderPool();
-	MeshPool* meshPool = new MeshPool();
 
 	Client* game = new Client();
 

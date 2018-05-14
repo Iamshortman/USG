@@ -1,48 +1,22 @@
 #ifndef MESHPOOL_HPP
 #define MESHPOOL_HPP
 
-#include <unordered_map>
-#include <string>
-#include "Common/Resource/Mesh.hpp"
-
+#include "Common/Resource/ResourcePool.hpp"
 #include "Client/Resource/TexturedMesh.hpp"
-#include "Client/Resource/AnimatedMesh.hpp"
 
-//Temp class
-class AnimatedMesh;
-
-using std::string;
-
-struct StaticMeshResource
+//Loads and stores all textures using in game.
+class MeshPool : public ResourcePool<TexturedMesh*>
 {
-	int usingCount = 0;
-	Mesh* mesh;
-};
-
-//Loads and stores all meshes using in game.
-class MeshPool
-{
-
 public:
+	static MeshPool*  getInstance();
+
+protected:
+	//Instance for the Singleton design pattern;
 	static MeshPool* instance;
-
 	MeshPool();
-	~MeshPool();
-	void loadMesh(string filename);
-	void unloadMesh(string filename);
 
-	void setUsing(string filename);
-	int getUsing(string filename);
-	void releaseUsing(string filename);
-	Mesh* getMesh(string filename);
-
-private:
-	bool hasMesh(string filename);
-
-
-	std::unordered_map<string, StaticMeshResource> staticMeshes;
-	//std::unordered_map<string, AnimatedMeshResource> animatedMesh;
+	virtual TexturedMesh* loadResource(string name);
+	virtual void unloadResource(TexturedMesh* resource);
 };
-
 
 #endif //MESHPOOL_HPP

@@ -33,8 +33,8 @@ InputManager::InputManager()
 	keyboardMouse->addButton("DebugBackward", KeyboardMouseButton(KEYBOARD, SDL_SCANCODE_S));
 	keyboardMouse->addButton("DebugLeft", KeyboardMouseButton(KEYBOARD, SDL_SCANCODE_A));
 	keyboardMouse->addButton("DebugRight", KeyboardMouseButton(KEYBOARD, SDL_SCANCODE_D));
-	keyboardMouse->addButton("DebugUp", KeyboardMouseButton(KEYBOARD, SDL_SCANCODE_SPACE));
-	keyboardMouse->addButton("DebugDown", KeyboardMouseButton(KEYBOARD, SDL_SCANCODE_LSHIFT));
+	keyboardMouse->addButton("DebugUp", KeyboardMouseButton(KEYBOARD, SDL_SCANCODE_LSHIFT));
+	keyboardMouse->addButton("DebugDown", KeyboardMouseButton(KEYBOARD, SDL_SCANCODE_LCTRL));
 	keyboardMouse->addButton("DebugRollLeft", KeyboardMouseButton(KEYBOARD, SDL_SCANCODE_Q));
 	keyboardMouse->addButton("DebugRollRight", KeyboardMouseButton(KEYBOARD, SDL_SCANCODE_E));
 	keyboardMouse->addAxis("DebugPitch", MouseAxis(MouseDirection::Mouse_Y, 0.05, 0.01, false));

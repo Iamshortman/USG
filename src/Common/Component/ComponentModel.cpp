@@ -30,12 +30,12 @@ void ComponentModel::enable()
 #ifdef CLIENT
 	if (!this->enabled)
 	{
-		MeshPool::instance->setUsing(this->mesh_file_path);
-		TexturePool::instance->setUsing(this->texture_name);
+		MeshPool::getInstance()->setUsing(this->mesh_file_path);
+		TexturePool::getInstance()->setUsing(this->texture_name);
 
-		ShaderPool::instance->setUsing(this->ambient_shader_name);
-		ShaderPool::instance->setUsing(this->lighting_shader_name);
-		ShaderPool::instance->setUsing(this->shadow_shader_name);
+		ShaderPool::getInstance()->setUsing(this->ambient_shader_name);
+		//ShaderPool::getInstance()->setUsing(this->lighting_shader_name);
+		//ShaderPool::getInstance()->setUsing(this->shadow_shader_name);
 	}
 #endif
 	Component::enable();
@@ -46,12 +46,12 @@ void ComponentModel::disable()
 #ifdef CLIENT
 	if (this->enabled)
 	{
-		MeshPool::instance->releaseUsing(this->mesh_file_path);
-		TexturePool::instance->releaseUsing(this->texture_name);
+		MeshPool::getInstance()->releaseUsing(this->mesh_file_path);
+		TexturePool::getInstance()->releaseUsing(this->texture_name);
 
-		ShaderPool::instance->releaseUsing(this->ambient_shader_name);
-		ShaderPool::instance->releaseUsing(this->lighting_shader_name);
-		ShaderPool::instance->releaseUsing(this->shadow_shader_name);
+		ShaderPool::getInstance()->releaseUsing(this->ambient_shader_name);
+		//ShaderPool::getInstance()->releaseUsing(this->lighting_shader_name);
+		//ShaderPool::getInstance()->releaseUsing(this->shadow_shader_name);
 	}
 #endif
 	Component::disable();

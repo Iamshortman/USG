@@ -1,41 +1,21 @@
 #ifndef SHADERPOOL_HPP
 #define SHADERPOOL_HPP
 
-#include <unordered_map>
-#include <string>
-
+#include "Common/Resource/ResourcePool.hpp"
 #include "Client/Rendering/ShaderProgram.hpp"
 
-using std::string;
-
-struct ShaderResource
+//Loads and stores all textures using in game.
+class ShaderPool : public ResourcePool<ShaderProgram*>
 {
-	unsigned short usingCount = 0;
-	ShaderProgram* program;
-	string vertexPath;
-	string fragmentPath;
-};
-
-//Loads and stores all shaders using in game.
-class ShaderPool
-{
-
 public:
+	static ShaderPool*  getInstance();
+
+protected:
+	//Instance for the Singleton design pattern;
 	static ShaderPool* instance;
-
 	ShaderPool();
-	~ShaderPool();
-	void loadShader(string name, string vertex, string fragment);
-	void unloadShader(string name);
 
-	void setUsing(string name);
-	unsigned short getUsing(string name);
-	void releaseUsing(string name);
-	ShaderProgram* getShader(string name);
-
-private:
-	std::unordered_map<string, ShaderResource> shaders;
+	virtual ShaderProgram* loadResource(string name);
+	virtual void unloadResource(ShaderProgram* resource);
 };
-
-
 #endif //SHADERPOOL_HPP
