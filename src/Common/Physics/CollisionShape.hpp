@@ -30,6 +30,8 @@ private:
 
 	CollisionShapeType shape_type;
 	btCollisionShape* shape = nullptr;
+
+	int index;
 };
 
 #endif //COLLISIONSHAPE_HPP

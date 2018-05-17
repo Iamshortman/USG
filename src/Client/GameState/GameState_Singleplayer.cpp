@@ -20,11 +20,11 @@ GameState_Singleplayer::GameState_Singleplayer()
 
 
 	GameObject* camera = GameObjectManager::getInstance()->createGameObject();
-	this->scene_root->addChild(camera);
 	camera->addComponent<Camera>();
 	camera->addComponent<DebugCamera>(5.0, 1.0);
 	scene_camera = camera->getComponent<Camera>();
 	camera->setLocalTransform(Transform(vector3D(0.0, 2.0, -8.0)));
+	this->scene_root->addChild(camera);
 }
 
 GameState_Singleplayer::~GameState_Singleplayer()

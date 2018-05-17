@@ -2,6 +2,8 @@
 
 #include "Common/Physics/RigidBody.hpp"
 
+#include "Common/Logger/Logger.hpp"
+
 GameObject::GameObject(GameObjectId objectId)
 	: object_Id(objectId)
 {
@@ -37,7 +39,7 @@ void GameObject::removeChild(GameObject* game_object)
 	this->children.erase(game_object);
 }
 
-void GameObject::onParentChange(GameObject* new_parent, int tree_level)
+void GameObject::onParentChange(GameObject* new_parent)
 {
 	for (auto component : this->component_map)
 	{
@@ -54,7 +56,7 @@ void GameObject::onParentChange(GameObject* new_parent, int tree_level)
 	//Not sure if this is needed
 	for (GameObject* child : this->children)
 	{
-		child->onParentChange(this, tree_level + 0);
+		child->onParentChange(this);
 	}
 }
 
@@ -78,4 +80,29 @@ Transform GameObject::getGlobalTransform()
 	}
 
 	return global_transform;
+}
+
+Transform GameObject::getRelitiveTransform(GameObject* parent)
+{
+	Transform relative_transform = this->getLocalTransform();
+
+	GameObject* game_object = this->parent;
+
+	while (game_object != nullptr)
+	{
+		if (game_object == parent)
+		{
+			//Found the parent, done searching
+			break;
+		}
+		else if (game_object == nullptr)
+		{
+			//Didn't find the parent, not good
+			Logger::getInstance()->logError("getRelitiveTransform parent not found\n");
+		}
+
+		relative_transform = relative_transform.transformBy(game_object->local_transform);
+	}
+
+	return relative_transform;
 }

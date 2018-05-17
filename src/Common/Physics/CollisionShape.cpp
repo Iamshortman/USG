@@ -3,6 +3,7 @@
 #include "Common/GameObject.hpp"
 #include "Common/Physics/Bullet_Include.hpp"
 #include "Common/Physics/RigidBody.hpp"
+#include "Common/Physics/PhysicsWorld.hpp"
 
 CollisionShape::CollisionShape()
 {
@@ -16,17 +17,11 @@ void CollisionShape::enable()
 {
 	if (!this->enabled)
 	{
-		GameObject* gameobject = this->parent;
-		while (gameobject->parent != nullptr)
+		GameObject* game_object = this->parent->findParentWithFirst_StopIfSecond<RigidBody, PhysicsWorld>();
+		if (game_object != nullptr)
 		{
-			gameobject = parent->parent;
-
-			if (gameobject->hasComponent<RigidBody>())
-			{
-				gameobject->getComponent<RigidBody>()->addChildShape(this, Transform(), 10.0);
-				Component::enable();
-				return;
-			}
+			this->index = game_object->getComponent<RigidBody>()->addChildShape(this);
+			Component::enable();
 		}
 	}
 }
@@ -35,6 +30,12 @@ void CollisionShape::disable()
 {
 	if (this->enabled)
 	{
+		GameObject* game_object = this->parent->findParentWithFirst_StopIfSecond<RigidBody, PhysicsWorld>();
+		if (game_object != nullptr)
+		{
+			game_object->getComponent<RigidBody>()->removeChildShape(this->index);
+			this->index = -1;
+		}
 
 		Component::disable();
 	}

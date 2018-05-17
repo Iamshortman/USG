@@ -13,37 +13,24 @@
 //Prototype Class
 class PhysicsWorld;
 
-typedef unsigned int childId;
-
-struct ChildShape
-{
-	CollisionShape* shape;
-	double mass;
-	Transform transform;
-	childId index;
-	GameObject* gameObject;
-};
-
 class RigidBody : public Component
 {
 public:
-	RigidBody();
+	RigidBody(bool is_static = false);
 	virtual ~RigidBody();
 
 	virtual void enable() override;
 	virtual void disable() override;
 
-	childId addChildShape(CollisionShape* shape, Transform transform, double mass, GameObject* node = nullptr);
-	GameObject* getChildNode(childId id);
-	void removeChildShape(childId id);
-	void updateChildTransform(childId id, Transform transform);
-	void rebuildCompondShape();
+	int addChildShape(CollisionShape* shape);
+	GameObject* getChildNode(int id);
+	void removeChildShape(int id);
 
-	void setMass(double massToAdd);
+	/*void setMass(double massToAdd);
 	double getMass();
 
 	void setInertiaTensor(vector3D inertia);
-	vector3D getInertiaTensor();
+	vector3D getInertiaTensor();*/
 
 	void Activate(bool activate);
 
@@ -70,17 +57,16 @@ public:
 	btRigidBody* getRigidBody();
 
 private:
+	const bool is_static;
+
 	btRigidBody* rigidBody = nullptr;
 	btCompoundShape* compoundShape = nullptr;
-	std::unordered_map<int, ChildShape> childShapes;
+	std::unordered_map<int, CollisionShape*> childShapes;
 	btEmptyShape* emptyShape = nullptr;
-
-	double mass = 1.0;
-	vector3D inertia = vector3D(0.0);
 
 	PhysicsWorld* world = nullptr;
 
-	childId getNextId();
+	int getNextId();
 };
 
 #endif //RIGIDBODY_HPP

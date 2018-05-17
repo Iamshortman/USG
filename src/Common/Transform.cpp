@@ -2,11 +2,14 @@
 
 	Transform::Transform()
 	{
+		this->position = vector3D();
+		this->orientation = quaternionD();
 	}
 
 	Transform::Transform(vector3D position)
 	{ 
-		this->position = position; 
+		this->position = position;
+		this->orientation = quaternionD();
 	}
 
 	Transform::Transform(vector3D position, quaternionD orientation)
