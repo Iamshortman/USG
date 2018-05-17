@@ -23,8 +23,6 @@ public:
 	void setCastShadows(bool cast_shadow) { this->cast_shadows = cast_shadow; };
 	bool castShadows() const { return this->cast_shadows; };
 
-	void* temp_mesh = nullptr;
-
 protected:
 	bool cast_shadows = true;
 

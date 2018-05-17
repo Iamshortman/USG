@@ -24,7 +24,12 @@
         "file_path": "res/models/A-Wing/a-wing-body.obj",
         "texture": "res/textures/A-Wing/a-wing-body.png",
         "ambient_shader": "res/shaders/Textured"
-      }
+      },
+	  
+	  "rigidBody":
+	  {
+		"mass": 1000.0
+	  }
     },
     "children": 
 	[

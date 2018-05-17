@@ -1,6 +1,8 @@
 #include "Common/GameObjectManager.hpp"
 
 #include "Common/Component/ComponentModel.hpp"
+#include "Common/Physics/RigidBody.hpp"
+
 #include "jsoncons/json.hpp"
 using jsoncons::json;
 
@@ -85,6 +87,24 @@ void parseComponents(GameObject* game_object, json json_component)
 		string ambient_shader = json_model["ambient_shader"].as_string();
 		game_object->addComponent<ComponentModel>(file_path, texture, ambient_shader, "", "");
 	}
+	
+	if (json_component.has_member("rigidBody"))
+	{
+		game_object->addComponent<RigidBody>();
+
+		if (json_component["rigidBody"].has_member("mass"))
+		{
+			game_object->getComponent<RigidBody>()->setMass(json_component["rigidBody"]["mass"].as_double());
+		}
+
+		if (json_component.has_member("inertiaTensor"))
+		{
+			vector<double> pos = json_component["rigidBody"]["inertiaTensor"].as<vector<double>>();
+			game_object->getComponent<RigidBody>()->setInertiaTensor(vector3D(pos[0], pos[1], pos[2]));
+		}
+	}
+
+	
 }
 
 GameObject* parseGameObject(json json_game_object)
@@ -106,6 +126,10 @@ GameObject* parseGameObject(json json_game_object)
 		{
 			vector<double> pos = json_transform["orientation"].as<vector<double>>();
 			transform.setOrientation(quaternionD( pos[0], pos[1], pos[2], pos[3]));
+		}
+		else
+		{
+			transform.setOrientation(quaternionD());
 		}
 
 		game_object->setLocalTransform(transform);

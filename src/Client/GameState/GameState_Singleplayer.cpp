@@ -17,8 +17,7 @@ GameState_Singleplayer::GameState_Singleplayer()
 
 	this->scene_root->addChild(GameObjectManager::getInstance()->createGameObjectFromJson("res/json/test.json"));
 
-	//GameObject* object = GameObjectManager::getInstance()->createGameObjectFromJson("res/json/test1.json");
-	//this->scene_root->addChild(object);
+
 
 	GameObject* camera = GameObjectManager::getInstance()->createGameObject();
 	this->scene_root->addChild(camera);

@@ -1,5 +1,5 @@
-#ifndef GAMEOBJECT_HPP
-#define GAMEOBJECT_HPP
+#ifndef GAME_OBJECT_HPP
+#define GAME_OBJECT_HPP
 
 #include <set>
 #include <map>
@@ -12,13 +12,15 @@ typedef uint32_t GameObjectId;
 class GameObject
 {
 public:
-	~GameObject();
+	virtual ~GameObject();
 
-	void update(double delta_Time);
+	virtual void update(double delta_Time);
 
 	//GameObject* getParent();
-	void addChild(GameObject* game_object);
-	void removeChild(GameObject* game_object);
+	virtual void addChild(GameObject* game_object);
+	virtual void removeChild(GameObject* game_object);
+
+	virtual void onParentChange(GameObject* new_parent, int tree_level = 0);
 
 	template<typename T, typename... TArgs> void addComponent(TArgs&&... mArgs)
 	{
@@ -59,8 +61,8 @@ public:
 		}
 	};
 
-	void setLocalTransform(Transform transform);
-	Transform getLocalTransform();
+	virtual void setLocalTransform(Transform transform);
+	virtual Transform getLocalTransform();
 	Transform getGlobalTransform();
 
 	GameObject* parent = nullptr;
@@ -76,4 +78,4 @@ protected:
 };
 
 
-#endif GAMEOBJECT_HPP
+#endif //GAME_OBJECT_HPP

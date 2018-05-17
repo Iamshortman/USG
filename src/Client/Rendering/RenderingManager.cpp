@@ -175,11 +175,6 @@ void RenderingManager::RenderModel(ComponentModel* model, Camera* camera)
 
 	Mesh* mesh = MeshPool::getInstance()->get(model->getMesh());
 
-	if (model->temp_mesh != nullptr)
-	{
-		mesh = (Mesh*)model->temp_mesh;
-	}
-
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, TexturePool::getInstance()->get(model->getTexture()));
 

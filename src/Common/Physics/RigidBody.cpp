@@ -5,11 +5,13 @@
 
 RigidBody::RigidBody()
 {
-	emptyShape = new btEmptyShape();
+	this->emptyShape = new btEmptyShape();
 
 	btDefaultMotionState* motionState = new btDefaultMotionState();
 	btRigidBody::btRigidBodyConstructionInfo boxRigidBodyCI(mass, motionState, emptyShape, btVector3(0.0, 0.0, 0.0));
 	this->rigidBody = new btRigidBody(boxRigidBodyCI);
+
+	this->rebuildCompondShape();
 }
 
 RigidBody::~RigidBody()
@@ -47,19 +49,20 @@ void RigidBody::enable()
 		{
 			if (this->parent->parent->hasComponent<PhysicsWorld>())
 			{
-				this->world = parent->parent->getComponent<PhysicsWorld>();
-				this->world->addRigidBody(this);
-				this->rigidBody->setUserPointer(this->parent);
-				Component::enable();
+					this->rebuildCompondShape();
+					this->world = parent->parent->getComponent<PhysicsWorld>();
+					this->world->addRigidBody(this);
+					this->rigidBody->setUserPointer(this->parent);
+					Component::enable();
 			}
 			else
 			{
-				printf("Error: No World\n");
+				//printf("Error: No World\n");
 			}
 		}
 		else
 		{
-			printf("Error: No Parent\n");
+			//printf("Error: No Parent\n");
 		}
 
 		Component::enable();
@@ -127,7 +130,7 @@ void RigidBody::updateChildTransform(childId id, Transform transform)
 
 void RigidBody::rebuildCompondShape()
 {
-	btCollisionShape* oldShape = this->rigidBody->getCollisionShape();
+	/*btCollisionShape* oldShape = this->rigidBody->getCollisionShape();
 
 	if (oldShape != nullptr && oldShape != this->emptyShape)
 	{
@@ -174,7 +177,7 @@ void RigidBody::rebuildCompondShape()
 
 		this->rigidBody->setCollisionShape(this->compoundShape);
 	}
-	else
+	else*/
 	{
 		this->rigidBody->setCollisionShape(this->emptyShape);
 	}

@@ -5,7 +5,6 @@
 GameObject::GameObject(GameObjectId objectId)
 	: object_Id(objectId)
 {
-
 }
 
 GameObject::~GameObject()
@@ -29,37 +28,43 @@ void GameObject::update(double delta_time)
 void GameObject::addChild(GameObject* game_object)
 {
 	this->children.insert(game_object);
-	game_object->parent = this;
+	game_object->onParentChange(this);
 }
 
 void GameObject::removeChild(GameObject* game_object)
 {
+	game_object->onParentChange(nullptr);
 	this->children.erase(game_object);
-	game_object->parent = nullptr;
+}
+
+void GameObject::onParentChange(GameObject* new_parent, int tree_level)
+{
+	for (auto component : this->component_map)
+	{
+		component.second->disable();
+	}
+
+	this->parent = new_parent;
+
+	for (auto component : this->component_map)
+	{
+		component.second->enable();
+	}
+
+	//Not sure if this is needed
+	for (GameObject* child : this->children)
+	{
+		child->onParentChange(this, tree_level + 0);
+	}
 }
 
 void GameObject::setLocalTransform(Transform transform)
 {
 	this->local_transform = transform;
-
-	RigidBody* rigidBody = this->getComponent<RigidBody>();
-	if (rigidBody != nullptr)
-	{
-		rigidBody->setWorldTransform(this->local_transform);
-	}
 }
 
 Transform GameObject::getLocalTransform()
 {
-	RigidBody* rigidBody = this->getComponent<RigidBody>();
-	if (rigidBody != nullptr)
-	{
-		if (rigidBody->enabled)
-		{
-			this->local_transform = rigidBody->getWorldTransform();
-		}
-	}
-
 	return this->local_transform;
 }
 
