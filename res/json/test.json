@@ -11,7 +11,7 @@
       ],
       "orientation": 
 	  [
-        0,
+        1,
         0,
         0,
         0
@@ -29,7 +29,9 @@
 	  "rigidBody":
 	  {
 		"mass": 1000.0
-	  }
+	  },
+	  
+	  "ComponentShipFlight": {}
     },
     "children": 
 	[

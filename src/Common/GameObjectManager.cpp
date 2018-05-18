@@ -2,6 +2,7 @@
 
 #include "Common/Component/ComponentModel.hpp"
 #include "Common/Physics/RigidBody.hpp"
+#include "Common/Component/ComponentShipFlight.hpp"
 
 #include "jsoncons/json.hpp"
 using jsoncons::json;
@@ -102,6 +103,11 @@ void parseComponents(GameObject* game_object, json json_component)
 			vector<double> pos = json_component["rigidBody"]["inertiaTensor"].as<vector<double>>();
 			//game_object->getComponent<RigidBody>()->setInertiaTensor(vector3D(pos[0], pos[1], pos[2]));
 		}
+	}
+
+	if (json_component.has_member("ComponentShipFlight"))
+	{
+		game_object->addComponent<ComponentShipFlight>();
 	}
 
 	

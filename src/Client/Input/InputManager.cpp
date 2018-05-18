@@ -40,6 +40,9 @@ InputManager::InputManager()
 	keyboardMouse->addAxis("DebugPitch", MouseAxis(MouseDirection::Mouse_Y, 0.05, 0.01, false));
 	keyboardMouse->addAxis("DebugYaw", MouseAxis(MouseDirection::Mouse_X, 0.05, 0.01, false));
 	keyboardMouse->addButton("DebugInteract", KeyboardMouseButton(KEYBOARD, SDL_SCANCODE_F));
+
+	keyboardMouse->addButton("Forward", KeyboardMouseButton(KEYBOARD, SDL_SCANCODE_UP));
+	keyboardMouse->addButton("Backward", KeyboardMouseButton(KEYBOARD, SDL_SCANCODE_DOWN));
 }
 
 InputManager::~InputManager()
