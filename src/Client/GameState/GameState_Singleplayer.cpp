@@ -15,9 +15,8 @@ GameState_Singleplayer::GameState_Singleplayer()
 	this->scene_root = GameObjectManager::getInstance()->createGameObject();
 	this->scene_root->addComponent<PhysicsWorld>();
 
-	this->scene_root->addChild(GameObjectManager::getInstance()->createGameObjectFromJson("res/json/test.json"));
-
-
+	GameObject* ship = GameObjectManager::getInstance()->createGameObjectFromJson("res/json/test.json");
+	this->scene_root->addChild(ship);
 
 	GameObject* camera = GameObjectManager::getInstance()->createGameObject();
 	camera->addComponent<Camera>();

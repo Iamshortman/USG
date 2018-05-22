@@ -67,7 +67,7 @@ void GameObject::setLocalTransform(Transform transform)
 
 Transform GameObject::getLocalTransform()
 {
-	if (this->hasComponent<RigidBody>())
+	if (this->hasComponent<RigidBody>() && this->getComponent<RigidBody>()->isEnabled())
 	{
 		this->local_transform = this->getComponent<RigidBody>()->getWorldTransform();
 	}

@@ -29,20 +29,23 @@ InputManager::InputManager()
 
 	keyboardMouse = new KeyboardMouseDevice();
 
-	keyboardMouse->addButton("DebugForward", KeyboardMouseButton(KEYBOARD, SDL_SCANCODE_W));
-	keyboardMouse->addButton("DebugBackward", KeyboardMouseButton(KEYBOARD, SDL_SCANCODE_S));
-	keyboardMouse->addButton("DebugLeft", KeyboardMouseButton(KEYBOARD, SDL_SCANCODE_A));
-	keyboardMouse->addButton("DebugRight", KeyboardMouseButton(KEYBOARD, SDL_SCANCODE_D));
-	keyboardMouse->addButton("DebugUp", KeyboardMouseButton(KEYBOARD, SDL_SCANCODE_LSHIFT));
-	keyboardMouse->addButton("DebugDown", KeyboardMouseButton(KEYBOARD, SDL_SCANCODE_LCTRL));
-	keyboardMouse->addButton("DebugRollLeft", KeyboardMouseButton(KEYBOARD, SDL_SCANCODE_Q));
-	keyboardMouse->addButton("DebugRollRight", KeyboardMouseButton(KEYBOARD, SDL_SCANCODE_E));
-	keyboardMouse->addAxis("DebugPitch", MouseAxis(MouseDirection::Mouse_Y, 0.05, 0.01, false));
-	keyboardMouse->addAxis("DebugYaw", MouseAxis(MouseDirection::Mouse_X, 0.05, 0.01, false));
-	keyboardMouse->addButton("DebugInteract", KeyboardMouseButton(KEYBOARD, SDL_SCANCODE_F));
+	keyboardMouse->addButton("Flight_Forward", KeyboardMouseButton(KEYBOARD, SDL_SCANCODE_W));
+	keyboardMouse->addButton("Flight_Backward", KeyboardMouseButton(KEYBOARD, SDL_SCANCODE_S));
+	keyboardMouse->addButton("Flight_Left", KeyboardMouseButton(KEYBOARD, SDL_SCANCODE_A));
+	keyboardMouse->addButton("Flight_Right", KeyboardMouseButton(KEYBOARD, SDL_SCANCODE_D));
+	keyboardMouse->addButton("Flight_Up", KeyboardMouseButton(KEYBOARD, SDL_SCANCODE_LSHIFT));
+	keyboardMouse->addButton("Flight_Down", KeyboardMouseButton(KEYBOARD, SDL_SCANCODE_LCTRL));
+	keyboardMouse->addButton("Flight_RollLeft", KeyboardMouseButton(KEYBOARD, SDL_SCANCODE_Q));
+	keyboardMouse->addButton("Flight_RollRight", KeyboardMouseButton(KEYBOARD, SDL_SCANCODE_E));
+	keyboardMouse->addAxis("Flight_Pitch", MouseAxis(MouseDirection::Mouse_Y, 0.05, 0.01, false));
+	keyboardMouse->addAxis("Flight_Yaw", MouseAxis(MouseDirection::Mouse_X, 0.05, 0.01, false));
+	//keyboardMouse->addButton("Flight_Interact", KeyboardMouseButton(KEYBOARD, SDL_SCANCODE_F));
 
-	keyboardMouse->addButton("Forward", KeyboardMouseButton(KEYBOARD, SDL_SCANCODE_UP));
-	keyboardMouse->addButton("Backward", KeyboardMouseButton(KEYBOARD, SDL_SCANCODE_DOWN));
+	keyboardMouse->addButton("Flight_PitchUp", KeyboardMouseButton(KEYBOARD, SDL_SCANCODE_UP));
+	keyboardMouse->addButton("Flight_PitchDown", KeyboardMouseButton(KEYBOARD, SDL_SCANCODE_DOWN));
+
+	//keyboardMouse->addButton("Left", KeyboardMouseButton(KEYBOARD, SDL_SCANCODE_LEFT));
+	//keyboardMouse->addButton("Right", KeyboardMouseButton(KEYBOARD, SDL_SCANCODE_RIGHT));
 }
 
 InputManager::~InputManager()

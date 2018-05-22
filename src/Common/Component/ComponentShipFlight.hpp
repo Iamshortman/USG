@@ -6,6 +6,17 @@
 #include "Common/GLM_Include.hpp"
 #include "Common/Rotation.hpp"
 
+
+const vector3B Directions3D[] =
+{
+	vector3B(0.0, 0.0, 1.0),
+	vector3B(0.0, 0.0, -1.0),
+	vector3B(0.0, 1.0, 0.0),
+	vector3B(0.0, -1.0, 0.0),
+	vector3B(1.0, 0.0, 0.0),
+	vector3B(-1.0, 0.0, 0.0),
+};
+
 class ComponentShipFlight : public Component
 {
 public:
@@ -14,19 +25,22 @@ public:
 
 	virtual void update(double delta_time);
 
-	vector3D thrust_input;
+	vector3D linear_input;
 
-	double max_speed[6];
-	double engine_acceleration[6];
-	double braking_acceleration[6];
+	vector3D max_linear_speed = vector3D(50.0, 50.0, 200.0);
+	vector3D linear_acceleration = vector3D(10.0, 10.0, 30.0);
+	vector3D linear_braking_acceleration = vector3D(20.0, 20.0, 60.0);
+	vector3D linear_drag_const = vector3D(0.3, 0.3, 0.1);
 
+	/*double max_linear_speed[6] = {200, 100, 50, 50, 50, 50};
+	double linear_acceleration[6] = {25, 10, 10, 10, 10, 10};
+	double linear_braking_acceleration[6] = {25, 50, 20, 20, 20, 20};*/
 
-	double spaceMaxSpeed = 500.0;
-	double spaceAcceleration = 20.0;
+	vector3D angular_input;
 
-	double forward_thrust = 10;
-	double reverse_thrust = 20;
-	double breaking_force = 75;
+	vector3D max_angular_speed = vector3D(0.7);
+	vector3D angular_acceleration = vector3D(1.0);
+	vector3D angular_braking_acceleration = vector3D(3.0);
 };
 
 

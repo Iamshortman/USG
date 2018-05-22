@@ -130,12 +130,8 @@ GameObject* parseGameObject(json json_game_object)
 		
 		if (json_transform.has_member("orientation"))
 		{
-			vector<double> pos = json_transform["orientation"].as<vector<double>>();
-			transform.setOrientation(quaternionD( pos[0], pos[1], pos[2], pos[3]));
-		}
-		else
-		{
-			transform.setOrientation(quaternionD());
+			vector<double> orientation = json_transform["orientation"].as<vector<double>>();
+			transform.setOrientation(quaternionD(orientation[0], orientation[1], orientation[2], orientation[3]));
 		}
 
 		game_object->setLocalTransform(transform);
