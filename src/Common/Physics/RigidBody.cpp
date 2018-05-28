@@ -2,38 +2,23 @@
 
 #include "Common/GameObject.hpp"
 #include "Common/Physics/PhysicsWorld.hpp"
+#include "Common/Component/ComponentMass.hpp"
 
 #include "Common/Logger/Logger.hpp"
 
-#define DEFAULT_MASS 10.0
+#define DEFAULT_MASS 100.0
 
 RigidBody::RigidBody(bool is_static)
 	:is_static(is_static)
 {
 	this->emptyShape = new btEmptyShape();
 
-	btCollisionShape* shape = new btBoxShape(btVector3(0.5, 0.5, 0.5));
-
-	double mass = DEFAULT_MASS;
-
-	if (this->is_static)
-	{
-		mass = 0.0;
-	}
-
-	btDefaultMotionState* motionState = new btDefaultMotionState();
-	btRigidBody::btRigidBodyConstructionInfo boxRigidBodyCI(mass, motionState, shape, btVector3(0.0, 0.0, 0.0));
-	this->rigidBody = new btRigidBody(boxRigidBodyCI);
+	//btCollisionShape* shape = new btBoxShape(btVector3(0.5, 0.5, 0.5));
 }
 
 RigidBody::~RigidBody()
 {
 	this->disable();
-
-	if (this->rigidBody != nullptr)
-	{
-		delete this->rigidBody;
-	}
 
 	if (this->compoundShape != nullptr)
 	{
@@ -54,11 +39,22 @@ void RigidBody::enable()
 		{
 			if (this->parent->parent->hasComponent<PhysicsWorld>())
 			{
-					this->world = parent->parent->getComponent<PhysicsWorld>();
-					this->world->addRigidBody(this);
-					this->rigidBody->setUserPointer(this->parent);
-					this->rigidBody->setWorldTransform(toBtTransform(this->parent->getLocalTransform()));
-					Component::enable();
+				double mass = 0.0;
+					
+				if (this->parent->hasComponent<ComponentMass>() && !this->is_static)
+				{
+					mass = this->parent->getComponent<ComponentMass>()->getTotalMass();
+				}
+
+				btDefaultMotionState* motionState = new btDefaultMotionState();
+				btRigidBody::btRigidBodyConstructionInfo boxRigidBodyCI(mass, motionState, this->emptyShape, btVector3(0.0, 0.0, 0.0));
+				this->rigidBody = new btRigidBody(boxRigidBodyCI);
+
+				this->world = parent->parent->getComponent<PhysicsWorld>();
+				this->world->addRigidBody(this);
+				this->rigidBody->setUserPointer(this->parent);
+				this->rigidBody->setWorldTransform(toBtTransform(this->parent->getLocalTransform()));
+				Component::enable();
 			}
 			else
 			{
@@ -83,6 +79,12 @@ void RigidBody::disable()
 			this->world->removeRigidBody(this);
 			this->world = nullptr;
 		}
+
+		if (this->rigidBody != nullptr)
+		{
+			delete this->rigidBody;
+		}
+
 		Component::disable();
 	}
 }

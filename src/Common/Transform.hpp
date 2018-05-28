@@ -18,6 +18,7 @@ public:
 	vector3D getForward() const;
 	vector3D getUp() const;
 	vector3D getLeft() const;
+	vector3D getDirection(int i) const;
 	quaternionD getOrientation() const;
 
 	void setPosition(const vector3D& vec);

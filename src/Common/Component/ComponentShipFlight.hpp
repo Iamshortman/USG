@@ -27,14 +27,14 @@ public:
 
 	vector3D linear_input;
 
-	vector3D max_linear_speed = vector3D(50.0, 50.0, 200.0);
+	vector3D linear_max_speed = vector3D(50.0, 50.0, 200.0);
 	vector3D linear_acceleration = vector3D(10.0, 10.0, 30.0);
 	vector3D linear_braking_acceleration = vector3D(20.0, 20.0, 60.0);
-	vector3D linear_drag_const = vector3D(0.3, 0.3, 0.1);
 
-	/*double max_linear_speed[6] = {200, 100, 50, 50, 50, 50};
-	double linear_acceleration[6] = {25, 10, 10, 10, 10, 10};
-	double linear_braking_acceleration[6] = {25, 50, 20, 20, 20, 20};*/
+	/*vector3D linear_max_speed = vector3D(50.0, 50.0, 200.0);
+	vector3D linear_force = vector3D(50000.0, 50000.0, 150000.0);
+	vector3D linear_drag_constant = vector3D(0.3, 0.3, 0.1);*/
+
 
 	vector3D angular_input;
 

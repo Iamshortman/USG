@@ -39,6 +39,24 @@
 		return this->orientation * vector3D(1.0f, 0.0f, 0.0f); 
 	}
 
+	vector3D Transform::getDirection(int i) const
+	{
+		if (i == 0)
+		{
+			return this->getLeft();
+		}
+		else if (i == 1)
+		{
+			return this->getUp();
+		}
+		else if (i == 2)
+		{
+			return this->getForward();
+		}
+
+		return vector3D(0.0);
+	}
+
 	quaternionD Transform::getOrientation() const 
 	{ 
 		return this->orientation; 

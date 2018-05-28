@@ -86,6 +86,8 @@ public:
 			{
 				return game_object;
 			}
+
+			game_object = game_object->parent;
 		}
 
 		return nullptr;
@@ -109,6 +111,8 @@ public:
 			{
 				return game_object;
 			}
+
+			game_object = game_object->parent;
 		}
 
 		return nullptr;
