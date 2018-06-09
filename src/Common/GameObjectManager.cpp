@@ -89,17 +89,6 @@ void parseComponents(GameObject* game_object, json json_component)
 		string ambient_shader = json_model["ambient_shader"].as_string();
 		game_object->addComponentNoEnable<ComponentModel>(file_path, texture, ambient_shader, "", "");
 	}
-	
-	if (json_component.has_member("rigidBody"))
-	{
-		game_object->addComponentNoEnable<RigidBody>();
-
-		if (json_component.has_member("inertiaTensor"))
-		{
-			vector<double> pos = json_component["rigidBody"]["inertiaTensor"].as<vector<double>>();
-			//game_object->getComponent<RigidBody>()->setInertiaTensor(vector3D(pos[0], pos[1], pos[2]));
-		}
-	}
 
 	if (json_component.has_member("mass"))
 	{
@@ -143,15 +132,6 @@ GameObject* parseGameObject(json json_game_object)
 	{
 		json components = json_game_object["components"];
 		parseComponents(game_object, components);
-	}
-
-	if (json_game_object.has_member("children"))
-	{
-		json children = json_game_object["children"];
-		for (int i = 0; i < children.size(); i++)
-		{
-			game_object->addChild(parseGameObject(children[i]));
-		}
 	}
 
 	return game_object;

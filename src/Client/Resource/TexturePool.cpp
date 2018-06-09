@@ -18,13 +18,10 @@ TexturePool::TexturePool()
 
 }
 
-#define STB_IMAGE_IMPLEMENTATION
-#include "Client/Resource/stb_image.h"
-
 GLuint TexturePool::loadResource(string name)
 {
 	int width, height, numComponents;
-	unsigned char* data = stbi_load((name).c_str(), &width, &height, &numComponents, 4);
+	unsigned char* data = load_png((name).c_str(), &width, &height, &numComponents, 4);
 
 	if (data == NULL)
 	{
@@ -42,7 +39,7 @@ GLuint TexturePool::loadResource(string name)
 	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
-	stbi_image_free(data);
+	unload_png(data);
 
 	return texture;
 }
@@ -50,4 +47,17 @@ GLuint TexturePool::loadResource(string name)
 void TexturePool::unloadResource(GLuint texture)
 {
 	glDeleteTextures(1, &texture);
+}
+
+#define STB_IMAGE_IMPLEMENTATION
+#include "Client/Resource/stb_image.h"
+
+unsigned char* load_png(char const *filename, int *x, int *y, int *comp, int req_comp)
+{
+	return stbi_load(filename, x, y, comp, req_comp);
+}
+
+void unload_png(void *retval_from_stbi_load)
+{
+	stbi_image_free(retval_from_stbi_load);
 }

@@ -29,6 +29,9 @@ public:
 	virtual void update(Client* client, double delta_time);
 
 private:
+	GameObject * camera;
+	GameObject* target;
+
 	Camera* scene_camera;
 	GameObject* scene_root;
 };

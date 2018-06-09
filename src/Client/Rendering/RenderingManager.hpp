@@ -7,7 +7,7 @@
 #include "Client/Resource/TexturePool.hpp"
 #include "Client/Resource/TexturedMesh.hpp"
 #include "Client/Rendering/G_Buffer.hpp"
-
+#include "Client/Rendering/Skybox.hpp"
 
 #include "Common/Resource/Mesh.hpp"
 #include "Common/GLM_Include.hpp"
@@ -25,12 +25,12 @@ public:
 
 	void RenderModel(ComponentModel* model, Camera* camera);
 
-
 private:
+	Skybox* skybox = nullptr;
+
 	Window* window = nullptr;
 
 	bool use_lighting = true;
-
 
 	//Deferred Shading
 	G_Buffer* g_buffer = nullptr;

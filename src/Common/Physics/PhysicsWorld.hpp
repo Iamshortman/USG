@@ -1,7 +1,6 @@
 #ifndef PHYSICSWORLD_HPP
 #define PHYSICSWORLD_HPP
 
-#include "Common/Component.hpp"
 #include "Common/Physics/Bullet_Include.hpp"
 #include "Common/Physics/RigidBody.hpp"
 #include <set>
@@ -17,16 +16,14 @@ struct SingleRayTestResult
 	int bodyId = 0;
 };
 
-class PhysicsWorld : public Component
+class PhysicsWorld
 {
 
 public:
 	PhysicsWorld();
 	virtual ~PhysicsWorld();
 
-	virtual void update(double delta_time) override;
-	virtual void enable() override;
-	virtual void disable() override;
+	virtual void update(double delta_time);
 
 	void addRigidBody(RigidBody* rigidBody);
 	void removeRigidBody(RigidBody* rigidBody);

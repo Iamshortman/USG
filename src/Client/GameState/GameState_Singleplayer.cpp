@@ -8,32 +8,24 @@
 #include "Client/Rendering/Camera.hpp"
 #include "Common/Component/ComponentModel.hpp"
 
+#include "Common/Component/ComponentShipFlight.hpp"
+
 #include "Common/Physics/PhysicsWorld.hpp"
 
 GameState_Singleplayer::GameState_Singleplayer()
 {
-	this->scene_root = GameObjectManager::getInstance()->createGameObject();
-	this->scene_root->addComponent<PhysicsWorld>();
-
-	GameObject* ship = GameObjectManager::getInstance()->createGameObjectFromJson("res/json/test.json");
-	this->scene_root->addChild(ship);
-
-	GameObject* camera = GameObjectManager::getInstance()->createGameObject();
-	camera->addComponent<Camera>();
-	camera->addComponent<DebugCamera>(5.0, 1.0);
-	scene_camera = camera->getComponent<Camera>();
-	camera->setLocalTransform(Transform(vector3D(0.0, 2.0, -8.0)));
-	this->scene_root->addChild(camera);
+	//this->scene_root = GameObjectManager::getInstance()->createGameObject();
+	//this->scene_root->addComponent<PhysicsWorld>();
 }
 
 GameState_Singleplayer::~GameState_Singleplayer()
 {
-	delete this->scene_root;
+	//delete this->scene_root;
 }
 
 void GameState_Singleplayer::update(Client* client, double delta_time)
 {
-	this->scene_root->update(delta_time);
+	//this->scene_root->update(delta_time);
 
-	client->renderingManager->renderScene(scene_root, scene_camera);
+	//client->renderingManager->renderScene(scene_root, scene_camera);
 }

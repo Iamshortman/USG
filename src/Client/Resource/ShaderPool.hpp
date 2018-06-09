@@ -10,12 +10,12 @@ class ShaderPool : public ResourcePool<ShaderProgram*>
 public:
 	static ShaderPool*  getInstance();
 
+	virtual ShaderProgram* loadResource(string name);
+	virtual void unloadResource(ShaderProgram* resource);
+
 protected:
 	//Instance for the Singleton design pattern;
 	static ShaderPool* instance;
 	ShaderPool();
-
-	virtual ShaderProgram* loadResource(string name);
-	virtual void unloadResource(ShaderProgram* resource);
 };
 #endif //SHADERPOOL_HPP

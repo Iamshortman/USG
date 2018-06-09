@@ -16,12 +16,6 @@ public:
 
 	virtual void update(double delta_Time);
 
-	//GameObject* getParent();
-	virtual void addChild(GameObject* game_object);
-	virtual void removeChild(GameObject* game_object);
-
-	virtual void onParentChange(GameObject* new_parent);
-
 	template<typename T, typename... TArgs> void addComponent(TArgs&&... mArgs)
 	{
 		if (!this->hasComponent<T>())
@@ -75,57 +69,10 @@ public:
 		}
 	};
 
-	//Returns the first parent object with this component
-	template<typename T> GameObject* findParentWith()
-	{
-		GameObject* game_object = this->parent;
-
-		while (game_object != nullptr)
-		{
-			if (game_object->hasComponent<T>())
-			{
-				return game_object;
-			}
-
-			game_object = game_object->parent;
-		}
-
-		return nullptr;
-	}
-
-	//Returns the first parent object with this component
-	//If the second component is found first return nullptr
-	template<typename T, typename S> GameObject* findParentWithFirst_StopIfSecond()
-	{
-		GameObject* game_object = this->parent;
-
-		while (game_object != nullptr)
-		{
-			if (game_object->hasComponent<S>())
-			{
-				//Found the second component
-				return nullptr;
-			}
-
-			if (game_object->hasComponent<T>())
-			{
-				return game_object;
-			}
-
-			game_object = game_object->parent;
-		}
-
-		return nullptr;
-	}
-
 	virtual void setLocalTransform(Transform transform);
 	virtual Transform getLocalTransform();
 	Transform getGlobalTransform();
-	Transform getRelitiveTransform(GameObject* parent);
 
-
-	GameObject* parent = nullptr;
-	std::set<GameObject*> children;
 	std::map<size_t, Component*> component_map;
 
 	const GameObjectId object_Id;

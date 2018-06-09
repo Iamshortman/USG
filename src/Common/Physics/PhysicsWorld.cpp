@@ -19,9 +19,7 @@ PhysicsWorld::PhysicsWorld()
 
 PhysicsWorld::~PhysicsWorld()
 {
-	this->disable();
-
-	// Clean up behind ourselves like good little programmers
+	// Clean up after ourselves like good little programmers
 	delete dynamicsWorld;
 	delete solver;
 	delete dispatcher;
@@ -31,26 +29,8 @@ PhysicsWorld::~PhysicsWorld()
 
 void PhysicsWorld::update(double delta_time)
 {
-	if (this->enabled)
-	{
-		//Run Physics Simulation
-		this->dynamicsWorld->stepSimulation(delta_time, 8, 1.0 / 120.0);
-	}
-}
-
-void PhysicsWorld::enable()
-{
-	Component::enable();
-}
-
-void PhysicsWorld::disable()
-{
-	for (RigidBody* right_body : this->rigid_bodies)
-	{
-		right_body->disable();
-	}
-
-	Component::disable();
+	//Run Physics Simulation
+	this->dynamicsWorld->stepSimulation(delta_time, 8, 1.0 / 120.0);
 }
 
 void PhysicsWorld::addRigidBody(RigidBody* rigidBody)

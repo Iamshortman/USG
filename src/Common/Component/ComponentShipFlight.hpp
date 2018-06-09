@@ -6,17 +6,6 @@
 #include "Common/GLM_Include.hpp"
 #include "Common/Rotation.hpp"
 
-
-const vector3B Directions3D[] =
-{
-	vector3B(0.0, 0.0, 1.0),
-	vector3B(0.0, 0.0, -1.0),
-	vector3B(0.0, 1.0, 0.0),
-	vector3B(0.0, -1.0, 0.0),
-	vector3B(1.0, 0.0, 0.0),
-	vector3B(-1.0, 0.0, 0.0),
-};
-
 class ComponentShipFlight : public Component
 {
 public:
@@ -27,14 +16,11 @@ public:
 
 	vector3D linear_input;
 
-	vector3D linear_max_speed = vector3D(50.0, 50.0, 200.0);
-	vector3D linear_acceleration = vector3D(10.0, 10.0, 30.0);
-	vector3D linear_braking_acceleration = vector3D(20.0, 20.0, 60.0);
+	double linear_max_speed[6] =	{ 50.0, 50.0, 50.0, 50.0, 500.0, 50.0 };
+	double linear_acceleration[6] = { 2.0, 2.0, 2.0, 2.0, 5.0, 2.0 };
+	double linear_braking_expo[6] = { 0.01, 0.01, 0.01, 0.01, 0.01, 0.01 };
 
-	/*vector3D linear_max_speed = vector3D(50.0, 50.0, 200.0);
-	vector3D linear_force = vector3D(50000.0, 50000.0, 150000.0);
-	vector3D linear_drag_constant = vector3D(0.3, 0.3, 0.1);*/
-
+	double linear_aero_drag[6] = { 0.2, 0.2, 0.2, 0.2, 0.01, 0.2 };
 
 	vector3D angular_input;
 

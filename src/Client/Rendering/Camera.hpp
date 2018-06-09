@@ -16,14 +16,12 @@ public:
 	matrix4 getOrthographicMatrix(float x_bounds, float y_bounds);
 
 	matrix4 getOriginViewMatrix();
-
-	void setProjection(float frame_of_view, float z_near, float z_far);
-
 	vector3D getPosition();
+
+	float frame_of_view = 70.0f;
 
 private:
 	//Perspective varables
-	float frame_of_view = 70.0f;
 	float z_near = 0.1f;
 	float z_far = 1000.0f;
 };

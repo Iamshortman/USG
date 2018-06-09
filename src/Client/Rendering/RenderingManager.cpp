@@ -45,6 +45,8 @@ RenderingManager::RenderingManager(Window* window)
 	this->full_screen_quad_program = new ShaderProgram("res/shaders/ScreenTexture.vs", "res/shaders/ScreenTexture.fs");
 
 	ShaderPool::getInstance()->getUsing("res/shaders/Textured");
+
+	//this->skybox = new Skybox("res/textures/Skybox/space", "res/shaders/Skybox");
 }
 
 RenderingManager::~RenderingManager()
@@ -69,42 +71,19 @@ void RenderingManager::renderScene(GameObject* scene_root, Camera* camera)
 		this->ms_g_buffer = new G_Buffer(windowWidth, windowHeight, true, 8);
 	}
 
-	//discovery mode
-	std::stack<GameObject*> nodes;
-	nodes.push(scene_root);
-
 	std::set<ComponentModel*> models;
 	std::set<void*> lights;
 	std::set<void*> models_transparent;
-	
-	while (!nodes.empty())
-	{
-		GameObject* node = nodes.top();
-		nodes.pop();
-
-
-		if (node->hasComponent<Component>())//TODO Distance Culling
-		{
-
-		}
-
-		if (node->hasComponent<ComponentModel>())
-		{
-			ComponentModel* model = node->getComponent<ComponentModel>();
-			if (model->isEnabled())
-			{
-				models.insert(model);
-			}
-		}
-
-		for (GameObject* child : node->children)
-		{
-			nodes.push(child);
-		}
-	}
 
 	glBindFramebuffer(GL_FRAMEBUFFER, this->ms_g_buffer->getFBO());
 	this->ms_g_buffer->clearBuffer();
+
+	if (this->skybox != nullptr)
+	{
+		this->skybox->draw(camera, bufferWidth, bufferHeight);
+		//glClearDepth(0.0f);
+		//glClear(GL_DEPTH_BUFFER_BIT);
+	}
 
 	for (ComponentModel* model : models)
 	{

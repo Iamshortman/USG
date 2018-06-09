@@ -12,14 +12,11 @@ enum CollisionShapeType
 	Capsule,
 };
 
-class CollisionShape: public Component
+class CollisionShape
 {
 public:
 	CollisionShape();
 	~CollisionShape();
-
-	virtual void enable() override;
-	virtual void disable() override;
 
 	void setBox(vector3D half_length);
 	void setCapsule(double radius, double height);

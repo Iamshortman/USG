@@ -39,13 +39,6 @@ matrix4 Camera::getOriginViewMatrix()
 	return this->parent->getGlobalTransform().getOriginViewMatrix();
 }
 
-void Camera::setProjection(float frame_of_view, float z_near, float z_far)
-{
-	this->frame_of_view = frame_of_view;
-	this->z_near = z_near;
-	this->z_far = z_far;
-}
-
 vector3D Camera::getPosition()
 {
 	return this->parent->getGlobalTransform().getPosition();

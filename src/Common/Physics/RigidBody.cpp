@@ -18,7 +18,6 @@ RigidBody::RigidBody(bool is_static)
 
 RigidBody::~RigidBody()
 {
-	this->disable();
 
 	if (this->compoundShape != nullptr)
 	{
@@ -28,64 +27,6 @@ RigidBody::~RigidBody()
 	if (this->emptyShape != nullptr)
 	{
 		delete this->emptyShape;
-	}
-}
-
-void RigidBody::enable()
-{
-	if (!this->enabled)
-	{
-		if (this->parent->parent != nullptr)
-		{
-			if (this->parent->parent->hasComponent<PhysicsWorld>())
-			{
-				double mass = 0.0;
-					
-				if (this->parent->hasComponent<ComponentMass>() && !this->is_static)
-				{
-					mass = this->parent->getComponent<ComponentMass>()->getTotalMass();
-				}
-
-				btDefaultMotionState* motionState = new btDefaultMotionState();
-				btRigidBody::btRigidBodyConstructionInfo boxRigidBodyCI(mass, motionState, this->emptyShape, btVector3(0.0, 0.0, 0.0));
-				this->rigidBody = new btRigidBody(boxRigidBodyCI);
-
-				this->world = parent->parent->getComponent<PhysicsWorld>();
-				this->world->addRigidBody(this);
-				this->rigidBody->setUserPointer(this->parent);
-				this->rigidBody->setWorldTransform(toBtTransform(this->parent->getLocalTransform()));
-				Component::enable();
-			}
-			else
-			{
-				Logger::getInstance()->logError("RigidBody->enable() No World\n");
-			}
-		}
-		else
-		{
-			Logger::getInstance()->logError("RigidBody->enable() No Parent\n");
-		}
-
-		Component::enable();
-	}
-}
-
-void RigidBody::disable()
-{
-	if (this->enabled)
-	{
-		if (this->world != nullptr)
-		{
-			this->world->removeRigidBody(this);
-			this->world = nullptr;
-		}
-
-		if (this->rigidBody != nullptr)
-		{
-			delete this->rigidBody;
-		}
-
-		Component::disable();
 	}
 }
 

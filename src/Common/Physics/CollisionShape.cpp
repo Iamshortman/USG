@@ -13,34 +13,6 @@ CollisionShape::~CollisionShape()
 {
 }
 
-void CollisionShape::enable()
-{
-	if (!this->enabled)
-	{
-		GameObject* game_object = this->parent->findParentWithFirst_StopIfSecond<RigidBody, PhysicsWorld>();
-		if (game_object != nullptr)
-		{
-			this->index = game_object->getComponent<RigidBody>()->addChildShape(this);
-			Component::enable();
-		}
-	}
-}
-
-void CollisionShape::disable()
-{
-	if (this->enabled)
-	{
-		GameObject* game_object = this->parent->findParentWithFirst_StopIfSecond<RigidBody, PhysicsWorld>();
-		if (game_object != nullptr)
-		{
-			game_object->getComponent<RigidBody>()->removeChildShape(this->index);
-			this->index = -1;
-		}
-
-		Component::disable();
-	}
-}
-
 void CollisionShape::setBox(vector3D half_length)
 {
 	if (this->shape != nullptr)

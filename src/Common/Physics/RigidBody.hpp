@@ -1,8 +1,6 @@
 #ifndef RIGIDBODY_HPP
 #define RIGIDBODY_HPP
 
-#include "Common/Component.hpp"
-
 #include <unordered_map>
 
 #include "Common/Physics/Bullet_Include.hpp"
@@ -13,14 +11,11 @@
 //Prototype Class
 class PhysicsWorld;
 
-class RigidBody : public Component
+class RigidBody
 {
 public:
 	RigidBody(bool is_static = false);
 	virtual ~RigidBody();
-
-	virtual void enable() override;
-	virtual void disable() override;
 
 	int addChildShape(CollisionShape* shape);
 	GameObject* getChildNode(int id);
