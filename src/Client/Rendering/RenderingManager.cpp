@@ -57,7 +57,7 @@ RenderingManager::~RenderingManager()
 	delete this->full_screen_quad_program;
 }
 
-void RenderingManager::renderScene(GameObject* scene_root, Camera* camera)
+void RenderingManager::renderScene(Entity* scene_root, Camera* camera)
 {
 	int windowWidth, windowHeight, bufferWidth, bufferHeight;
 	this->window->getWindowSize(windowWidth, windowHeight);

@@ -1,6 +1,6 @@
 #include "CollisionShape.hpp"
 
-#include "Common/GameObject.hpp"
+#include "Common/Entity/Entity.hpp"
 #include "Common/Physics/Bullet_Include.hpp"
 #include "Common/Physics/RigidBody.hpp"
 #include "Common/Physics/PhysicsWorld.hpp"

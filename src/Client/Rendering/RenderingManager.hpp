@@ -12,7 +12,7 @@
 #include "Common/Resource/Mesh.hpp"
 #include "Common/GLM_Include.hpp"
 
-#include "Common/GameObject.hpp"
+#include "Common/Entity/Entity.hpp"
 #include "Common/Component/ComponentModel.hpp"
 
 class RenderingManager
@@ -21,7 +21,7 @@ public:
 	RenderingManager(Window* window);
 	virtual ~RenderingManager();
 
-	void renderScene(GameObject* scene_root, Camera* camera);
+	void renderScene(Entity* scene_root, Camera* camera);
 
 	void RenderModel(ComponentModel* model, Camera* camera);
 

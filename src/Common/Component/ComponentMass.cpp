@@ -1,6 +1,6 @@
 #include "ComponentMass.hpp"
 
-#include "Common/GameObject.hpp"
+#include "Common/Entity/Entity.hpp"
 
 ComponentMass::ComponentMass(double mass)
 {

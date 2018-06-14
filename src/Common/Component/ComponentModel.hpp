@@ -1,7 +1,7 @@
 #ifndef COMPONENT_MODEL_HPP
 #define COMPONENT_MODEL_HPP 
 
-#include "Common/Component.hpp"
+#include "Common/Component/Component.hpp"
 #include "Common/Types.hpp"
 
 class ComponentModel : public Component

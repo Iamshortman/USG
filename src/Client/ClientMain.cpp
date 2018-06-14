@@ -2,7 +2,7 @@
 
 #include "Client/Input/InputManager.hpp"
 
-#include "Common/GameObjectManager.hpp"
+#include "Common/Entity/EntityManager.hpp"
 
 #include "Common/Logger/Logger.hpp"
 

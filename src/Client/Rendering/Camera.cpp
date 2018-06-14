@@ -1,5 +1,5 @@
 #include "Camera.hpp"
-#include "Common/GameObject.hpp"
+#include "Common/Entity/Entity.hpp"
 
 Camera::Camera()
 {

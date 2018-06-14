@@ -3,7 +3,7 @@
 
 //Prototype class
 class Client;
-class GameObject;
+class Entity;
 class Camera;
 
 class GameState
@@ -29,11 +29,11 @@ public:
 	virtual void update(Client* client, double delta_time);
 
 private:
-	GameObject * camera;
-	GameObject* target;
+	Entity * camera;
+	Entity* target;
 
 	Camera* scene_camera;
-	GameObject* scene_root;
+	Entity* scene_root;
 };
 
 class GameState_Multiplayer : public GameState

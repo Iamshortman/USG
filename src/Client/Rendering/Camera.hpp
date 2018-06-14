@@ -2,7 +2,7 @@
 #define CAMERA_HPP
 
 
-#include "Common/Component.hpp"
+#include "Common/Component/Component.hpp"
 #include "Common/GLM_Include.hpp"
 #include "Client/Rendering/Window.hpp"
 

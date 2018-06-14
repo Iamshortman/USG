@@ -1,8 +1,8 @@
 #include "Client/GameState/GameState.hpp"
 #include "Client/Client.hpp"
 
-#include "Common/GameObject.hpp"
-#include "Common/GameObjectManager.hpp"
+#include "Common/Entity/Entity.hpp"
+#include "Common/Entity/EntityManager.hpp"
 
 #include "Client/Component/DebugCamera.hpp"
 #include "Client/Rendering/Camera.hpp"
@@ -14,7 +14,7 @@
 
 GameState_Singleplayer::GameState_Singleplayer()
 {
-	//this->scene_root = GameObjectManager::getInstance()->createGameObject();
+	//this->scene_root = EntityManager::getInstance()->createEntity();
 	//this->scene_root->addComponent<PhysicsWorld>();
 }
 

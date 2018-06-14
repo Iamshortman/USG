@@ -1,24 +1,24 @@
 #ifndef COMPONENT_HPP
 #define COMPONENT_HPP
 
-class GameObject;
+class Entity;
 class Component
 {
 public:
 	Component() {};
 	virtual void update(double delta_time) {};
 
-	GameObject* getParent() { return this->parent; };
+	Entity* getParent() { return this->parent; };
 
 	virtual void enable() { this->enabled = true; };
 	virtual void disable() { this->enabled = false; };
 	virtual bool isEnabled() { return this->enabled; };
 
 protected:
-	GameObject * parent;
+	Entity* parent;
 	bool enabled = false;
 
-	friend class GameObject;
+	friend class Entity;
 };
 
 #endif //COMPONENT_HPP

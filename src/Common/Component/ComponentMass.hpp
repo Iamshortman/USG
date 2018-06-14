@@ -1,7 +1,7 @@
 #ifndef COMPONENT_MASS_HPP
 #define COMPONENT_MASS_HPP
 
-#include "Common/Component.hpp"
+#include "Common/Component/Component.hpp"
 #include <set>
 
 class ComponentMass : public Component

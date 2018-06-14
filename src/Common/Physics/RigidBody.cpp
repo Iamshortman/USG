@@ -1,67 +1,44 @@
 #include "Common/Physics/RigidBody.hpp"
 
-#include "Common/GameObject.hpp"
+#include "Common/Entity/Entity.hpp"
 #include "Common/Physics/PhysicsWorld.hpp"
-#include "Common/Component/ComponentMass.hpp"
 
 #include "Common/Logger/Logger.hpp"
 
-#define DEFAULT_MASS 100.0
-
-RigidBody::RigidBody(bool is_static)
-	:is_static(is_static)
+RigidBody::RigidBody(Entity* entity)
 {
-	this->emptyShape = new btEmptyShape();
-
-	//btCollisionShape* shape = new btBoxShape(btVector3(0.5, 0.5, 0.5));
+	this->parent = entity;
 }
 
 RigidBody::~RigidBody()
 {
-
-	if (this->compoundShape != nullptr)
+	if (this->rigidBody != nullptr)
 	{
-		delete this->compoundShape;
+		delete this->rigidBody;
 	}
 
-	if (this->emptyShape != nullptr)
-	{
-		delete this->emptyShape;
-	}
 }
 
-int RigidBody::addChildShape(CollisionShape* shape)
+void RigidBody::setMass(double massToAdd)
 {
-	int id = getNextId();
-
-	this->childShapes[id] = shape;
-
-	return id;
+	this->mass = massToAdd;
+	this->rigidBody->setMassProps(this->mass, toBtVec3(this->inertia));
 }
 
-GameObject* RigidBody::getChildNode(int id)
+double RigidBody::getMass()
 {
-	if (id < 0)
-	{
-		return nullptr;
-	}
-
-	if (this->childShapes.find(id) != this->childShapes.end())
-	{
-		return this->childShapes[id]->getParent();
-	}
-
-	return nullptr;
+	return this->mass;
 }
 
-void RigidBody::removeChildShape(int id)
+void RigidBody::setInertiaTensor(vector3D inertiaToSet)
 {
-	if (id < 0)
-	{
-		return;
-	}
+	this->inertia = inertiaToSet;
+	this->rigidBody->setMassProps(this->mass, toBtVec3(this->inertia));
+}
 
-	this->childShapes.erase(id);
+vector3D RigidBody::getInertiaTensor()
+{
+	return this->inertia;
 }
 
 void RigidBody::Activate(bool activate)
@@ -137,16 +114,4 @@ void RigidBody::setDampening(double linear, double angular)
 btRigidBody* RigidBody::getRigidBody()
 {
 	return this->rigidBody;
-}
-
-int RigidBody::getNextId()
-{
-	int id = 0;
-
-	while (this->childShapes.find(id) != this->childShapes.end())
-	{
-		id++;
-	}
-
-	return id;
 }

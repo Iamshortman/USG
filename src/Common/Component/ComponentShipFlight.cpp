@@ -1,6 +1,6 @@
 #include "ComponentShipFlight.hpp"
 
-#include "Common/GameObject.hpp"
+#include "Common/Entity/Entity.hpp"
 #include "Common/Physics/RigidBody.hpp"
 
 #ifdef CLIENT

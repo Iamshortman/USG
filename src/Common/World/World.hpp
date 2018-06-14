@@ -8,7 +8,7 @@ class World;
 #include <set>
 #include <algorithm>
 
-#include "Common/GameObject.hpp"
+#include "Common/Entity/Entity.hpp"
 #include "Common/Physics/PhysicsWorld.hpp"
 
 typedef uint32_t WorldId;
@@ -20,14 +20,13 @@ public:
 	vector3F ambientLight = vector3F(0.4f);
 
 	const WorldId worldId;
-
 	World(WorldId id);
 	virtual ~World();
 	virtual void update(double deltaTime);
 
-	void addEntityToWorld(GameObject* entity);
-	void removeEntityFromWorld(GameObject* entity);
-	std::set<GameObject*>* getEntitiesInWorld();
+	void addEntityToWorld(Entity* entity);
+	void removeEntityFromWorld(Entity* entity);
+	std::set<Entity*>* getEntitiesInWorld();
 
 	void addRigidBody(RigidBody* rigidBody);
 	void removeRigidBody(RigidBody* entity);
@@ -40,24 +39,24 @@ public:
 	void setGravity(vector3D gravity);
 
 	SingleRayTestResult singleRayTest(vector3D startPos, vector3D endPos);
-	SingleRayTestResult singleRayTestNotMe(vector3D startPos, vector3D endPos, GameObject* me);
+	SingleRayTestResult singleRayTestNotMe(vector3D startPos, vector3D endPos, Entity* me);
 
-	void setParent(GameObject* entity);
-	GameObject* getParent();
+	void setParent(Entity* entity);
+	Entity* getParent();
 
 	bool hasParentWorld();
 	World* getParentWorld();
 
-	Transform getWorldOffsetMatrix();
-	
+	Transform getWorldOffset();
+
 protected:
 	PhysicsWorld* physicsWorld = nullptr;
 
-	GameObject* parent = nullptr;
-
-	std::set<GameObject*> entitiesInWorld;
-	std::set<World*> subWorlds;
+	Entity* parent = nullptr;
 	World* parentWorld = nullptr;
+
+	std::set<Entity*> entitiesInWorld;
+	std::set<World*> subWorlds;
 };
 
 #endif //WORLD_HPP

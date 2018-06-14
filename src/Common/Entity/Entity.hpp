@@ -1,18 +1,25 @@
-#ifndef GAME_OBJECT_HPP
-#define GAME_OBJECT_HPP
+#ifndef ENTITY_HPP
+#define ENTITY_HPP
 
 #include <set>
 #include <map>
 
 #include "Common/Transform.hpp"
-#include "Common/Component.hpp"
+#include "Common/Component/Component.hpp"
+#include "Common/Physics/RigidBody.hpp"
 
-typedef uint32_t GameObjectId;
+//Prototype Classe
+class World;
 
-class GameObject
+typedef uint32_t EntityId;
+
+class Entity
 {
 public:
-	virtual ~GameObject();
+	virtual ~Entity();
+
+	inline bool isAlive() { return this->alive; };
+	inline void kill() { this->alive = false; };
 
 	virtual void update(double delta_Time);
 
@@ -75,13 +82,18 @@ public:
 
 	std::map<size_t, Component*> component_map;
 
-	const GameObjectId object_Id;
+	const EntityId entityId;
 protected:
 	Transform local_transform;
 
-	GameObject(GameObjectId objectId); //protected for GameObjectManager use only
-	friend class GameObjectManager;
+	World* world = nullptr;
+	bool alive = true;
+
+	RigidBody* rigidBody;
+
+	Entity(EntityId objectId); //protected for EntityManager use only
+	friend class EntityManager;
 };
 
 
-#endif //GAME_OBJECT_HPP
+#endif //ENTITY_HPP

@@ -9,23 +9,21 @@
 #include "Common/Transform.hpp"
 
 //Prototype Class
+class Entity;
 class PhysicsWorld;
+
 
 class RigidBody
 {
 public:
-	RigidBody(bool is_static = false);
+	RigidBody(Entity* entity);
 	virtual ~RigidBody();
 
-	int addChildShape(CollisionShape* shape);
-	GameObject* getChildNode(int id);
-	void removeChildShape(int id);
-
-	/*void setMass(double massToAdd);
+	void setMass(double massToAdd);
 	double getMass();
 
 	void setInertiaTensor(vector3D inertia);
-	vector3D getInertiaTensor();*/
+	vector3D getInertiaTensor();
 
 	void Activate(bool activate);
 
@@ -51,17 +49,13 @@ public:
 
 	btRigidBody* getRigidBody();
 
-private:
-	const bool is_static;
+protected:
+	double mass = 1.0;
+	vector3D inertia = vector3D(0.0);
 
 	btRigidBody* rigidBody = nullptr;
-	btCompoundShape* compoundShape = nullptr;
-	std::unordered_map<int, CollisionShape*> childShapes;
-	btEmptyShape* emptyShape = nullptr;
 
-	PhysicsWorld* world = nullptr;
-
-	int getNextId();
+	Entity* parent = nullptr;
 };
 
 #endif //RIGIDBODY_HPP

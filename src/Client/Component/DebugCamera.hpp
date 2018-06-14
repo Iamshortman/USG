@@ -1,7 +1,7 @@
 #ifndef PLAYERCONTROL_HPP
 #define PLAYERCONTROL_HPP
 
-#include "Common/Component.hpp"
+#include "Common/Component/Component.hpp"
 
 struct DebugCamera : public Component
 {

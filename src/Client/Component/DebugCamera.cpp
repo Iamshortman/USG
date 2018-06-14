@@ -1,6 +1,6 @@
 #include "DebugCamera.hpp"
 
-#include "Common/GameObject.hpp"
+#include "Common/Entity/Entity.hpp"
 #include "Client/Input/InputManager.hpp"
 
 DebugCamera::DebugCamera(double linear, double angular)
