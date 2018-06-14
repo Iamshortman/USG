@@ -8,7 +8,7 @@
 struct SingleRayTestResult
 {
 	bool hasHit = false;
-	GameObject* gameObject = nullptr;
+	void* entity = nullptr;
 	const btRigidBody* hitBody;
 	vector3D hitPosition;
 	vector3D hitNormal;
@@ -29,7 +29,7 @@ public:
 	void removeRigidBody(RigidBody* rigidBody);
 
 	SingleRayTestResult singleRayTest(vector3D startPos, vector3D endPos);
-	SingleRayTestResult singleRayTestNotMe(vector3D startPos, vector3D endPos, GameObject* me);
+	SingleRayTestResult singleRayTestNotMe(vector3D startPos, vector3D endPos, void* me);
 	btDiscreteDynamicsWorld* dynamicsWorld = nullptr;
 
 protected:

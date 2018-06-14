@@ -28,6 +28,7 @@ link_directories(lib/assimp-3.3.1/build/code/Debug/)
 link_directories(lib/assimp-3.3.1/build/contrib/zlib/Debug/)
 link_directories(lib/angelscript_2.31.2/sdk/angelscript/lib/)
 link_directories(lib/RakNet-master/build/Lib/DLL/Debug/)
+link_directories(lib/entityx-1.1.2/build/Debug)
 
 #Create Projects
 add_executable(Client ${CLIENT_SOURCES} ${CLIENT_HEADERS} ${COMMON_SOURCES} ${COMMON_HEADERS})
@@ -85,3 +86,8 @@ target_link_libraries (Server angelscript64d)
 include_directories(lib/RakNet-master/source/)
 target_link_libraries (Client RakNetDLL)
 target_link_libraries (Server RakNetDLL)
+
+#Entityx
+include_directories(lib/entityx-1.1.2)
+target_link_libraries (Client entityx-d)
+target_link_libraries (Server entityx-d)

@@ -110,7 +110,7 @@ void Skybox::draw(Camera* camera, int width, int height)
 	this->shader_program->setActiveProgram();
 	
 	this->shader_program->setUniform("projection", camera->getProjectionMatrix(width, height));
-	this->shader_program->setUniform("view", camera->getOriginViewMatrix());
+	//TODO: this->shader_program->setUniform("view", camera->getOriginViewMatrix());
 
 	glBindVertexArray(this->VAO);
 	glDrawArrays(GL_TRIANGLES, 0, 3);

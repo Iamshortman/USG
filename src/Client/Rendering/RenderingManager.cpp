@@ -45,8 +45,6 @@ RenderingManager::RenderingManager(Window* window)
 	this->full_screen_quad_program = new ShaderProgram("res/shaders/ScreenTexture.vs", "res/shaders/ScreenTexture.fs");
 
 	ShaderPool::getInstance()->getUsing("res/shaders/Textured");
-
-	//this->skybox = new Skybox("res/textures/Skybox/space", "res/shaders/Skybox");
 }
 
 RenderingManager::~RenderingManager()
@@ -57,7 +55,7 @@ RenderingManager::~RenderingManager()
 	delete this->full_screen_quad_program;
 }
 
-void RenderingManager::renderScene(GameObject* scene_root, Camera* camera)
+void RenderingManager::renderScene(entityx::EntityX &ecs_system)
 {
 	int windowWidth, windowHeight, bufferWidth, bufferHeight;
 	this->window->getWindowSize(windowWidth, windowHeight);
@@ -78,16 +76,14 @@ void RenderingManager::renderScene(GameObject* scene_root, Camera* camera)
 	glBindFramebuffer(GL_FRAMEBUFFER, this->ms_g_buffer->getFBO());
 	this->ms_g_buffer->clearBuffer();
 
-	if (this->skybox != nullptr)
+	for (Entity entity : ecs_system.entities.entities_with_components<ComponentModel, Transform>())
 	{
-		this->skybox->draw(camera, bufferWidth, bufferHeight);
-		//glClearDepth(0.0f);
-		//glClear(GL_DEPTH_BUFFER_BIT);
-	}
+		ComponentHandle<ComponentModel> model = entity.component<ComponentModel>();
+		ComponentHandle<Transform> transform = entity.component<Transform>();
 
-	for (ComponentModel* model : models)
-	{
-		this->RenderModel(model, camera);
+		Camera camera;
+
+		this->RenderModel(model.get(), &camera, getEntityTransform(entity), Transform());
 	}
 
 	this->g_buffer->clearBuffer();
@@ -144,11 +140,10 @@ void RenderingManager::renderScene(GameObject* scene_root, Camera* camera)
 	this->window->updateBuffer(); 
 }
 
-void RenderingManager::RenderModel(ComponentModel* model, Camera* camera)
+void RenderingManager::RenderModel(ComponentModel* model, Camera* camera, Transform model_transform, Transform camera_tranform)
 {
-	Transform globalTransform = model->getParent()->getGlobalTransform();
-	matrix4 modelMatrix = globalTransform.getModleMatrix(camera->getPosition());
-	matrix4 mvp = camera->getProjectionMatrix(this->window) * camera->getOriginViewMatrix() * modelMatrix;
+	matrix4 modelMatrix = model_transform.getModleMatrix(camera_tranform.getPosition());
+	matrix4 mvp = camera->getProjectionMatrix(this->window) * camera_tranform.getOriginViewMatrix() * modelMatrix;
 
 	vector3F ambientLight = vector3F(1.0f);//TODO ambient Light
 
@@ -163,7 +158,7 @@ void RenderingManager::RenderModel(ComponentModel* model, Camera* camera)
 	ambient_shader->setActiveProgram();
 	ambient_shader->setUniform("MVP", mvp);
 	ambient_shader->setUniform("modelMatrix", modelMatrix);
-	ambient_shader->setUniform("normalMatrix", globalTransform.getNormalMatrix());
+	ambient_shader->setUniform("normalMatrix", model_transform.getNormalMatrix());
 	ambient_shader->setUniform("ambientLight", ambientLight);
 
 	//ambient_shader->setUniform("texture1", TexturePool::getInstance()->get("res/textures/1K_Grid.png"));

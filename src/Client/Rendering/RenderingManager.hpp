@@ -12,8 +12,11 @@
 #include "Common/Resource/Mesh.hpp"
 #include "Common/GLM_Include.hpp"
 
-#include "Common/GameObject.hpp"
 #include "Common/Component/ComponentModel.hpp"
+
+#include "Common/Transform.hpp"
+
+#include "Common/EntityX_Include.hpp"
 
 class RenderingManager
 {
@@ -21,9 +24,9 @@ public:
 	RenderingManager(Window* window);
 	virtual ~RenderingManager();
 
-	void renderScene(GameObject* scene_root, Camera* camera);
+	void renderScene(EntityX &ecs_system);
 
-	void RenderModel(ComponentModel* model, Camera* camera);
+	void RenderModel(ComponentModel* model, Camera* camera, Transform model_transform, Transform camera_tranform);
 
 private:
 	Skybox* skybox = nullptr;
@@ -38,7 +41,6 @@ private:
 
 	ShaderProgram* full_screen_quad_program = nullptr;
 	TexturedMesh* full_screen_quad = nullptr;
-
 };
 
 #endif //RENDERINGMANAGER_HPP

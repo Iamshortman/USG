@@ -2,8 +2,6 @@
 
 #include "Client/Input/InputManager.hpp"
 
-#include "Common/GameObjectManager.hpp"
-
 #include "Common/Logger/Logger.hpp"
 
 int main()

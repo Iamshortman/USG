@@ -1,7 +1,6 @@
 #ifndef COLLISIONSHAPE_HPP
 #define COLLISIONSHAPE_HPP
 
-#include "Common/Component.hpp"
 #include "Common/GLM_Include.hpp"
 
 #include "BulletCollision/CollisionShapes/btCollisionShape.h"

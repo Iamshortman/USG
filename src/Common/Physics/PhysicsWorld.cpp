@@ -64,7 +64,7 @@ SingleRayTestResult PhysicsWorld::singleRayTest(vector3D startPos, vector3D endP
 		result.hitBody = hitBody;
 		result.hitPosition = toVec3(rayCallback.m_hitPointWorld);
 		result.hitNormal = toVec3(rayCallback.m_hitNormalWorld);
-		result.gameObject = (GameObject*)hitBody->getUserPointer();
+		result.entity = hitBody->getUserPointer();
 
 		if (rayCallback.m_bodyId != -1)
 		{
@@ -90,7 +90,7 @@ SingleRayTestResult PhysicsWorld::singleRayTest(vector3D startPos, vector3D endP
 	return result;
 }
 
-SingleRayTestResult PhysicsWorld::singleRayTestNotMe(vector3D startPos, vector3D endPos, GameObject* me)
+SingleRayTestResult PhysicsWorld::singleRayTestNotMe(vector3D startPos, vector3D endPos, void* me)
 {
 	btVector3 start = toBtVec3(startPos);
 	btVector3 end = toBtVec3(endPos);
@@ -134,7 +134,7 @@ SingleRayTestResult PhysicsWorld::singleRayTestNotMe(vector3D startPos, vector3D
 			result.hitBody = hitBody;
 			result.hitPosition = toVec3(rayCallback.m_hitPointWorld[closestHitIndex]);
 			result.hitNormal = toVec3(rayCallback.m_hitNormalWorld[closestHitIndex]);
-			result.gameObject = (GameObject*)hitBody->getUserPointer();
+			result.entity = hitBody->getUserPointer();
 		}
 
 	}

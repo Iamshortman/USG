@@ -18,7 +18,6 @@ public:
 	virtual ~RigidBody();
 
 	int addChildShape(CollisionShape* shape);
-	GameObject* getChildNode(int id);
 	void removeChildShape(int id);
 
 	/*void setMass(double massToAdd);
@@ -50,6 +49,8 @@ public:
 	void setDampening(double linear, double angular);
 
 	btRigidBody* getRigidBody();
+
+	bool enabled = false;
 
 private:
 	const bool is_static;

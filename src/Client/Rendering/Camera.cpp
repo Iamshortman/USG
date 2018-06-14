@@ -1,5 +1,4 @@
 #include "Camera.hpp"
-#include "Common/GameObject.hpp"
 
 Camera::Camera()
 {
@@ -32,14 +31,4 @@ matrix4 Camera::getProjectionMatrix(Window* window)
 matrix4 Camera::getOrthographicMatrix(float x_bounds, float y_bounds)
 {
 	return glm::ortho(-x_bounds, x_bounds, -y_bounds, y_bounds, this->z_near, this->z_far);
-}
-
-matrix4 Camera::getOriginViewMatrix()
-{
-	return this->parent->getGlobalTransform().getOriginViewMatrix();
-}
-
-vector3D Camera::getPosition()
-{
-	return this->parent->getGlobalTransform().getPosition();
 }

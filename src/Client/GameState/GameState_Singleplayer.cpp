@@ -1,31 +1,30 @@
-#include "Client/GameState/GameState.hpp"
+#include "Client/GameState/GameState_Singleplayer.hpp"
 #include "Client/Client.hpp"
 
-#include "Common/GameObject.hpp"
-#include "Common/GameObjectManager.hpp"
+#include "Common/Physics/PhysicsSystem.hpp"
 
-#include "Client/Component/DebugCamera.hpp"
-#include "Client/Rendering/Camera.hpp"
+#include "Common/Physics/RigidBody.hpp"
 #include "Common/Component/ComponentModel.hpp"
-
-#include "Common/Component/ComponentShipFlight.hpp"
-
-#include "Common/Physics/PhysicsWorld.hpp"
 
 GameState_Singleplayer::GameState_Singleplayer()
 {
-	//this->scene_root = GameObjectManager::getInstance()->createGameObject();
-	//this->scene_root->addComponent<PhysicsWorld>();
+	this->ecs_system.systems.add<PhysicsSystem>();
+	this->ecs_system.systems.configure();
+
+	Entity entity = this->ecs_system.entities.create();
+	entity.assign<Transform>(vector3D(0.0, -2.0, 10.0));
+	entity.assign<ComponentModel>("res/models/A-Wing/a-wing-body.obj", "res/textures/A-Wing/a-wing-body.png", "res/shaders/Textured", "", "");
+	entity.assign<RigidBody>();
 }
 
 GameState_Singleplayer::~GameState_Singleplayer()
 {
-	//delete this->scene_root;
+	this->ecs_system.entities.reset();
 }
 
 void GameState_Singleplayer::update(Client* client, double delta_time)
 {
-	//this->scene_root->update(delta_time);
+	this->ecs_system.systems.update_all((entityx::TimeDelta) delta_time);
 
-	//client->renderingManager->renderScene(scene_root, scene_camera);
+	client->renderingManager->renderScene(this->ecs_system);
 }

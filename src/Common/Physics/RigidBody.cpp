@@ -1,8 +1,6 @@
 #include "Common/Physics/RigidBody.hpp"
 
-#include "Common/GameObject.hpp"
 #include "Common/Physics/PhysicsWorld.hpp"
-#include "Common/Component/ComponentMass.hpp"
 
 #include "Common/Logger/Logger.hpp"
 
@@ -37,21 +35,6 @@ int RigidBody::addChildShape(CollisionShape* shape)
 	this->childShapes[id] = shape;
 
 	return id;
-}
-
-GameObject* RigidBody::getChildNode(int id)
-{
-	if (id < 0)
-	{
-		return nullptr;
-	}
-
-	if (this->childShapes.find(id) != this->childShapes.end())
-	{
-		return this->childShapes[id]->getParent();
-	}
-
-	return nullptr;
 }
 
 void RigidBody::removeChildShape(int id)

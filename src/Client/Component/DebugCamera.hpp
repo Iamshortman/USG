@@ -1,9 +1,7 @@
 #ifndef PLAYERCONTROL_HPP
 #define PLAYERCONTROL_HPP
 
-#include "Common/Component.hpp"
-
-struct DebugCamera : public Component
+struct DebugCamera
 {
 	DebugCamera(double linear, double angular);
 
@@ -13,7 +11,7 @@ struct DebugCamera : public Component
 	//rad per second
 	double angularSpeed;
 
-	virtual void update(double delta_time);
+	void update(double delta_time);
 };
 
 #endif //PLAYERCONTROL_HPP

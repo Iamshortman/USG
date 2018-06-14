@@ -1,12 +1,10 @@
 #ifndef CAMERA_HPP
 #define CAMERA_HPP
 
-
-#include "Common/Component.hpp"
 #include "Common/GLM_Include.hpp"
 #include "Client/Rendering/Window.hpp"
 
-class Camera : public Component
+class Camera
 {
 public:
 	Camera();
@@ -14,9 +12,6 @@ public:
 	matrix4 getProjectionMatrix(int screenWidth, int screenheight);
 	matrix4 getProjectionMatrix(Window* window);
 	matrix4 getOrthographicMatrix(float x_bounds, float y_bounds);
-
-	matrix4 getOriginViewMatrix();
-	vector3D getPosition();
 
 	float frame_of_view = 70.0f;
 
