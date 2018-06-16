@@ -1,6 +1,6 @@
-#include "Single_RigidBody.hpp"
+#include "SingleRigidBody.hpp"
 
-Single_RigidBody::Single_RigidBody(Entity* entity)
+SingleRigidBody::SingleRigidBody(Entity* entity)
 : RigidBody(entity)
 {
 	this->empty_shape = new btEmptyShape();
@@ -12,14 +12,14 @@ Single_RigidBody::Single_RigidBody(Entity* entity)
 	this->rigidBody->setUserPointer(this->parent);
 }
 
-Single_RigidBody::~Single_RigidBody()
+SingleRigidBody::~SingleRigidBody()
 {
 	delete this->empty_shape;
 
 	RigidBody::~RigidBody();
 }
 
-void Single_RigidBody::setShape(CollisionShape* shape)
+void SingleRigidBody::setShape(CollisionShape* shape)
 {
 	if (shape == nullptr)
 	{
@@ -33,7 +33,7 @@ void Single_RigidBody::setShape(CollisionShape* shape)
 	}
 }
 
-CollisionShape* Single_RigidBody::getShape()
+CollisionShape* SingleRigidBody::getShape()
 {
 	return this->shape;
 }

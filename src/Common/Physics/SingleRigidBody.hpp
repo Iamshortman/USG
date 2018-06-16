@@ -3,14 +3,16 @@
 
 #include "Common/Physics/RigidBody.hpp"
 
-class Single_RigidBody : public RigidBody
+class SingleRigidBody : public RigidBody
 {
 public:
-	Single_RigidBody(Entity* entity);
-	~Single_RigidBody();
+	SingleRigidBody(Entity* entity);
+	~SingleRigidBody();
 
 	void setShape(CollisionShape* shape);
 	CollisionShape* getShape();
+
+	virtual RigidBodyType getType() { return RigidBodyType::SINGLE; };
 
 private:
 	CollisionShape* shape;

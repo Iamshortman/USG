@@ -46,6 +46,18 @@ InputManager::InputManager()
 	keyboardMouse->addButton("Flight_YawLeft", KeyboardMouseButton(KEYBOARD, SDL_SCANCODE_LEFT));
 	keyboardMouse->addButton("Flight_YawRight", KeyboardMouseButton(KEYBOARD, SDL_SCANCODE_RIGHT));
 
+	keyboardMouse->addButton("Debug_Forward", KeyboardMouseButton(KEYBOARD, SDL_SCANCODE_W));
+	keyboardMouse->addButton("Debug_Backward", KeyboardMouseButton(KEYBOARD, SDL_SCANCODE_S));
+	keyboardMouse->addButton("Debug_Left", KeyboardMouseButton(KEYBOARD, SDL_SCANCODE_A));
+	keyboardMouse->addButton("Debug_Right", KeyboardMouseButton(KEYBOARD, SDL_SCANCODE_D));
+	keyboardMouse->addButton("Debug_Up", KeyboardMouseButton(KEYBOARD, SDL_SCANCODE_LSHIFT));
+	keyboardMouse->addButton("Debug_Down", KeyboardMouseButton(KEYBOARD, SDL_SCANCODE_LCTRL));
+
+	keyboardMouse->addAxis("Debug_Pitch", MouseAxis(MouseDirection::Mouse_Y, 50.0, 0.01, false));
+	keyboardMouse->addAxis("Debug_Yaw", MouseAxis(MouseDirection::Mouse_X, 50.0, 0.01, false));
+	keyboardMouse->addButton("Debug_RollLeft", KeyboardMouseButton(KEYBOARD, SDL_SCANCODE_Q));
+	keyboardMouse->addButton("Debug_RollRight", KeyboardMouseButton(KEYBOARD, SDL_SCANCODE_E));
+
 }
 
 InputManager::~InputManager()
@@ -79,10 +91,10 @@ void InputManager::resetPreviousValues()
 
 bool InputManager::hasAxis(string name)
 {
-	/*if (keyboardMouse->hasAxis(name))
+	if (keyboardMouse->hasAxis(name))
 	{
 		return true;
-	}*/
+	}
 
 	for (std::pair<void*, InputDevice*> it : this->device_map)
 	{
@@ -110,8 +122,6 @@ double InputManager::getAxis(string name)
 		tempAxisValue = this->keyboardMouse->getAxis(name);
 		axisValue = tempAxisValue;
 	}
-
-	//axisValue = keyboardMouse->getAxis(name);
 
 	for (std::pair<void*, InputDevice*> it : this->device_map)
 	{

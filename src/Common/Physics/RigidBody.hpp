@@ -8,10 +8,15 @@
 #include "Common/GLM_Include.hpp"
 #include "Common/Transform.hpp"
 
+enum RigidBodyType
+{
+	SINGLE,
+	MULTI,
+};
+
 //Prototype Class
 class Entity;
-class PhysicsWorld;
-
+class PhysicsWorld;\
 
 class RigidBody
 {
@@ -48,6 +53,8 @@ public:
 	void setDampening(double linear, double angular);
 
 	btRigidBody* getRigidBody();
+
+	virtual RigidBodyType getType() = 0;
 
 protected:
 	double mass = 1.0;

@@ -16,7 +16,6 @@ RigidBody::~RigidBody()
 	{
 		delete this->rigidBody;
 	}
-
 }
 
 void RigidBody::setMass(double massToAdd)

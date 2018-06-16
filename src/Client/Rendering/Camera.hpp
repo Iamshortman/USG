@@ -1,12 +1,13 @@
 #ifndef CAMERA_HPP
 #define CAMERA_HPP
 
+#include "Common/Component/ComponentNode.hpp"
+#include "Common/Component/ComponentEntity.hpp"
 
-#include "Common/Component/Component.hpp"
 #include "Common/GLM_Include.hpp"
 #include "Client/Rendering/Window.hpp"
 
-class Camera : public Component
+class Camera : public ComponentEntity, public ComponentNode
 {
 public:
 	Camera();

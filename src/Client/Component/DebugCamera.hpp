@@ -1,9 +1,9 @@
 #ifndef PLAYERCONTROL_HPP
 #define PLAYERCONTROL_HPP
 
-#include "Common/Component/Component.hpp"
+#include "Common/Component/ComponentEntity.hpp"
 
-struct DebugCamera : public Component
+struct DebugCamera : public ComponentEntity
 {
 	DebugCamera(double linear, double angular);
 

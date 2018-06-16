@@ -95,13 +95,17 @@ AxisReturn KeyboardMouseDevice::getAxis(string name)
 		axis.timestamp = mouse_axis_timestamp;
 		MouseAxis mouse = this->axis_bindings[name];
 		double value;
+
+		int width, height;
+		Client::instance->window->getWindowSize(width, height);
+
 		if (mouse.direction == MouseDirection::Mouse_X)
 		{
-			value = (double)this->mouse_axis_state[0];
+			value = (double)this->mouse_axis_state[0] / ((double)width / 2.0);
 		}
 		else
 		{
-			value = (double)this->mouse_axis_state[1];
+			value = (double)this->mouse_axis_state[1] / ((double)height / 2.0);
 		}
 
 		if (abs(value) > mouse.deadzone)

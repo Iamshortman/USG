@@ -6,6 +6,8 @@
 #include "Client/Resource/MeshPool.hpp"
 #include "Client/Resource/TexturedMesh.hpp"
 
+#include "Client/GameState/GameState_Singleplayer.hpp"
+
 Client* Client::instance = nullptr;
 
 Client::Client()

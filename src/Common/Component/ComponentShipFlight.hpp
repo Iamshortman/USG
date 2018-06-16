@@ -1,12 +1,12 @@
 #ifndef COMPONENT_SHIP_FLIGHT_HPP
 #define COMPONENT_SHIP_FLIGHT_HPP
 
-#include "Common/Component/Component.hpp"
+#include "Common/Component/ComponentEntity.hpp"
 
 #include "Common/GLM_Include.hpp"
 #include "Common/Rotation.hpp"
 
-class ComponentShipFlight : public Component
+class ComponentShipFlight : public ComponentEntity
 {
 public:
 	ComponentShipFlight();

@@ -52,3 +52,18 @@ void ComponentModel::disable()
 #endif
 	Component::disable();
 }
+
+Transform ComponentModel::getGlobalTransform()
+{
+	if (this->parent_entity != nullptr)
+	{
+		return this->parent_entity->getGlobalTransform();
+	}
+	else if (this->parent_node != nullptr)
+	{
+		//TODO Node position
+		return Transform();//this->parent_node->getGlobalTransform().getOriginViewMatrix();
+	}
+
+	return Transform();
+}

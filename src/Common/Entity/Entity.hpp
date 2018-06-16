@@ -5,7 +5,7 @@
 #include <map>
 
 #include "Common/Transform.hpp"
-#include "Common/Component/Component.hpp"
+#include "Common/Component/ComponentEntity.hpp"
 #include "Common/Physics/RigidBody.hpp"
 
 //Prototype Classe
@@ -23,18 +23,20 @@ public:
 
 	virtual void update(double delta_Time);
 
-	template<typename T, typename... TArgs> void addComponent(TArgs&&... mArgs)
+	template<typename T, typename... TArgs> T* addComponent(TArgs&&... mArgs)
 	{
 		if (!this->hasComponent<T>())
 		{
-			Component* component = new T(std::forward<TArgs>(mArgs)...);
-			component->parent = this;
+			ComponentEntity* component = new T(std::forward<TArgs>(mArgs)...);
+			component->parent_entity = this;
 			component->enable();
 			this->component_map[typeid(T).hash_code()] = component;
+			return (T*)component;
 		}
 		else
 		{
 			printf("Error: Entity already has component %s\n", typeid(T).name());
+			return nullptr;
 		}
 	};
 
@@ -42,8 +44,8 @@ public:
 	{
 		if (!this->hasComponent<T>())
 		{
-			Component* component = new T(std::forward<TArgs>(mArgs)...);
-			component->parent = this;
+			ComponentEntity* component = new T(std::forward<TArgs>(mArgs)...);
+			component->parent_entity = this;
 			this->component_map[typeid(T).hash_code()] = component;
 		}
 		else
@@ -80,16 +82,23 @@ public:
 	virtual Transform getLocalTransform();
 	Transform getGlobalTransform();
 
-	std::map<size_t, Component*> component_map;
+	virtual void addToWorld(World* world);
+	inline World* getWorld() { return this->world; };
+
+	virtual void addRigidBody();
+	virtual void removeRigidBody();
+	inline RigidBody* getRigidBody() { return this->rigidBody; };
 
 	const EntityId entityId;
 protected:
+	std::map<size_t, ComponentEntity*> component_map;
+
 	Transform local_transform;
 
 	World* world = nullptr;
 	bool alive = true;
 
-	RigidBody* rigidBody;
+	RigidBody* rigidBody = nullptr;
 
 	Entity(EntityId objectId); //protected for EntityManager use only
 	friend class EntityManager;

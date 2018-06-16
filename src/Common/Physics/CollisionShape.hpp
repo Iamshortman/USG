@@ -1,7 +1,8 @@
 #ifndef COLLISIONSHAPE_HPP
 #define COLLISIONSHAPE_HPP
 
-#include "Common/Component/Component.hpp"
+#include "Common/Component/ComponentEntity.hpp"
+#include "Common/Component/ComponentNode.hpp"
 #include "Common/GLM_Include.hpp"
 
 #include "BulletCollision/CollisionShapes/btCollisionShape.h"
@@ -12,7 +13,7 @@ enum CollisionShapeType
 	Capsule,
 };
 
-class CollisionShape
+class CollisionShape : public ComponentEntity, public ComponentNode
 {
 public:
 	CollisionShape();
@@ -22,6 +23,9 @@ public:
 	void setCapsule(double radius, double height);
 
 	btCollisionShape* getShape();
+
+	virtual void enable() override;
+	virtual void disable() override;
 
 private:
 

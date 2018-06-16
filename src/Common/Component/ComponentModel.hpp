@@ -1,10 +1,15 @@
 #ifndef COMPONENT_MODEL_HPP
 #define COMPONENT_MODEL_HPP 
 
-#include "Common/Component/Component.hpp"
+#include "Common/Component/ComponentEntity.hpp"
+#include "Common/Component/ComponentNode.hpp"
+
+#include "Common/Entity/Entity.hpp"
+
+#include "Common/Transform.hpp"
 #include "Common/Types.hpp"
 
-class ComponentModel : public Component
+class ComponentModel : public ComponentEntity, public ComponentNode
 {
 public:
 	ComponentModel(string mesh, string texture, string ambient_shader, string lighting_shader, string shadow_shader);
@@ -22,6 +27,8 @@ public:
 
 	void setCastShadows(bool cast_shadow) { this->cast_shadows = cast_shadow; };
 	bool castShadows() const { return this->cast_shadows; };
+
+	Transform getGlobalTransform();
 
 protected:
 	bool cast_shadows = true;

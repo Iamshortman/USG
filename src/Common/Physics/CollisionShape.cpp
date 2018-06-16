@@ -2,8 +2,8 @@
 
 #include "Common/Entity/Entity.hpp"
 #include "Common/Physics/Bullet_Include.hpp"
-#include "Common/Physics/RigidBody.hpp"
-#include "Common/Physics/PhysicsWorld.hpp"
+#include "Common/Physics/SingleRigidBody.hpp"
+
 
 CollisionShape::CollisionShape()
 {
@@ -15,6 +15,8 @@ CollisionShape::~CollisionShape()
 
 void CollisionShape::setBox(vector3D half_length)
 {
+	this->disable();
+
 	if (this->shape != nullptr)
 	{
 		delete this->shape;
@@ -22,10 +24,14 @@ void CollisionShape::setBox(vector3D half_length)
 
 	this->shape_type = Box;
 	this->shape = new btBoxShape(toBtVec3(half_length));
+
+	this->enable();
 }
 
 void CollisionShape::setCapsule(double radius, double height)
 {
+	this->disable();
+
 	if (this->shape != nullptr)
 	{
 		delete this->shape;
@@ -33,9 +39,61 @@ void CollisionShape::setCapsule(double radius, double height)
 
 	this->shape_type = Capsule;
 	this->shape = new btCapsuleShape(radius, height);
+
+	this->enable();
 }
 
 btCollisionShape* CollisionShape::getShape()
 {
 	return this->shape;
+}
+
+void CollisionShape::enable()
+{
+	if (!this->enabled)
+	{
+		if (this->parent_entity != nullptr)
+		{
+			RigidBody* rigid_body = this->parent_entity->getRigidBody();
+			if (rigid_body != nullptr)
+			{
+				if (rigid_body->getType() == RigidBodyType::SINGLE)
+				{
+					SingleRigidBody* single_body = (SingleRigidBody*)rigid_body;
+					single_body->setShape(this);
+				}
+			}
+		}
+		else if (this->parent_node != nullptr)
+		{
+			//TODO Node Based
+		}
+	}
+
+	Component::enable();
+}
+
+void CollisionShape::disable()
+{
+	if (this->enabled)
+	{
+		if (this->parent_entity != nullptr)
+		{
+			RigidBody* rigid_body = this->parent_entity->getRigidBody();
+			if (rigid_body != nullptr)
+			{
+				if (rigid_body->getType() == RigidBodyType::SINGLE)
+				{
+					SingleRigidBody* single_body = (SingleRigidBody*)rigid_body;
+					single_body->setShape(nullptr);
+				}
+			}
+		}
+		else if (this->parent_node != nullptr)
+		{
+			//TODO Node Based
+		}
+	}
+
+	Component::disable();
 }

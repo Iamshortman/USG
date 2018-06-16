@@ -18,7 +18,7 @@ ComponentShipFlight::~ComponentShipFlight()
 
 void ComponentShipFlight::update(double delta_time)
 {
-	if (!this->enabled || !this->parent->hasComponent<RigidBody>())
+	if (!this->enabled || !this->parent_entity->hasComponent<RigidBody>())
 	{
 		return;
 	}
@@ -35,8 +35,8 @@ void ComponentShipFlight::update(double delta_time)
 
 #endif // CLIENT
 
-	Transform transform = this->parent->getLocalTransform();
-	RigidBody* rigidBody = this->parent->getComponent<RigidBody>();
+	Transform transform = this->parent_entity->getLocalTransform();
+	RigidBody* rigidBody = this->parent_entity->getComponent<RigidBody>();
 
 	//Angular Section
 	vector3D angular_velocity = glm::inverse(transform.getOrientation()) * rigidBody->getAngularVelocity();

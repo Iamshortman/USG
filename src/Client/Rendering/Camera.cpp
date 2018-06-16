@@ -36,10 +36,30 @@ matrix4 Camera::getOrthographicMatrix(float x_bounds, float y_bounds)
 
 matrix4 Camera::getOriginViewMatrix()
 {
-	return this->parent->getGlobalTransform().getOriginViewMatrix();
+	if (this->parent_entity != nullptr)
+	{
+		return this->parent_entity->getGlobalTransform().getOriginViewMatrix();
+	}
+	else if (this->parent_node != nullptr)
+	{
+		//TODO Node position
+		return Transform().getOriginViewMatrix();//this->parent_node->getGlobalTransform().getOriginViewMatrix();
+	}
+
+	return Transform().getOriginViewMatrix();
 }
 
 vector3D Camera::getPosition()
 {
-	return this->parent->getGlobalTransform().getPosition();
+	if (this->parent_entity != nullptr)
+	{
+		return this->parent_entity->getGlobalTransform().getPosition();
+	}
+	else if (this->parent_node != nullptr)
+	{
+		//TODO Node position
+		return Transform().getPosition();//this->parent_node->getGlobalTransform().getPosition();
+	}
+
+	return vector3D(0.0);
 }
