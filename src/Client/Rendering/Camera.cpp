@@ -1,5 +1,6 @@
 #include "Camera.hpp"
 #include "Common/Entity/Entity.hpp"
+#include "Common/Entity/Node.hpp"
 
 Camera::Camera()
 {
@@ -43,7 +44,7 @@ matrix4 Camera::getOriginViewMatrix()
 	else if (this->parent_node != nullptr)
 	{
 		//TODO Node position
-		return Transform().getOriginViewMatrix();//this->parent_node->getGlobalTransform().getOriginViewMatrix();
+		return this->parent_node->getGlobalTransform().getOriginViewMatrix();
 	}
 
 	return Transform().getOriginViewMatrix();
@@ -58,7 +59,7 @@ vector3D Camera::getPosition()
 	else if (this->parent_node != nullptr)
 	{
 		//TODO Node position
-		return Transform().getPosition();//this->parent_node->getGlobalTransform().getPosition();
+		return this->parent_node->getGlobalTransform().getPosition();
 	}
 
 	return vector3D(0.0);

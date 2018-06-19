@@ -8,6 +8,12 @@
 #include "Common/Component/ComponentEntity.hpp"
 #include "Common/Physics/RigidBody.hpp"
 
+enum EntityType
+{
+	ENTITY,
+	NODE_ENTITY,
+};
+
 //Prototype Classe
 class World;
 
@@ -40,20 +46,6 @@ public:
 		}
 	};
 
-	template<typename T, typename... TArgs> void addComponentNoEnable(TArgs&&... mArgs)
-	{
-		if (!this->hasComponent<T>())
-		{
-			ComponentEntity* component = new T(std::forward<TArgs>(mArgs)...);
-			component->parent_entity = this;
-			this->component_map[typeid(T).hash_code()] = component;
-		}
-		else
-		{
-			printf("Error: Entity already has component %s\n", typeid(T).name());
-		}
-	};
-
 	template<typename T> bool hasComponent()
 	{
 		return this->component_map.find(typeid(T).hash_code()) != this->component_map.end();
@@ -78,8 +70,8 @@ public:
 		}
 	};
 
-	virtual void setLocalTransform(Transform transform);
-	virtual Transform getLocalTransform();
+	void setLocalTransform(Transform transform);
+	Transform getLocalTransform();
 	Transform getGlobalTransform();
 
 	virtual void addToWorld(World* world);
@@ -88,6 +80,8 @@ public:
 	virtual void addRigidBody();
 	virtual void removeRigidBody();
 	inline RigidBody* getRigidBody() { return this->rigidBody; };
+
+	virtual EntityType getType() { return EntityType::ENTITY; };
 
 	const EntityId entityId;
 protected:

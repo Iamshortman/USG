@@ -1,4 +1,4 @@
-#include "ComponentModel.hpp"
+#include "Model.hpp"
 
 #ifdef CLIENT
 #include "Client/Resource/MeshPool.hpp"
@@ -6,7 +6,7 @@
 #include "Client/Resource/TexturePool.hpp"
 #endif
 
-ComponentModel::ComponentModel(string mesh, string texture, string ambient_shader, string lighting_shader, string shadow_shader)
+Model::Model(string mesh, string texture, string ambient_shader, string lighting_shader, string shadow_shader)
 {
 	this->mesh_file_path = mesh;
 	this->texture_name = texture;
@@ -16,12 +16,12 @@ ComponentModel::ComponentModel(string mesh, string texture, string ambient_shade
 	this->shadow_shader_name = shadow_shader;
 }
 
-ComponentModel::~ComponentModel()
+Model::~Model()
 {
 	this->disable();
 }
 
-void ComponentModel::enable()
+void Model::enable()
 {
 #ifdef CLIENT
 	if (!this->enabled)
@@ -37,7 +37,7 @@ void ComponentModel::enable()
 	Component::enable();
 }
 
-void ComponentModel::disable()
+void Model::disable()
 {
 #ifdef CLIENT
 	if (this->enabled)
@@ -53,7 +53,7 @@ void ComponentModel::disable()
 	Component::disable();
 }
 
-Transform ComponentModel::getGlobalTransform()
+Transform Model::getGlobalTransform()
 {
 	if (this->parent_entity != nullptr)
 	{
@@ -62,7 +62,7 @@ Transform ComponentModel::getGlobalTransform()
 	else if (this->parent_node != nullptr)
 	{
 		//TODO Node position
-		return Transform();//this->parent_node->getGlobalTransform().getOriginViewMatrix();
+		return this->parent_node->getGlobalTransform();
 	}
 
 	return Transform();

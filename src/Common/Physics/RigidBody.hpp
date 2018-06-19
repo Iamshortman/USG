@@ -1,8 +1,6 @@
 #ifndef RIGIDBODY_HPP
 #define RIGIDBODY_HPP
 
-#include <unordered_map>
-
 #include "Common/Physics/Bullet_Include.hpp"
 #include "Common/Physics/CollisionShape.hpp"
 #include "Common/GLM_Include.hpp"

@@ -7,7 +7,7 @@ class Node;
 class ComponentNode : public virtual Component
 {
 public:
-	Node* getParentNode() { return this->parent_node; };
+	inline Node* getParentNode() { return this->parent_node; };
 
 protected:
 	Node* parent_node;

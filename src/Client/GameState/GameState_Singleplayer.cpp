@@ -8,7 +8,7 @@
 
 #include "Client/Component/DebugCamera.hpp"
 #include "Client/Rendering/Camera.hpp"
-#include "Common/Component/ComponentModel.hpp"
+#include "Common/Component/Model.hpp"
 
 #include "Common/Component/ComponentShipFlight.hpp"
 
@@ -26,7 +26,7 @@ GameState_Singleplayer::GameState_Singleplayer()
 
 	this->ship = EntityManager::getInstance()->createEntity();
 	this->ship->addToWorld(this->world);
-	this->ship->addComponent<ComponentModel>("res/models/A-Wing/a-wing-body.obj", "res/textures/A-Wing/a-wing-body.png", "res/shaders/Textured", "", "");
+	this->ship->addComponent<Model>("res/models/A-Wing/a-wing-body.obj", "res/textures/A-Wing/a-wing-body.png", "res/shaders/Textured", "", "");
 	this->ship->addRigidBody();
 	this->ship->addComponent<CollisionShape>()->setBox(vector3D(2.0, 0.5, 3.0));
 
@@ -35,7 +35,7 @@ GameState_Singleplayer::GameState_Singleplayer()
 	ground->setLocalTransform(Transform(vector3D(0.0, -3.0, 0.0)));
 
 	ground->addToWorld(this->world);
-	ground->addComponent<ComponentModel>("res/models/A-Wing/a-wing-body.obj", "res/textures/A-Wing/a-wing-body.png", "res/shaders/Textured", "", "");
+	ground->addComponent<Model>("res/models/A-Wing/a-wing-body.obj", "res/textures/A-Wing/a-wing-body.png", "res/shaders/Textured", "", "");
 	ground->addRigidBody();
 	ground->addComponent<CollisionShape>()->setBox(vector3D(5.0, 0.5, 5.0));
 	ground->getRigidBody()->setMass(0.0);

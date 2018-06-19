@@ -1,19 +1,20 @@
-#ifndef COMPONENT_MODEL_HPP
-#define COMPONENT_MODEL_HPP 
+#ifndef MODEL_HPP
+#define MODEL_HPP 
 
 #include "Common/Component/ComponentEntity.hpp"
 #include "Common/Component/ComponentNode.hpp"
 
 #include "Common/Entity/Entity.hpp"
+#include "Common/Entity/Node.hpp"
 
 #include "Common/Transform.hpp"
 #include "Common/Types.hpp"
 
-class ComponentModel : public ComponentEntity, public ComponentNode
+class Model : public ComponentEntity, public ComponentNode
 {
 public:
-	ComponentModel(string mesh, string texture, string ambient_shader, string lighting_shader, string shadow_shader);
-	virtual ~ComponentModel();
+	Model(string mesh, string texture, string ambient_shader, string lighting_shader, string shadow_shader);
+	virtual ~Model();
 
 	string getMesh() const { return this->mesh_file_path; };
 	string getTexture() const { return this->texture_name; };
@@ -41,4 +42,4 @@ protected:
 	string shadow_shader_name;
 };
 
-#endif //COMPONENT_MODEL_HPP
+#endif //MODEL_HPP

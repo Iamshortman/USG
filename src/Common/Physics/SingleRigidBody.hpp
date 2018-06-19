@@ -15,9 +15,9 @@ public:
 	virtual RigidBodyType getType() { return RigidBodyType::SINGLE; };
 
 private:
-	CollisionShape* shape;
+	CollisionShape* shape = nullptr;
 
-	btEmptyShape* empty_shape;
+	btEmptyShape* empty_shape = nullptr;
 };
 
 

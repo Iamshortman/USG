@@ -7,7 +7,7 @@ class Entity;
 class ComponentEntity : public virtual Component
 {
 public:
-	Entity* getParentEntity() { return this->parent_entity; };
+	inline Entity* getParentEntity() { return this->parent_entity; };
 
 protected:
 	Entity* parent_entity;

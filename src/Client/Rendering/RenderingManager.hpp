@@ -13,7 +13,7 @@
 #include "Common/GLM_Include.hpp"
 
 #include "Common/Entity/Entity.hpp"
-#include "Common/Component/ComponentModel.hpp"
+#include "Common/Component/Model.hpp"
 
 class RenderingManager
 {
@@ -26,7 +26,7 @@ public:
 	void RenderWorld(World* world, Camera* camera);
 	void Render(World* baseWorld, Camera* camera);
 
-	void RenderModel(ComponentModel* model, Camera* camera);
+	void RenderModel(Model* model, Camera* camera);
 
 private:
 	Skybox* skybox = nullptr;

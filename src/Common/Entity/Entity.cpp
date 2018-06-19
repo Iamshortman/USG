@@ -97,7 +97,6 @@ void Entity::addRigidBody()
 {
 	if (this->rigidBody == nullptr)
 	{
-
 		this->rigidBody = new SingleRigidBody(this);
 		this->rigidBody->setWorldTransform(this->local_transform);
 

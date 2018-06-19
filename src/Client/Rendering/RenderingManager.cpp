@@ -73,7 +73,7 @@ void RenderingManager::renderScene(Entity* scene_root, Camera* camera)
 		this->ms_g_buffer = new G_Buffer(windowWidth, windowHeight, true, 8);
 	}
 
-	std::set<ComponentModel*> models;
+	std::set<Model*> models;
 	std::set<void*> lights;
 	std::set<void*> models_transparent;
 
@@ -87,7 +87,7 @@ void RenderingManager::renderScene(Entity* scene_root, Camera* camera)
 		//glClear(GL_DEPTH_BUFFER_BIT);
 	}
 
-	for (ComponentModel* model : models)
+	for (Model* model : models)
 	{
 		this->RenderModel(model, camera);
 	}
@@ -153,7 +153,6 @@ void RenderingManager::RenderWorld(World* world, Camera* camera)
 		return;
 	}
 
-	//Now render world
 	auto entities = world->getEntitiesInWorld();
 	for (auto it = entities->begin(); it != entities->end(); it++)
 	{
@@ -161,9 +160,17 @@ void RenderingManager::RenderWorld(World* world, Camera* camera)
 
 		if (entity != nullptr)
 		{
-			if (entity->hasComponent<ComponentModel>())
+			if (entity->getType() == EntityType::ENTITY)
 			{
-				this->RenderModel(entity->getComponent<ComponentModel>(), camera);
+				if (entity->hasComponent<Model>())
+				{
+					this->RenderModel(entity->getComponent<Model>(), camera);
+				}
+			}
+			else if (entity->getType() == EntityType::NODE_ENTITY)
+			{
+				NodeEntity* node_entity = (NodeEntity*)entity;
+				//TODO: something clever
 			}
 		}
 	}
@@ -247,7 +254,7 @@ void RenderingManager::Render(World* baseWorld, Camera* camera)
 	this->window->updateBuffer();
 }
 
-void RenderingManager::RenderModel(ComponentModel* model, Camera* camera)
+void RenderingManager::RenderModel(Model* model, Camera* camera)
 {
 	Transform globalTransform = model->getGlobalTransform();
 	matrix4 modelMatrix = globalTransform.getModleMatrix(camera->getPosition());

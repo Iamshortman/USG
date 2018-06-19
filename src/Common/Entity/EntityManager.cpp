@@ -1,6 +1,6 @@
 #include "Common/Entity/EntityManager.hpp"
 
-#include "Common/Component/ComponentModel.hpp"
+#include "Common/Component/Model.hpp"
 #include "Common/Physics/RigidBody.hpp"
 #include "Common/Component/ComponentShipFlight.hpp"
 #include "Common/Component/ComponentMass.hpp"
@@ -59,6 +59,15 @@ Entity* EntityManager::createEntity()
 	EntityId game_object_id = this->getNextId();
 
 	Entity* game_object = new Entity(game_object_id);
+	this->game_objects[game_object_id] = game_object;
+	return game_object;
+}
+
+NodeEntity* EntityManager::createNodeEntity()
+{
+	EntityId game_object_id = this->getNextId();
+
+	NodeEntity* game_object = new NodeEntity(game_object_id);
 	this->game_objects[game_object_id] = game_object;
 	return game_object;
 }
