@@ -24,12 +24,12 @@ void SingleRigidBody::setShape(CollisionShape* shape)
 	if (shape == nullptr)
 	{
 		this->shape = nullptr;
-		this->rigidBody->setCollisionShape(this->empty_shape);
+		this->setCollisionShape(this->empty_shape);
 	}
 	else
 	{
 		this->shape = shape;
-		this->rigidBody->setCollisionShape(shape->getShape());
+		this->setCollisionShape(shape->getShape());
 	}
 }
 

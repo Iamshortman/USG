@@ -58,6 +58,8 @@ InputManager::InputManager()
 	keyboardMouse->addButton("Debug_RollLeft", KeyboardMouseButton(KEYBOARD, SDL_SCANCODE_Q));
 	keyboardMouse->addButton("Debug_RollRight", KeyboardMouseButton(KEYBOARD, SDL_SCANCODE_E));
 
+	keyboardMouse->addButton("Debug_Interact", KeyboardMouseButton(MOUSE, SDL_BUTTON_LEFT));
+
 }
 
 InputManager::~InputManager()

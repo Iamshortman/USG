@@ -14,7 +14,7 @@ enum RigidBodyType
 
 //Prototype Class
 class Entity;
-class PhysicsWorld;\
+class PhysicsWorld;
 
 class RigidBody
 {
@@ -27,6 +27,7 @@ public:
 
 	void setInertiaTensor(vector3D inertia);
 	vector3D getInertiaTensor();
+	void calcInertiaTensorFromShape();
 
 	void Activate(bool activate);
 
@@ -50,17 +51,24 @@ public:
 
 	void setDampening(double linear, double angular);
 
-	btRigidBody* getRigidBody();
+	inline btRigidBody* getRigidBody() { return this->rigidBody; };
+
+	inline PhysicsWorld* getPhysicsWorld() { return this->physics_world; };
+	inline void setPhysicsWorld(PhysicsWorld* world) { this->physics_world = world; };
 
 	virtual RigidBodyType getType() = 0;
 
 protected:
+	void setCollisionShape(btCollisionShape* shape);
+
 	double mass = 1.0;
-	vector3D inertia = vector3D(0.0);
+	vector3D inertia = vector3D(1.0);
 
 	btRigidBody* rigidBody = nullptr;
 
 	Entity* parent = nullptr;
+
+	PhysicsWorld* physics_world = nullptr;
 };
 
 #endif //RIGIDBODY_HPP

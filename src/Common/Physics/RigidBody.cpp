@@ -40,6 +40,16 @@ vector3D RigidBody::getInertiaTensor()
 	return this->inertia;
 }
 
+void RigidBody::calcInertiaTensorFromShape()
+{
+	if (this->mass > 0.0)
+	{
+		btVector3 inertia_tensor = btVector3(0.0, 0.0, 0.0);
+		this->rigidBody->getCollisionShape()->calculateLocalInertia(this->mass, inertia_tensor);
+		this->inertia = toVec3(inertia_tensor);
+	}
+}
+
 void RigidBody::Activate(bool activate)
 {
 	this->rigidBody->activate(activate);
@@ -110,7 +120,17 @@ void RigidBody::setDampening(double linear, double angular)
 	rigidBody->setDamping(linear, angular);
 }
 
-btRigidBody* RigidBody::getRigidBody()
+void RigidBody::setCollisionShape(btCollisionShape* shape)
 {
-	return this->rigidBody;
+	if (this->physics_world != nullptr)
+	{
+		PhysicsWorld* world = this->physics_world;
+		this->physics_world->removeRigidBody(this);
+		this->rigidBody->setCollisionShape(shape);
+		world->addRigidBody(this);
+	}
+	else
+	{
+		this->rigidBody->setCollisionShape(shape);
+	}
 }

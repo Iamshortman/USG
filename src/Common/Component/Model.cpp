@@ -61,7 +61,6 @@ Transform Model::getGlobalTransform()
 	}
 	else if (this->parent_node != nullptr)
 	{
-		//TODO Node position
 		return this->parent_node->getGlobalTransform();
 	}
 

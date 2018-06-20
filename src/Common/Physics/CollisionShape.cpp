@@ -1,8 +1,10 @@
 #include "CollisionShape.hpp"
 
 #include "Common/Entity/Entity.hpp"
+#include "Common/Entity/NodeEntity.hpp"
 #include "Common/Physics/Bullet_Include.hpp"
 #include "Common/Physics/SingleRigidBody.hpp"
+#include "Common/Physics/MuiltiRigidBody.hpp"
 
 
 CollisionShape::CollisionShape()
@@ -50,7 +52,7 @@ btCollisionShape* CollisionShape::getShape()
 
 void CollisionShape::enable()
 {
-	if (!this->enabled)
+	if (!this->enabled && this->shape != nullptr)
 	{
 		if (this->parent_entity != nullptr)
 		{
@@ -66,7 +68,20 @@ void CollisionShape::enable()
 		}
 		else if (this->parent_node != nullptr)
 		{
-			//TODO Node Based
+			if (this->parent_node->getParentEntity() != nullptr)
+			{
+				this->shape->setUserPointer(this->parent_node);
+
+				RigidBody* rigid_body = this->parent_node->getParentEntity()->getRigidBody();
+				if (rigid_body != nullptr)
+				{
+					if (rigid_body->getType() == RigidBodyType::MULTI)
+					{
+						MuiltiRigidBody* muilti_body = (MuiltiRigidBody*)rigid_body;
+						muilti_body->addChildShape(this->parent_node);
+					}
+				}
+			}
 		}
 	}
 
@@ -75,7 +90,7 @@ void CollisionShape::enable()
 
 void CollisionShape::disable()
 {
-	if (this->enabled)
+	if (this->enabled && this->shape != nullptr)
 	{
 		if (this->parent_entity != nullptr)
 		{
@@ -91,7 +106,18 @@ void CollisionShape::disable()
 		}
 		else if (this->parent_node != nullptr)
 		{
-			//TODO Node Based
+			if (this->parent_node->getParentEntity() != nullptr)
+			{
+				RigidBody* rigid_body = this->parent_node->getParentEntity()->getRigidBody();
+				if (rigid_body != nullptr)
+				{
+					if (rigid_body->getType() == RigidBodyType::MULTI)
+					{
+						MuiltiRigidBody* muilti_body = (MuiltiRigidBody*)rigid_body;
+						muilti_body->removeChildShape(this->parent_node);
+					}
+				}
+			}
 		}
 	}
 

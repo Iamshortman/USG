@@ -6,6 +6,8 @@
 
 #include "Common/World/World.hpp"
 
+#include "Common/Entity/NodeEntity.hpp"
+
 #include <stack>
 #include <set>
 
@@ -171,6 +173,29 @@ void RenderingManager::RenderWorld(World* world, Camera* camera)
 			{
 				NodeEntity* node_entity = (NodeEntity*)entity;
 				//TODO: something clever
+
+				std::stack<Node*> nodes;
+				for (Node* child : node_entity->getChildNodes())
+				{
+					nodes.push(child);
+				}
+
+				while (!nodes.empty())
+				{
+					Node* node = nodes.top();
+					nodes.pop();
+					
+					if (node->hasComponent<Model>())
+					{
+						this->RenderModel(node->getComponent<Model>(), camera);
+					}
+
+					for (Node* child : node->getChildNodes())
+					{
+						nodes.push(child);
+					}
+				}
+
 			}
 		}
 	}

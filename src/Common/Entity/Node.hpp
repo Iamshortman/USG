@@ -20,8 +20,8 @@ public:
 	{
 		if (!this->hasComponent<T>())
 		{
-			ComponentEntity* component = new T(std::forward<TArgs>(mArgs)...);
-			component->parent_entity = this;
+			ComponentNode* component = new T(std::forward<TArgs>(mArgs)...);
+			component->parent_node = this;
 			component->enable();
 			this->component_map[typeid(T).hash_code()] = component;
 			return (T*)component;
@@ -61,6 +61,8 @@ public:
 
 	void addChild(Node* node);
 	void removeChild(Node* node);
+
+	inline std::set<Node*> getChildNodes() { return this->child_nodes; };
 
 	void setLocalTransform(Transform trans);
 	Transform getLocalTransform();

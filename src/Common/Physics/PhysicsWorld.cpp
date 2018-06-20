@@ -36,12 +36,14 @@ void PhysicsWorld::update(double delta_time)
 void PhysicsWorld::addRigidBody(RigidBody* rigidBody)
 {
 	this->dynamicsWorld->addRigidBody(rigidBody->getRigidBody());
+	rigidBody->setPhysicsWorld(this);
 	this->rigid_bodies.insert(rigidBody);
 }
 
 void PhysicsWorld::removeRigidBody(RigidBody* rigidBody)
 {
 	this->dynamicsWorld->removeRigidBody(rigidBody->getRigidBody());
+	rigidBody->setPhysicsWorld(nullptr);
 	this->rigid_bodies.erase(rigidBody);
 }
 
@@ -61,10 +63,11 @@ SingleRayTestResult PhysicsWorld::singleRayTest(vector3D startPos, vector3D endP
 	{
 		result.hasHit = true;
 		const btRigidBody* hitBody = btRigidBody::upcast(rayCallback.m_collisionObject);
-		result.hitBody = hitBody;
+
 		result.hitPosition = toVec3(rayCallback.m_hitPointWorld);
 		result.hitNormal = toVec3(rayCallback.m_hitNormalWorld);
-		result.gameObject = (Entity*)hitBody->getUserPointer();
+
+		result.entity = (Entity*)hitBody->getUserPointer();
 
 		if (rayCallback.m_bodyId != -1)
 		{
@@ -81,7 +84,7 @@ SingleRayTestResult PhysicsWorld::singleRayTest(vector3D startPos, vector3D endP
 
 				if (child != nullptr)
 				{
-					result.bodyId = child->getUserIndex();
+					result.node = (Node*)child->getUserPointer();
 				}
 			}
 		}
@@ -131,10 +134,10 @@ SingleRayTestResult PhysicsWorld::singleRayTestNotMe(vector3D startPos, vector3D
 		{
 			result.hasHit = true;
 			const btRigidBody* hitBody = btRigidBody::upcast(rayCallback.m_collisionObjects[closestHitIndex]);
-			result.hitBody = hitBody;
+
 			result.hitPosition = toVec3(rayCallback.m_hitPointWorld[closestHitIndex]);
 			result.hitNormal = toVec3(rayCallback.m_hitNormalWorld[closestHitIndex]);
-			result.gameObject = (Entity*)hitBody->getUserPointer();
+			result.entity = (Entity*)hitBody->getUserPointer();
 		}
 
 	}

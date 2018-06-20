@@ -14,7 +14,7 @@ public:
 	MuiltiRigidBody(Entity* entity);
 	~MuiltiRigidBody();
 
-	void addChildShape(Node* node, CollisionShape* shape);
+	void addChildShape(Node* node);
 	void removeChildShape(Node* node);
 	void updateChildShapeTransform(Node* node);
 

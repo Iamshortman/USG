@@ -10,7 +10,7 @@ public:
 	inline Entity* getParentEntity() { return this->parent_entity; };
 
 protected:
-	Entity* parent_entity;
+	Entity* parent_entity = nullptr;
 
 	friend class Entity;
 };

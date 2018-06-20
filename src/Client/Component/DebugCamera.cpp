@@ -3,6 +3,11 @@
 #include "Common/Entity/Entity.hpp"
 #include "Client/Input/InputManager.hpp"
 
+//Temp
+#include "Common/Physics/PhysicsWorld.hpp"
+#include "Common/World/World.hpp"
+#include "Common/Entity/NodeEntity.hpp"
+
 DebugCamera::DebugCamera(double linear, double angular)
 {
 	linearSpeed = linear;
@@ -27,6 +32,51 @@ void DebugCamera::update(double delta_time)
 		transform.setOrientation(orientation);
 
 		this->parent_entity->setLocalTransform(transform);
+
+
+		//TEMP CODE
+		if (InputManager::getInstance()->getButtonPressed("Debug_Interact"))
+		{
+			printf("Try: ");
+			World* world = this->parent_entity->getWorld();
+
+			double rayDistance = 10.0;
+			vector3D startPos = transform.getPosition();
+			vector3D endPos = startPos + (transform.getForward() * rayDistance);
+			SingleRayTestResult result = world->singleRayTest(startPos, endPos);
+
+			if (result.hasHit)
+			{
+				if (result.entity != nullptr)
+				{
+					printf("Hit");
+
+					if (result.node != nullptr && result.entity->getType() == EntityType::NODE_ENTITY)
+					{						
+						printf(" Node");
+
+						NodeEntity* node_entity = (NodeEntity*)result.entity;
+						
+						Node* node = result.node->getParent();
+
+						if (node != nullptr)
+						{
+							node->removeChild(result.node);
+						}
+						else
+						{
+							node_entity->removeChild(result.node);
+						}
+
+					}
+
+				}
+			}
+
+			printf("\n");
+
+		}
+
 	}
 }
 

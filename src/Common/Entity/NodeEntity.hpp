@@ -19,6 +19,10 @@ public:
 	void addChild(Node* node);
 	void removeChild(Node* node);
 
+	inline std::set<Node*> getChildNodes() { return this->child_nodes; };
+
+	virtual EntityType getType() { return EntityType::NODE_ENTITY; };
+
 protected:
 
 	std::set<Node*> child_nodes;

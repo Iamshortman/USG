@@ -10,7 +10,7 @@ public:
 	inline Node* getParentNode() { return this->parent_node; };
 
 protected:
-	Node* parent_node;
+	Node* parent_node = nullptr;
 
 	friend class Node;
 };

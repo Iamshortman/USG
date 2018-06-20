@@ -3,17 +3,19 @@
 
 #include "Common/Physics/Bullet_Include.hpp"
 #include "Common/Physics/RigidBody.hpp"
+#include "Common/Entity/Node.hpp"
+
 #include <set>
 
 struct SingleRayTestResult
 {
 	bool hasHit = false;
-	Entity* gameObject = nullptr;
-	const btRigidBody* hitBody;
+
+	Entity* entity = nullptr;
+	Node* node = nullptr;
+
 	vector3D hitPosition;
 	vector3D hitNormal;
-	int userValue = 0;
-	int bodyId = 0;
 };
 
 class PhysicsWorld
@@ -33,6 +35,7 @@ public:
 	btDiscreteDynamicsWorld* dynamicsWorld = nullptr;
 
 protected:
+	//TODO: Remove this list
 	std::set<RigidBody*> rigid_bodies;
 
 	btBroadphaseInterface* broadphase = nullptr;

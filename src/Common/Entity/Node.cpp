@@ -35,6 +35,14 @@ void Node::update(double deltaTime)
 
 void Node::addToEntity(NodeEntity* entity)
 {
+	if (this->parent_entity != nullptr)
+	{
+		for (auto component : this->component_map)
+		{
+			component.second->disable();
+		}
+	}
+
 	this->parent_entity = entity;
 
 	for (Node* node : this->child_nodes)
@@ -42,9 +50,12 @@ void Node::addToEntity(NodeEntity* entity)
 		node->addToEntity(this->parent_entity);
 	}
 
-	for (auto component : this->component_map)
+	if (this->parent_entity != nullptr)
 	{
-		//component.second->addtoEntity(this->parent_entity);
+		for (auto component : this->component_map)
+		{
+			component.second->enable();
+		}
 	}
 }
 void Node::addChild(Node* node)
