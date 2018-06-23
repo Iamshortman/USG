@@ -35,12 +35,10 @@ void Node::update(double deltaTime)
 
 void Node::addToEntity(NodeEntity* entity)
 {
-	if (this->parent_entity != nullptr)
+
+	for (auto component : this->component_map)
 	{
-		for (auto component : this->component_map)
-		{
-			component.second->disable();
-		}
+		component.second->disable();
 	}
 
 	this->parent_entity = entity;
@@ -101,7 +99,7 @@ Transform Node::getGlobalTransform()
 {
 	if (this->parent != nullptr)
 	{
-		return this->localTransform.transformBy(this->parent->getRelativeTransform());
+		return this->localTransform.transformBy(this->parent->getGlobalTransform());
 	}
 	else
 	{

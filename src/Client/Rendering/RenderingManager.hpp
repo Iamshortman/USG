@@ -21,8 +21,6 @@ public:
 	RenderingManager(Window* window);
 	virtual ~RenderingManager();
 
-	void renderScene(Entity* scene_root, Camera* camera);
-
 	void RenderWorld(World* world, Camera* camera);
 	void Render(World* baseWorld, Camera* camera);
 

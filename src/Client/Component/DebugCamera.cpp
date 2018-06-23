@@ -61,11 +61,11 @@ void DebugCamera::update(double delta_time)
 
 						if (node != nullptr)
 						{
-							node->removeChild(result.node);
+							//node->removeChild(result.node);
 						}
 						else
 						{
-							node_entity->removeChild(result.node);
+							//node_entity->removeChild(result.node);
 						}
 
 					}
@@ -74,7 +74,6 @@ void DebugCamera::update(double delta_time)
 			}
 
 			printf("\n");
-
 		}
 
 	}

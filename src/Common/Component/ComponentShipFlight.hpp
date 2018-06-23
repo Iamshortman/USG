@@ -16,8 +16,8 @@ public:
 
 	vector3D linear_input;
 
-	double linear_max_speed[6] =	{ 50.0, 50.0, 50.0, 50.0, 500.0, 50.0 };
-	double linear_acceleration[6] = { 2.0, 2.0, 2.0, 2.0, 5.0, 2.0 };
+	double linear_max_speed[6] =	{ 50.0, 50.0, 50.0, 50.0, 50.0, 50.0 };
+	double linear_acceleration[6] = { 2.0, 2.0, 2.0, 2.0, 2.0, 2.0 };
 	double linear_braking_expo[6] = { 0.01, 0.01, 0.01, 0.01, 0.01, 0.01 };
 
 	double linear_aero_drag[6] = { 0.2, 0.2, 0.2, 0.2, 0.01, 0.2 };

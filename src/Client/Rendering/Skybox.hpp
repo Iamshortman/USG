@@ -5,6 +5,7 @@
 #include "Client/Rendering/OpenGL_Include.hpp"
 #include "Client/Rendering/ShaderProgram.hpp"
 #include "Client/Rendering/Camera.hpp"
+#include "Client/Resource/TexturedMesh.hpp"
 
 class Skybox
 {
@@ -16,8 +17,9 @@ public:
 
 private:
 	ShaderProgram* shader_program = nullptr;
+	TexturedMesh* cube_mesh = nullptr;
+	
 	GLuint cube_map = 0;
-	GLuint VAO, VBO = 0;
 };
 
 #endif //SKYBOX_HPP

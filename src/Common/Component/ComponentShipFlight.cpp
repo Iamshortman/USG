@@ -18,7 +18,7 @@ ComponentShipFlight::~ComponentShipFlight()
 
 void ComponentShipFlight::update(double delta_time)
 {
-	if (!this->enabled || !this->parent_entity->hasComponent<RigidBody>())
+	if (!this->enabled || this->parent_entity->getRigidBody() == nullptr)
 	{
 		return;
 	}
@@ -36,7 +36,7 @@ void ComponentShipFlight::update(double delta_time)
 #endif // CLIENT
 
 	Transform transform = this->parent_entity->getLocalTransform();
-	RigidBody* rigidBody = this->parent_entity->getComponent<RigidBody>();
+	RigidBody* rigidBody = this->parent_entity->getRigidBody();
 
 	//Angular Section
 	vector3D angular_velocity = glm::inverse(transform.getOrientation()) * rigidBody->getAngularVelocity();
@@ -88,7 +88,7 @@ void ComponentShipFlight::update(double delta_time)
 
 	rigidBody->setAngularVelocity(transform.getOrientation() * angular_velocity);
 
-	vector3D linear_velocity = rigidBody->getLinearVelocity();
+	vector3D linear_velocity = glm::inverse(transform.getOrientation()) * rigidBody->getLinearVelocity();
 
 	//Linear Section
 	for (size_t i = 0; i < 3; i++)
@@ -130,7 +130,7 @@ void ComponentShipFlight::update(double delta_time)
 		}
 	}
 
-	rigidBody->setLinearVelocity(linear_velocity);
+	rigidBody->setLinearVelocity(transform.getOrientation() * linear_velocity);
 
 	if (rigidBody->getLinearVelocity() != vector3D(0.0) || rigidBody->getAngularVelocity() != vector3D(0.0))
 	{

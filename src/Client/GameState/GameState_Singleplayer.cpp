@@ -15,33 +15,61 @@
 NodeEntity* build_node()
 {
 	NodeEntity* node_entity = EntityManager::getInstance()->createNodeEntity();
+
+	node_entity->addComponent<ComponentShipFlight>();
+
 	node_entity->addRigidBody();
 
-	Node* cube1 = new Node();
-	cube1->setLocalTransform(Transform());
-	node_entity->addChild(cube1);
-	cube1->addComponent<Model>("res/models/cube.obj", "res/textures/Green.png", "res/shaders/Textured", "", "");
-	cube1->addComponent<CollisionShape>()->setBox(vector3D(0.5));
+	Node* hull = new Node();
+	hull->setLocalTransform(Transform());
+	node_entity->addChild(hull);
+	hull->addComponent<Model>("res/models/Cobra/Hull.obj", "res/textures/1K_Grid.png", "res/shaders/Textured", "", "");
+	hull->addComponent<CollisionShape>()->setConvexMesh("res/models/Cobra/Col_Hull.obj");
 
-	Node* cube2 = new Node();
-	cube2->setLocalTransform(Transform(vector3D(0.7, 0.6, -2.1), quaternionD(0.558268, 0.095265, -0.814123, -0.128315)));
-	node_entity->addChild(cube2);
-	cube2->addComponent<Model>("res/models/cube.obj", "res/textures/Purple.png", "res/shaders/Textured", "", "");
-	cube2->addComponent<CollisionShape>()->setBox(vector3D(0.5));
+	Node* nose = new Node();
+	nose->setLocalTransform(Transform());
+	node_entity->addChild(nose);
+	nose->addComponent<CollisionShape>()->setConvexMesh("res/models/Cobra/Col_Hull_Nose.obj");
 
-	Node* cube3 = new Node();
-	cube3->setLocalTransform(Transform(vector3D(1.41113, -0.587204, 1.45522), quaternionD(0.87165, -0.309547, -0.368961, -0.090961)));
-	node_entity->addChild(cube3);
-	cube3->addComponent<Model>("res/models/cube.obj", "res/textures/Blue.png", "res/shaders/Textured", "", "");
-	cube3->addComponent<CollisionShape>()->setBox(vector3D(0.5));
+	Node* right_engine = new Node();
+	node_entity->addChild(right_engine);
+	right_engine->setLocalTransform(Transform(vector3D(-1.7, 0.0, -4.25)));
+	right_engine->addComponent<Model>("res/models/Cobra/Engine_R.obj", "res/textures/1K_Grid.png", "res/shaders/Textured", "", "");
+	right_engine->addComponent<CollisionShape>()->setConvexMesh("res/models/Cobra/Col_Engine.obj");
+	{
+		Node* right_wing = new Node();
+		right_wing->setLocalTransform(Transform(vector3D(-2.5, 0.0, 0.7)));
+		right_wing->addComponent<Model>("res/models/Cobra/Wing_R.obj", "res/textures/1K_Grid.png", "res/shaders/Textured", "", "");
+		right_wing->addComponent<CollisionShape>()->setConvexMesh("res/models/Cobra/Col_Wing_R.obj");
+		right_engine->addChild(right_wing);
+	}
 
-	Node* cube4 = new Node();
-	cube4->setLocalTransform(Transform(vector3D(-1.51604, 1.1474, 1.43531), quaternionD(0.856668, 0.247514, 0.32453, 0.315495)));
-	node_entity->addChild(cube4);
-	cube4->addComponent<Model>("res/models/cube.obj", "res/textures/Red.png", "res/shaders/Textured", "", "");
-	cube4->addComponent<CollisionShape>()->setBox(vector3D(0.5));
+	Node* left_engine = new Node();
+	node_entity->addChild(left_engine);
+	left_engine->setLocalTransform(Transform(vector3D(1.7, 0.0, -4.25)));
+	left_engine->addComponent<Model>("res/models/Cobra/Engine_L.obj", "res/textures/1K_Grid.png", "res/shaders/Textured", "", "");
+	left_engine->addComponent<CollisionShape>()->setConvexMesh("res/models/Cobra/Col_Engine.obj");
+	{
+		Node* left_wing = new Node();
+		left_wing->setLocalTransform(Transform(vector3D(2.5, 0.0, 0.7)));
+		left_wing->addComponent<Model>("res/models/Cobra/Wing_L.obj", "res/textures/1K_Grid.png", "res/shaders/Textured", "", "");
+		left_wing->addComponent<CollisionShape>()->setConvexMesh("res/models/Cobra/Col_Wing_L.obj");
+		left_engine->addChild(left_wing);
+	}
 
-	node_entity->getRigidBody()->setMass(200.0);
+	Node* cockpit = new Node();
+	node_entity->addChild(cockpit);
+	cockpit->addComponent<Model>("res/models/Cobra/Cockpit.obj", "res/textures/1K_Grid.png", "res/shaders/Textured", "", "");
+
+	Node* canopy = new Node();
+	node_entity->addChild(canopy);
+	canopy->setLocalTransform(Transform(vector3D(0.0, 1.3, -2.6)));
+	canopy->addComponent<Model>("res/models/Cobra/Canopy_Outside.obj", "res/textures/1K_Grid.png", "res/shaders/Textured", "", "");
+	canopy->addComponent<CollisionShape>()->setConvexMesh("res/models/Cobra/Canopy_Outside.obj");
+
+	node_entity->getRigidBody()->setMass(5000.0);
+	//node_entity->getRigidBody()->calcInertiaTensorFromShape();
+	node_entity->getRigidBody()->setInertiaTensor(vector3D(1000.0));
 	node_entity->getRigidBody()->getRigidBody()->forceActivationState(DISABLE_DEACTIVATION);
 
 	return node_entity;
@@ -52,21 +80,27 @@ GameState_Singleplayer::GameState_Singleplayer()
 {
 	this->world = WorldManager::getInstance()->createWorld();
 
-	this->camera = EntityManager::getInstance()->createEntity();
+	/*this->camera = EntityManager::getInstance()->createEntity();
 	this->camera->addToWorld(this->world);
 	this->camera->addComponent<Camera>();
 	this->camera->addComponent<DebugCamera>(5.0, 0.5);
-	this->camera->setLocalTransform(Transform(vector3D(0.0, 2.0, -10.0)));
+	this->camera->setLocalTransform(Transform(vector3D(0.0, 2.0, -10.0)));*/
 
-	this->ship = EntityManager::getInstance()->createEntity();
-	this->ship->addToWorld(this->world);
-	this->ship->addComponent<Model>("res/models/cube.obj", "res/textures/Red.png", "res/shaders/Textured", "", "");
-	this->ship->addRigidBody();
-	this->ship->addComponent<CollisionShape>()->setBox(vector3D(0.5));
+	this->cube = EntityManager::getInstance()->createEntity();
+	this->cube->addToWorld(this->world);
+	this->cube->addComponent<Model>("res/models/cube.obj", "res/textures/Red.png", "res/shaders/Textured", "", "");
+	this->cube->addRigidBody();
+	this->cube->addComponent<CollisionShape>()->setBox(vector3D(0.5));
 
-	Entity* entity_node = build_node();
+	NodeEntity* entity_node = build_node();
 	entity_node->addToWorld(this->world);
 	entity_node->setLocalTransform(Transform(vector3D(-2.0, 0.0, 1.0)));
+	entity_node->getRigidBody()->setLinearVelocity(vector3D(0.0, 0.0, 10.0));
+
+	Node* camera_node = new Node();
+	this->camera = camera_node->addComponent<Camera>();
+	camera_node->setLocalTransform(Transform(vector3D(0.0, 1.2, -2.0)));
+	entity_node->addChild(camera_node);
 }
 
 GameState_Singleplayer::~GameState_Singleplayer()
@@ -78,5 +112,5 @@ void GameState_Singleplayer::update(Client* client, double delta_time)
 {
 	this->world->update(delta_time);
 
-	client->renderingManager->Render(this->camera->getWorld(), this->camera->getComponent<Camera>());
+	client->renderingManager->Render(this->camera->getParentNode()->getParentEntity()->getWorld(), this->camera);
 }

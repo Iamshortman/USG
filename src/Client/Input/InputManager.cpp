@@ -36,8 +36,8 @@ InputManager::InputManager()
 	keyboardMouse->addButton("Flight_Up", KeyboardMouseButton(KEYBOARD, SDL_SCANCODE_LSHIFT));
 	keyboardMouse->addButton("Flight_Down", KeyboardMouseButton(KEYBOARD, SDL_SCANCODE_LCTRL));
 
-	keyboardMouse->addAxis("Flight_Pitch", MouseAxis(MouseDirection::Mouse_Y, 0.05, 0.01, false));
-	keyboardMouse->addAxis("Flight_Yaw", MouseAxis(MouseDirection::Mouse_X, 0.05, 0.01, false));
+	keyboardMouse->addAxis("Flight_Pitch", MouseAxis(MouseDirection::Mouse_Y, 50.0, 0.01, true));
+	keyboardMouse->addAxis("Flight_Yaw", MouseAxis(MouseDirection::Mouse_X, 50.0, 0.01, false));
 
 	keyboardMouse->addButton("Flight_PitchUp", KeyboardMouseButton(KEYBOARD, SDL_SCANCODE_UP));
 	keyboardMouse->addButton("Flight_PitchDown", KeyboardMouseButton(KEYBOARD, SDL_SCANCODE_DOWN));
@@ -333,16 +333,16 @@ void InputManager::loadJoystick(SDL_Joystick* joystick)
 	}
 	else if (device->name == "DUALSHOCK®4 USB Wireless Adaptor")
 	{
-		device->addAxis("DebugForwardBackward", JoystickAxis(1, 0.1, true));
-		device->addAxis("DebugLeftRight", JoystickAxis(0, 0.1, true));
+		device->addAxis("Flight_ForwardBackward", JoystickAxis(1, 0.1, true));
+		device->addAxis("Flight_LeftRight", JoystickAxis(0, 0.1, true));
 
-		device->addAxis("DebugPitch", JoystickAxis(5, 0.1, false));
-		device->addAxis("DebugYaw", JoystickAxis(2, 0.1, true));
+		device->addAxis("Flight_Pitch", JoystickAxis(5, 0.1, false));
+		device->addAxis("Flight_Yaw", JoystickAxis(2, 0.1, true));
 
-		device->addButton("DebugRollRight", JoystickButton(5));
-		device->addButton("DebugRollLeft", JoystickButton(4));
+		device->addButton("Flight_RollRight", JoystickButton(5));
+		device->addButton("Flight_RollLeft", JoystickButton(4));
 
-		device->addButton("DebugInteract", JoystickButton(0));
+		device->addButton("Debug_Interact", JoystickButton(0));
 	}
 
 	this->device_map[joystick] = device;

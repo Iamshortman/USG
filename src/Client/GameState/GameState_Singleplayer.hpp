@@ -4,6 +4,7 @@
 #include "Client/GameState/GameState.hpp"
 
 #include "Common/Entity/Entity.hpp"
+#include "Client/Rendering/Camera.hpp"
 
 class GameState_Singleplayer : public GameState
 {
@@ -15,8 +16,10 @@ public:
 protected:
 	World* world;
 
-	Entity* camera;
-	Entity* ship;
+	Camera* camera = nullptr;
+
+	//Entity* camera;
+	Entity* cube;
 };
 
 #endif //GAMESTATE_SINGLEPLAYER_HPP
