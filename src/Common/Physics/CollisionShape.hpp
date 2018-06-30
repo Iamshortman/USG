@@ -1,7 +1,6 @@
 #ifndef COLLISIONSHAPE_HPP
 #define COLLISIONSHAPE_HPP
 
-#include "Common/Component/ComponentEntity.hpp"
 #include "Common/Component/ComponentNode.hpp"
 #include "Common/GLM_Include.hpp"
 
@@ -16,10 +15,10 @@ enum CollisionShapeType
 	ConvexMesh,
 };
 
-class CollisionShape : public ComponentEntity, public ComponentNode
+class CollisionShape : public ComponentNode
 {
 public:
-	CollisionShape();
+	CollisionShape(I_Node* node);
 	~CollisionShape();
 
 	void setBox(vector3D half_length);
@@ -27,9 +26,6 @@ public:
 	void setConvexMesh(string file_path);
 
 	btCollisionShape* getShape();
-
-	virtual void enable() override;
-	virtual void disable() override;
 
 private:
 

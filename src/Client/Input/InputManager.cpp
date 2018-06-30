@@ -36,8 +36,11 @@ InputManager::InputManager()
 	keyboardMouse->addButton("Flight_Up", KeyboardMouseButton(KEYBOARD, SDL_SCANCODE_LSHIFT));
 	keyboardMouse->addButton("Flight_Down", KeyboardMouseButton(KEYBOARD, SDL_SCANCODE_LCTRL));
 
-	keyboardMouse->addAxis("Flight_Pitch", MouseAxis(MouseDirection::Mouse_Y, 50.0, 0.01, true));
-	keyboardMouse->addAxis("Flight_Yaw", MouseAxis(MouseDirection::Mouse_X, 50.0, 0.01, false));
+	keyboardMouse->addAxis("Flight_Pitch", MouseAxis(MouseDirection::Mouse_Y, 1.0, 0.1, false));
+	keyboardMouse->addAxis("Flight_Yaw", MouseAxis(MouseDirection::Mouse_X, 1.0, 0.1, false));
+
+	keyboardMouse->addButton("Flight_Shoot", KeyboardMouseButton(MOUSE, SDL_BUTTON_LEFT));
+
 
 	keyboardMouse->addButton("Flight_PitchUp", KeyboardMouseButton(KEYBOARD, SDL_SCANCODE_UP));
 	keyboardMouse->addButton("Flight_PitchDown", KeyboardMouseButton(KEYBOARD, SDL_SCANCODE_DOWN));
@@ -359,7 +362,7 @@ void InputManager::unloadJoystick(SDL_Joystick* joystick)
 
 void InputManager::centerMouse()
 {
-	if (this->mouseLocked == true)
+	if (this->mouseLocked == true && false)
 	{
 		int width, height;
 		if (Client::instance != nullptr)
@@ -377,7 +380,11 @@ void InputManager::setMouseLock(bool locked)
 	if (this->mouseLocked == true)
 	{
 		this->centerMouse();
-		SDL_ShowCursor(SDL_DISABLE);
+		//SDL_ShowCursor(SDL_DISABLE);
+
+		int width, height;
+		Client::instance->window->getWindowSize(width, height);
+		Client::instance->window->setMousePos(width / 2, height / 2);
 	}
 	else
 	{

@@ -8,7 +8,8 @@
 #include "Common/World/World.hpp"
 #include "Common/Entity/NodeEntity.hpp"
 
-DebugCamera::DebugCamera(double linear, double angular)
+DebugCamera::DebugCamera(Entity* entity, double linear, double angular)
+	:ComponentEntity(entity)
 {
 	linearSpeed = linear;
 	angularSpeed = angular;

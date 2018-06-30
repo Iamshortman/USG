@@ -1,17 +1,5 @@
 #include "Common/Transform.hpp"
 
-	Transform::Transform()
-	{
-		this->position = vector3D(0.0);
-		this->orientation = quaternionD(1.0, 0.0, 0.0, 0.0);
-	}
-
-	Transform::Transform(vector3D position)
-	{ 
-		this->position = position;
-		this->orientation = quaternionD(1.0, 0.0, 0.0, 0.0);
-	}
-
 	Transform::Transform(vector3D position, quaternionD orientation)
 	{
 		this->position = position;

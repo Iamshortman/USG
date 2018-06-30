@@ -6,7 +6,7 @@
 
 
 //Prototype TODO replace
-class Node;
+class I_Node;
 
 class MuiltiRigidBody : public RigidBody
 {
@@ -14,9 +14,9 @@ public:
 	MuiltiRigidBody(Entity* entity);
 	~MuiltiRigidBody();
 
-	void addChildShape(Node* node);
-	void removeChildShape(Node* node);
-	void updateChildShapeTransform(Node* node);
+	void addChildShape(I_Node* node);
+	void removeChildShape(I_Node* node);
+	void updateChildShapeTransform(I_Node* node);
 
 	virtual RigidBodyType getType() { return RigidBodyType::MULTI; };
 
@@ -27,7 +27,7 @@ private:
 		int shape_index;
 	};
 
-	std::map<Node*, ChildShape> child_shapes;
+	std::map<I_Node*, ChildShape> child_shapes;
 
 	btCompoundShape* compound_shape = nullptr;
 

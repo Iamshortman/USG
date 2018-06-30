@@ -6,9 +6,7 @@
 class Transform
 {
 public:
-	Transform();
-	Transform(vector3D position);
-	Transform(vector3D position, quaternionD orientation);
+	Transform(vector3D position = vector3D(0.0), quaternionD orientation = quaternionD(1.0, 0.0, 0.0, 0.0));
 
 	vector3D position;
 	quaternionD orientation;

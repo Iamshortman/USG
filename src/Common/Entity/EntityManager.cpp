@@ -3,7 +3,6 @@
 #include "Common/Component/Model.hpp"
 #include "Common/Physics/RigidBody.hpp"
 #include "Common/Component/ComponentShipFlight.hpp"
-#include "Common/Component/ComponentMass.hpp"
 
 #include "jsoncons/json.hpp"
 using jsoncons::json;
@@ -28,12 +27,13 @@ void EntityManager::update()
 {
 	while (!this->game_objects_to_delete.empty())
 	{
-		EntityId gameObjectId = this->game_objects_to_delete.top();
+		EntityId entity_id = this->game_objects_to_delete.top();
 
-		if (this->game_objects.count(gameObjectId))
+		if (this->game_objects.count(entity_id))
 		{
-			delete this->game_objects[gameObjectId];
-			this->game_objects.erase(gameObjectId);
+			this->game_objects[entity_id]->addToWorld(nullptr);
+			delete this->game_objects[entity_id];
+			this->game_objects.erase(entity_id);
 		}
 
 		this->game_objects_to_delete.pop();
@@ -42,47 +42,47 @@ void EntityManager::update()
 
 EntityId EntityManager::getNextId()
 {
-	EntityId game_object_id = this->next_id;
+	EntityId entity_id = this->next_id;
 
-	while (this->game_objects.find(game_object_id) != this->game_objects.end())
+	while (this->game_objects.find(entity_id) != this->game_objects.end())
 	{
 		this->next_id++;
-		game_object_id = this->next_id;
+		entity_id = this->next_id;
 	}
 
 	this->next_id++;
-	return game_object_id;
+	return entity_id;
 }
 
 Entity* EntityManager::createEntity()
 {
-	EntityId game_object_id = this->getNextId();
+	EntityId entity_id = this->getNextId();
 
-	Entity* game_object = new Entity(game_object_id);
-	this->game_objects[game_object_id] = game_object;
+	Entity* game_object = new Entity(entity_id);
+	this->game_objects[entity_id] = game_object;
 	return game_object;
 }
 
 NodeEntity* EntityManager::createNodeEntity()
 {
-	EntityId game_object_id = this->getNextId();
+	EntityId entity_id = this->getNextId();
 
-	NodeEntity* game_object = new NodeEntity(game_object_id);
-	this->game_objects[game_object_id] = game_object;
+	NodeEntity* game_object = new NodeEntity(entity_id);
+	this->game_objects[entity_id] = game_object;
 	return game_object;
 }
  
-Entity* EntityManager::getEntity(EntityId game_object_id)
+Entity* EntityManager::getEntity(EntityId entity_id)
 {
-	if (this->game_objects.find(game_object_id) == this->game_objects.end())
+	if (this->game_objects.find(entity_id) == this->game_objects.end())
 	{
 		return nullptr;
 	}
 
-	return this->game_objects[game_object_id];
+	return this->game_objects[entity_id];
 }
 
-void EntityManager::destroyEntity(EntityId game_object_id)
+void EntityManager::destroyEntity(EntityId entity_id)
 {
-	this->game_objects_to_delete.push(game_object_id);
+	this->game_objects_to_delete.push(entity_id);
 }

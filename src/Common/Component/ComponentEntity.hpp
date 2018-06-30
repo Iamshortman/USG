@@ -1,16 +1,23 @@
 #ifndef ENTITY_COMPONENT_HPP
 #define ENTITY_COMPONENT_HPP
 
-#include "Common/Component/Component.hpp"
-
 class Entity;
-class ComponentEntity : public virtual Component
+
+class ComponentEntity
 {
 public:
-	inline Entity* getParentEntity() { return this->parent_entity; };
+	ComponentEntity(Entity* entity) : parent_entity(entity) {};
+
+	virtual void update(double delta_time) {};
+
+	virtual void enable() { this->enabled = true; };
+	virtual void disable() { this->enabled = false; };
+	virtual bool isEnabled() { return this->enabled; };
+
+	Entity* const parent_entity;
 
 protected:
-	Entity* parent_entity = nullptr;
+	bool enabled = true;
 
 	friend class Entity;
 };

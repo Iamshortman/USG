@@ -16,13 +16,13 @@ NodeEntity::~NodeEntity()
 
 }
 
-void NodeEntity::update(double delta_Time)
+void NodeEntity::update(double delta_time)
 {
-	Entity::update(delta_Time);
+	Entity::update(delta_time);
 
 	for (auto child : this->child_nodes)
 	{
-		child->update(delta_Time);
+		child->update(delta_time);
 	}
 }
 

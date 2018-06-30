@@ -77,10 +77,13 @@ void RenderingManager::RenderWorld(World* world, Camera* camera)
 		{
 			if (entity->getType() == EntityType::ENTITY)
 			{
-				if (entity->hasComponent<Model>())
+				Model* model = entity->getNodeComponent<Model>();
+
+				if (model != nullptr && model->isEnabled())
 				{
-					this->RenderModel(entity->getComponent<Model>(), camera);
+					this->RenderModel(model, camera);
 				}
+
 			}
 			else if (entity->getType() == EntityType::NODE_ENTITY)
 			{
@@ -98,9 +101,11 @@ void RenderingManager::RenderWorld(World* world, Camera* camera)
 					Node* node = nodes.top();
 					nodes.pop();
 					
-					if (node->hasComponent<Model>())
+					Model* model = node->getNodeComponent<Model>();
+
+					if (model != nullptr && model->isEnabled())
 					{
-						this->RenderModel(node->getComponent<Model>(), camera);
+						this->RenderModel(model, camera);
 					}
 
 					for (Node* child : node->getChildNodes())
@@ -202,9 +207,10 @@ void RenderingManager::Render(World* baseWorld, Camera* camera)
 
 void RenderingManager::RenderModel(Model* model, Camera* camera)
 {
-	Transform globalTransform = model->getGlobalTransform();
-	matrix4 modelMatrix = globalTransform.getModleMatrix(camera->getPosition());
-	matrix4 mvp = camera->getProjectionMatrix(this->window) * camera->getOriginViewMatrix() * modelMatrix;
+	Transform globalTransform = model->parent_node->getGlobalTransform();
+	Transform cameraTransform = camera->parent_node->getGlobalTransform();
+	matrix4 modelMatrix = globalTransform.getModleMatrix(cameraTransform.getPosition());
+	matrix4 mvp = camera->getProjectionMatrix(this->window) * cameraTransform.getOriginViewMatrix() * modelMatrix;
 
 	vector3F ambientLight = vector3F(1.0f);//TODO ambient Light
 

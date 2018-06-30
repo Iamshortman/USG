@@ -1,12 +1,14 @@
 #ifndef ENTITY_HPP
 #define ENTITY_HPP
 
-#include <set>
-#include <map>
+#include "Common/Entity/I_Node.hpp"
 
 #include "Common/Transform.hpp"
 #include "Common/Component/ComponentEntity.hpp"
 #include "Common/Physics/RigidBody.hpp"
+
+#include <set>
+#include <map>
 
 enum EntityType
 {
@@ -19,7 +21,7 @@ class World;
 
 typedef uint32_t EntityId;
 
-class Entity
+class Entity : public I_Node
 {
 public:
 	virtual ~Entity();
@@ -27,15 +29,23 @@ public:
 	inline bool isAlive() { return this->alive; };
 	inline void kill() { this->alive = false; };
 
-	virtual void update(double delta_Time);
+	virtual void update(double delta_time);
+
+	virtual Node* getNode() { return nullptr; };
+	virtual Entity* getEntity() { return this; };
+
+	virtual void setLocalTransform(Transform transform);
+	virtual Transform getLocalTransform();
+	virtual Transform getRelativeTransform();
+	virtual Transform getWorldTransform();
+	virtual Transform getGlobalTransform();
 
 	template<typename T, typename... TArgs> T* addComponent(TArgs&&... mArgs)
 	{
 		if (!this->hasComponent<T>())
 		{
-			ComponentEntity* component = new T(std::forward<TArgs>(mArgs)...);
-			component->parent_entity = this;
-			component->enable();
+			ComponentEntity* component = new T(this, std::forward<TArgs>(mArgs)...);
+			//component->enable();
 			this->component_map[typeid(T).hash_code()] = component;
 			return (T*)component;
 		}
@@ -69,10 +79,6 @@ public:
 			this->component_map.erase(type);
 		}
 	};
-
-	void setLocalTransform(Transform transform);
-	Transform getLocalTransform();
-	Transform getGlobalTransform();
 
 	virtual void addToWorld(World* world);
 	inline World* getWorld() { return this->world; };

@@ -1,18 +1,25 @@
 #ifndef NODE_COMPONENT_HPP
 #define NODE_COMPONENT_HPP
 
-#include "Common/Component/Component.hpp"
+class I_Node;
 
-class Node;
-class ComponentNode : public virtual Component
+class ComponentNode
 {
 public:
-	inline Node* getParentNode() { return this->parent_node; };
+	ComponentNode(I_Node* node) : parent_node(node) {};
+
+	virtual void update(double delta_time) {};
+
+	virtual void enable() { this->enabled = true; };
+	virtual void disable() { this->enabled = false; };
+	virtual bool isEnabled() { return this->enabled; };
+
+	I_Node* const parent_node;
 
 protected:
-	Node* parent_node = nullptr;
+	bool enabled = true;
 
-	friend class Node;
+	friend class I_Node;
 };
 
 #endif //NODE_COMPONENT_HPP

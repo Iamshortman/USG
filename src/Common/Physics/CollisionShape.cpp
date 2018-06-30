@@ -1,7 +1,5 @@
 #include "CollisionShape.hpp"
 
-#include "Common/Entity/Entity.hpp"
-#include "Common/Entity/NodeEntity.hpp"
 #include "Common/Physics/Bullet_Include.hpp"
 #include "Common/Physics/SingleRigidBody.hpp"
 #include "Common/Physics/MuiltiRigidBody.hpp"
@@ -9,7 +7,8 @@
 #include "Common/Resource/Assimp_Include.hpp"
 #include "Common/Logger/Logger.hpp"
 
-CollisionShape::CollisionShape()
+CollisionShape::CollisionShape(I_Node* node)
+	:ComponentNode(node)
 {
 }
 
@@ -92,7 +91,7 @@ btCollisionShape* CollisionShape::getShape()
 	return this->shape;
 }
 
-void CollisionShape::enable()
+/*void CollisionShape::enable()
 {
 	if (!this->enabled && this->shape != nullptr)
 	{
@@ -126,11 +125,9 @@ void CollisionShape::enable()
 			}
 		}
 	}
+}*/
 
-	Component::enable();
-}
-
-void CollisionShape::disable()
+/*void CollisionShape::disable()
 {
 	if (this->enabled && this->shape != nullptr)
 	{
@@ -164,4 +161,4 @@ void CollisionShape::disable()
 	}
 
 	Component::disable();
-}
+}*/

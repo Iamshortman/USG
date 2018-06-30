@@ -11,7 +11,10 @@ Entity::Entity(EntityId objectId)
 
 Entity::~Entity()
 {
-
+	for (auto component : this->component_map)
+	{
+		delete component.second;
+	}
 }
 
 void Entity::update(double delta_time)
@@ -21,8 +24,8 @@ void Entity::update(double delta_time)
 		component.second->update(delta_time);
 	}
 
+	I_Node::update(delta_time);
 }
-
 void Entity::setLocalTransform(Transform transform)
 {
 	this->local_transform = transform;
@@ -41,6 +44,16 @@ Transform Entity::getLocalTransform()
 	}
 
 	return this->local_transform;
+}
+
+Transform Entity::getRelativeTransform()
+{
+	return Transform();
+}
+
+Transform Entity::getWorldTransform()
+{
+	return this->getLocalTransform();
 }
 
 Transform Entity::getGlobalTransform()

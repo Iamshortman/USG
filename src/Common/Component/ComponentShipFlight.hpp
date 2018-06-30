@@ -9,7 +9,7 @@
 class ComponentShipFlight : public ComponentEntity
 {
 public:
-	ComponentShipFlight();
+	ComponentShipFlight(Entity* entity);
 	virtual ~ComponentShipFlight();
 
 	virtual void update(double delta_time);
@@ -27,6 +27,9 @@ public:
 	vector3D max_angular_speed = vector3D(0.7);
 	vector3D angular_acceleration = vector3D(1.0);
 	vector3D angular_braking_acceleration = vector3D(3.0);
+
+	void UpdateLinearVelocity(double delta_time);
+	void UpdateAngularVelocity(double delta_time);
 };
 
 

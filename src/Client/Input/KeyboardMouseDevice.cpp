@@ -1,5 +1,6 @@
 #include "Client/Input/KeyboardMouseDevice.hpp"
 #include "Client/Client.hpp"
+#include "Client/Input/InputManager.hpp"
 
 KeyboardMouseDevice::KeyboardMouseDevice()
 {
@@ -49,8 +50,8 @@ void KeyboardMouseDevice::processEvent(SDL_Event event)
 
 void KeyboardMouseDevice::resetPreviousValues()
 {
-	this->mouse_axis_state[0] = 0;
-	this->mouse_axis_state[1] = 0;
+	//this->mouse_axis_state[0] = 0;
+	//this->mouse_axis_state[1] = 0;
 
 	for (int i = 0; i < 8; i++)
 	{
@@ -90,7 +91,7 @@ bool KeyboardMouseDevice::hasAxis(string name)
 AxisReturn KeyboardMouseDevice::getAxis(string name)
 {
 	AxisReturn axis;
-	if (this->hasAxis(name))
+	if (this->hasAxis(name) && InputManager::getInstance()->getMouseLock())
 	{
 		axis.timestamp = mouse_axis_timestamp;
 		MouseAxis mouse = this->axis_bindings[name];

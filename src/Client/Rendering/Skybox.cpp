@@ -1,5 +1,6 @@
 #include "Skybox.hpp"
 
+#include "Common/Entity/I_Node.hpp"
 #include "Client/Resource/ShaderPool.hpp"
 #include "Common/Logger/Logger.hpp"
 #include "Client/Resource/TexturePool.hpp"
@@ -56,7 +57,7 @@ void Skybox::draw(Camera* camera, int width, int height)
 	this->shader_program->setActiveProgram();
 	
 	this->shader_program->setUniform("projection", camera->getProjectionMatrix(width, height));
-	this->shader_program->setUniform("view", camera->getOriginViewMatrix());
+	this->shader_program->setUniform("view", camera->parent_node->getGlobalTransform().getOriginViewMatrix());
 
 	this->cube_mesh->draw(this->shader_program);
 }

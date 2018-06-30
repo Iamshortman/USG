@@ -13,33 +13,24 @@ Node::~Node()
 	{
 		delete node;
 	}
-
-	for (auto componet : this->component_map)
-	{
-		delete componet.second;
-	}
 }
 
-void Node::update(double deltaTime)
+void Node::update(double delta_time)
 {
 	for (Node* node : this->child_nodes)
 	{
-		node->update(deltaTime);
+		node->update(delta_time);
 	}
 
-	for (auto component : this->component_map)
-	{
-		component.second->update(deltaTime);
-	}
+	I_Node::update(delta_time);
 }
 
 void Node::addToEntity(NodeEntity* entity)
 {
-
-	for (auto component : this->component_map)
+	/*for (auto component : this->component_map)
 	{
 		component.second->disable();
-	}
+	}*/
 
 	this->parent_entity = entity;
 
@@ -50,10 +41,10 @@ void Node::addToEntity(NodeEntity* entity)
 
 	if (this->parent_entity != nullptr)
 	{
-		for (auto component : this->component_map)
+		/*for (auto component : this->component_map)
 		{
 			component.second->enable();
-		}
+		}*/
 	}
 }
 void Node::addChild(Node* node)
@@ -92,6 +83,18 @@ Transform Node::getRelativeTransform()
 	else
 	{
 		return this->localTransform;
+	}
+}
+
+Transform Node::getWorldTransform()
+{
+	if (this->parent != nullptr)
+	{
+		return this->localTransform.transformBy(this->parent->getWorldTransform());
+	}
+	else
+	{
+		return this->localTransform.transformBy(this->parent_entity->getLocalTransform());
 	}
 }
 

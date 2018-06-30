@@ -5,7 +5,7 @@
 
 struct DebugCamera : public ComponentEntity
 {
-	DebugCamera(double linear, double angular);
+	DebugCamera(Entity* entity, double linear, double angular);
 
 	//meter per second
 	double linearSpeed;

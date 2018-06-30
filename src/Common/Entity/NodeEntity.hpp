@@ -11,7 +11,7 @@ class NodeEntity : public Entity
 public:
 	virtual ~NodeEntity();
 
-	virtual void update(double delta_Time);
+	virtual void update(double delta_time);
 
 	virtual void addRigidBody();
 	virtual void removeRigidBody();

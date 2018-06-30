@@ -1,6 +1,6 @@
 #include "MuiltiRigidBody.hpp"
 
-#include "Common/Entity/Node.hpp"
+#include "Common/Entity/I_Node.hpp"
 #include "Common/Physics/PhysicsWorld.hpp"
 
 MuiltiRigidBody::MuiltiRigidBody(Entity* entity)
@@ -25,26 +25,26 @@ MuiltiRigidBody::~MuiltiRigidBody()
 	RigidBody::~RigidBody();
 }
 
-void MuiltiRigidBody::addChildShape(Node* node)
+void MuiltiRigidBody::addChildShape(I_Node* node)
 {
-	if (node->hasComponent<CollisionShape>())
+	if (node->hasNodeComponent<CollisionShape>())
 	{
 		if (this->rigidBody->getCollisionShape() == this->empty_shape)
 		{
 			this->setCollisionShape(this->compound_shape);
 		}
 
-		CollisionShape* shape = node->getComponent<CollisionShape>();
+		CollisionShape* shape = node->getNodeComponent<CollisionShape>();
 
 		this->compound_shape->addChildShape(toBtTransform(node->getRelativeTransform()), shape->getShape());
 	}
 }
 
-void MuiltiRigidBody::removeChildShape(Node* node)
+void MuiltiRigidBody::removeChildShape(I_Node* node)
 {
-	if (node->hasComponent<CollisionShape>())
+	if (node->hasNodeComponent<CollisionShape>())
 	{
-		CollisionShape* shape = node->getComponent<CollisionShape>();
+		CollisionShape* shape = node->getNodeComponent<CollisionShape>();
 
 		this->compound_shape->removeChildShape(shape->getShape());
 
@@ -55,11 +55,11 @@ void MuiltiRigidBody::removeChildShape(Node* node)
 	}
 }
 
-void MuiltiRigidBody::updateChildShapeTransform(Node* node)
+void MuiltiRigidBody::updateChildShapeTransform(I_Node* node)
 {
-	if (node->hasComponent<CollisionShape>())
+	if (node->hasNodeComponent<CollisionShape>())
 	{
-		CollisionShape* shape = node->getComponent<CollisionShape>();
+		CollisionShape* shape = node->getNodeComponent<CollisionShape>();
 
 		this->compound_shape->removeChildShape(shape->getShape());
 		this->compound_shape->addChildShape(toBtTransform(node->getRelativeTransform()), shape->getShape());
