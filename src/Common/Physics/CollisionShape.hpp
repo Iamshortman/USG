@@ -27,6 +27,9 @@ public:
 
 	btCollisionShape* getShape();
 
+	virtual void enable() override;
+	virtual void disable() override;
+
 private:
 
 	CollisionShapeType shape_type;

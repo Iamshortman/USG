@@ -63,10 +63,10 @@ NodeEntity* build_node()
 	right_engine->addNodeComponent<CollisionShape>()->setConvexMesh("res/models/Cobra/Col_Engine.obj");
 	{
 		Node* right_wing = new Node();
+		right_engine->addChild(right_wing);
 		right_wing->setLocalTransform(Transform(vector3D(-2.5, 0.0, 0.7)));
 		right_wing->addNodeComponent<Model>("res/models/Cobra/Wing_R.obj", "res/textures/1K_Grid.png", "res/shaders/Textured", "", "");
 		right_wing->addNodeComponent<CollisionShape>()->setConvexMesh("res/models/Cobra/Col_Wing_R.obj");
-		right_engine->addChild(right_wing);
 	}
 
 	Node* left_engine = new Node();
@@ -76,10 +76,10 @@ NodeEntity* build_node()
 	left_engine->addNodeComponent<CollisionShape>()->setConvexMesh("res/models/Cobra/Col_Engine.obj");
 	{
 		Node* left_wing = new Node();
+		left_engine->addChild(left_wing);
 		left_wing->setLocalTransform(Transform(vector3D(2.5, 0.0, 0.7)));
 		left_wing->addNodeComponent<Model>("res/models/Cobra/Wing_L.obj", "res/textures/1K_Grid.png", "res/shaders/Textured", "", "");
 		left_wing->addNodeComponent<CollisionShape>()->setConvexMesh("res/models/Cobra/Col_Wing_L.obj");
-		left_engine->addChild(left_wing);
 	}
 
 	Node* cockpit = new Node();

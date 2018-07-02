@@ -1,5 +1,7 @@
 #include "CollisionShape.hpp"
 
+#include "Common/Entity/Entity.hpp"
+#include "Common/Entity/Node.hpp"
 #include "Common/Physics/Bullet_Include.hpp"
 #include "Common/Physics/SingleRigidBody.hpp"
 #include "Common/Physics/MuiltiRigidBody.hpp"
@@ -10,15 +12,19 @@
 CollisionShape::CollisionShape(I_Node* node)
 	:ComponentNode(node)
 {
+	this->enabled = false;
+	this->enable();
 }
 
 CollisionShape::~CollisionShape()
 {
+	this->disable();
 }
 
 void CollisionShape::setBox(vector3D half_length)
 {
 	this->disable();
+
 
 	if (this->shape != nullptr)
 	{
@@ -91,74 +97,57 @@ btCollisionShape* CollisionShape::getShape()
 	return this->shape;
 }
 
-/*void CollisionShape::enable()
+void CollisionShape::enable()
 {
-	if (!this->enabled && this->shape != nullptr)
+	if (this->shape != nullptr)
 	{
-		if (this->parent_entity != nullptr)
-		{
-			RigidBody* rigid_body = this->parent_entity->getRigidBody();
-			if (rigid_body != nullptr)
-			{
-				if (rigid_body->getType() == RigidBodyType::SINGLE)
-				{
-					SingleRigidBody* single_body = (SingleRigidBody*)rigid_body;
-					single_body->setShape(this);
-				}
-			}
-		}
-		else if (this->parent_node != nullptr)
-		{
-			if (this->parent_node->getParentEntity() != nullptr)
-			{
-				this->shape->setUserPointer(this->parent_node);
+		//Null shape don't bother
+		return;
+	}
 
-				RigidBody* rigid_body = this->parent_node->getParentEntity()->getRigidBody();
-				if (rigid_body != nullptr)
-				{
-					if (rigid_body->getType() == RigidBodyType::MULTI)
-					{
-						MuiltiRigidBody* muilti_body = (MuiltiRigidBody*)rigid_body;
-						muilti_body->addChildShape(this->parent_node);
-					}
-				}
+	if (!this->enabled)
+	{
+		RigidBody* rigid_body = this->parent_node->getEntity()->getRigidBody();
+		if (rigid_body != nullptr)
+		{
+			if (rigid_body->getType() == RigidBodyType::SINGLE)
+			{
+				SingleRigidBody* single_body = (SingleRigidBody*)rigid_body;
+				single_body->setShape(this);
 			}
+			else if (rigid_body->getType() == RigidBodyType::MULTI)
+			{
+				MuiltiRigidBody* muilti_body = (MuiltiRigidBody*)rigid_body;
+				muilti_body->addChildShape(this->parent_node);
+			}
+
+			ComponentNode::enable();
+			return;
 		}
 	}
-}*/
 
-/*void CollisionShape::disable()
+	Logger::getInstance()->logError("Shape could not attach\n");
+}
+
+void CollisionShape::disable()
 {
 	if (this->enabled && this->shape != nullptr)
 	{
-		if (this->parent_entity != nullptr)
+		RigidBody* rigid_body = this->parent_node->getEntity()->getRigidBody();
+		if (rigid_body != nullptr)
 		{
-			RigidBody* rigid_body = this->parent_entity->getRigidBody();
-			if (rigid_body != nullptr)
+			if (rigid_body->getType() == RigidBodyType::SINGLE)
 			{
-				if (rigid_body->getType() == RigidBodyType::SINGLE)
-				{
-					SingleRigidBody* single_body = (SingleRigidBody*)rigid_body;
-					single_body->setShape(nullptr);
-				}
+				SingleRigidBody* single_body = (SingleRigidBody*)rigid_body;
+				single_body->setShape(nullptr);
 			}
-		}
-		else if (this->parent_node != nullptr)
-		{
-			if (this->parent_node->getParentEntity() != nullptr)
+			else if (rigid_body->getType() == RigidBodyType::MULTI)
 			{
-				RigidBody* rigid_body = this->parent_node->getParentEntity()->getRigidBody();
-				if (rigid_body != nullptr)
-				{
-					if (rigid_body->getType() == RigidBodyType::MULTI)
-					{
-						MuiltiRigidBody* muilti_body = (MuiltiRigidBody*)rigid_body;
-						muilti_body->removeChildShape(this->parent_node);
-					}
-				}
+				MuiltiRigidBody* muilti_body = (MuiltiRigidBody*)rigid_body;
+				muilti_body->removeChildShape(this->parent_node);
 			}
 		}
 	}
 
-	Component::disable();
-}*/
+	ComponentNode::disable();
+}
