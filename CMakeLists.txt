@@ -78,9 +78,9 @@ target_link_libraries (Server assimp-vc140-mt)
 target_link_libraries (Client assimp-vc140-mt)
 
 #AngelScript
-include_directories(lib/angelscript_2.31.2/sdk/angelscript/include/)
-target_link_libraries (Client angelscript64d)
-target_link_libraries (Server angelscript64d)
+#include_directories(lib/angelscript_2.31.2/sdk/angelscript/include/)
+#target_link_libraries (Client angelscript64d)
+#target_link_libraries (Server angelscript64d)
 
 #RakNet-master/build/Lib/DLL/Debug/
 include_directories(lib/RakNet-master/source/)
