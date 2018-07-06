@@ -30,7 +30,7 @@ int main()
 		frames++;
 		if (currentTime - lastTime > 1000)
 		{
-			game->window->setTitleString("USG FPS: " + std::to_string(frames));
+			//game->window->setTitleString("USG FPS: " + std::to_string(frames));
 			lastTime = currentTime;
 			frames = 0;
 		}

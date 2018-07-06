@@ -23,7 +23,7 @@ public:
 		{
 			this->resources[name].usingCount++;
 		}
-		else
+		else if(name != "")
 		{
 			Resource<T> resource;
 			resource.usingCount = 1;
@@ -74,6 +74,11 @@ public:
 protected:
 	bool hasResource(string name)
 	{
+		if (name == "")
+		{
+			return false;
+		}
+
 		return this->resources.find(name) != this->resources.end();
 	};
 

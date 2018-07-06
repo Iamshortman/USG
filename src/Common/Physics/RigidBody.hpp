@@ -1,12 +1,16 @@
 #ifndef RIGIDBODY_HPP
 #define RIGIDBODY_HPP
 
-#include <unordered_map>
-
 #include "Common/Physics/Bullet_Include.hpp"
 #include "Common/Physics/CollisionShape.hpp"
 #include "Common/GLM_Include.hpp"
 #include "Common/Transform.hpp"
+
+enum RigidBodyType
+{
+	SINGLE,
+	MULTI,
+};
 
 //Prototype Class
 class PhysicsWorld;
@@ -14,17 +18,15 @@ class PhysicsWorld;
 class RigidBody
 {
 public:
-	RigidBody(bool is_static = false);
+	RigidBody();
 	virtual ~RigidBody();
 
-	int addChildShape(CollisionShape* shape);
-	void removeChildShape(int id);
-
-	/*void setMass(double massToAdd);
+	void setMass(double massToAdd);
 	double getMass();
 
 	void setInertiaTensor(vector3D inertia);
-	vector3D getInertiaTensor();*/
+	vector3D getInertiaTensor();
+	void calcInertiaTensorFromShape();
 
 	void Activate(bool activate);
 
@@ -48,21 +50,22 @@ public:
 
 	void setDampening(double linear, double angular);
 
-	btRigidBody* getRigidBody();
+	inline btRigidBody* getRigidBody() { return this->rigidBody; };
 
-	bool enabled = false;
+	inline PhysicsWorld* getPhysicsWorld() { return this->physics_world; };
+	inline void setPhysicsWorld(PhysicsWorld* world) { this->physics_world = world; };
 
-private:
-	const bool is_static;
+	virtual RigidBodyType getType() = 0;
+
+protected:
+	void setCollisionShape(btCollisionShape* shape);
+
+	double mass = 1.0;
+	vector3D inertia = vector3D(1.0);
 
 	btRigidBody* rigidBody = nullptr;
-	btCompoundShape* compoundShape = nullptr;
-	std::unordered_map<int, CollisionShape*> childShapes;
-	btEmptyShape* emptyShape = nullptr;
 
-	PhysicsWorld* world = nullptr;
-
-	int getNextId();
+	PhysicsWorld* physics_world = nullptr;
 };
 
 #endif //RIGIDBODY_HPP

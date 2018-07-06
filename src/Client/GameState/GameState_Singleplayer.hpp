@@ -13,6 +13,7 @@ public:
 	virtual void update(Client* client, double delta_time);
 
 	EntityX ecs_system;
+	Entity entity;
 
 private:
 };

@@ -1,16 +1,4 @@
-#include "Common/Transform.hpp"
-
-	Transform::Transform()
-	{
-		this->position = vector3D(0.0);
-		this->orientation = quaternionD(1.0, 0.0, 0.0, 0.0);
-	}
-
-	Transform::Transform(vector3D position)
-	{ 
-		this->position = position;
-		this->orientation = quaternionD(1.0, 0.0, 0.0, 0.0);
-	}
+#include "Transform.hpp"
 
 	Transform::Transform(vector3D position, quaternionD orientation)
 	{
@@ -19,26 +7,6 @@
 	}
 
 	//Getters for the directional vectors.
-	vector3D Transform::getPosition() const
-	{ 
-		return this->position; 
-	}
-
-	vector3D Transform::getForward() const
-	{ 
-		return this->orientation * vector3D(0.0f, 0.0f, 1.0f); 
-	}
-
-	vector3D Transform::getUp() const 
-	{ 
-		return this->orientation * vector3D(0.0f, 1.0f, 0.0f); 
-	}
-
-	vector3D Transform::getLeft() const 
-	{ 
-		return this->orientation * vector3D(1.0f, 0.0f, 0.0f); 
-	}
-
 	vector3D Transform::getDirection(int i) const
 	{
 		if (i == 0)
@@ -55,33 +23,6 @@
 		}
 
 		return vector3D(0.0);
-	}
-
-	quaternionD Transform::getOrientation() const 
-	{ 
-		return this->orientation; 
-	}
-
-	void Transform::setPosition(const vector3D& vec)
-	{ 
-		this->position = vec; 
-	}
-
-	void Transform::setOrientation(const quaternionD& quat)
-	{ 
-		this->orientation = quat; 
-	}
-
-	void Transform::setTransform(const Transform& transform)
-	{
-		this->setPosition(getPosition());
-		this->setOrientation(getOrientation());
-	}
-
-	void Transform::setPositionAndRotationFromTransform(const Transform& transform)
-	{
-		this->setPosition(getPosition());
-		this->setOrientation(getOrientation());
 	}
 
 	matrix4 Transform::getModleMatrix() const
@@ -113,7 +54,7 @@
 	}
 
 
-	Transform Transform::transformBy(const Transform&  transform1) const
+	Transform Transform::transformBy(const Transform& transform1) const
 	{
 		Transform result;
 		result.setOrientation(transform1.getOrientation() * this->getOrientation());

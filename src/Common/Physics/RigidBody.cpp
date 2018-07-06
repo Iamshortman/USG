@@ -4,47 +4,54 @@
 
 #include "Common/Logger/Logger.hpp"
 
-#define DEFAULT_MASS 100.0
-
-RigidBody::RigidBody(bool is_static)
-	:is_static(is_static)
+RigidBody::RigidBody()
 {
-	this->emptyShape = new btEmptyShape();
-
-	//btCollisionShape* shape = new btBoxShape(btVector3(0.5, 0.5, 0.5));
 }
 
 RigidBody::~RigidBody()
 {
-
-	if (this->compoundShape != nullptr)
+	if (this->physics_world != nullptr)
 	{
-		delete this->compoundShape;
+		this->physics_world->removeRigidBody(this);
+		this->physics_world = nullptr;
 	}
 
-	if (this->emptyShape != nullptr)
+	if (this->rigidBody != nullptr)
 	{
-		delete this->emptyShape;
+		delete this->rigidBody;
 	}
 }
 
-int RigidBody::addChildShape(CollisionShape* shape)
+void RigidBody::setMass(double massToAdd)
 {
-	int id = getNextId();
-
-	this->childShapes[id] = shape;
-
-	return id;
+	this->mass = massToAdd;
+	this->rigidBody->setMassProps(this->mass, toBtVec3(this->inertia));
 }
 
-void RigidBody::removeChildShape(int id)
+double RigidBody::getMass()
 {
-	if (id < 0)
-	{
-		return;
-	}
+	return this->mass;
+}
 
-	this->childShapes.erase(id);
+void RigidBody::setInertiaTensor(vector3D inertiaToSet)
+{
+	this->inertia = inertiaToSet;
+	this->rigidBody->setMassProps(this->mass, toBtVec3(this->inertia));
+}
+
+vector3D RigidBody::getInertiaTensor()
+{
+	return this->inertia;
+}
+
+void RigidBody::calcInertiaTensorFromShape()
+{
+	if (this->mass > 0.0)
+	{
+		btVector3 inertia_tensor = btVector3(0.0, 0.0, 0.0);
+		this->rigidBody->getCollisionShape()->calculateLocalInertia(this->mass, inertia_tensor);
+		this->inertia = toVec3(inertia_tensor);
+	}
 }
 
 void RigidBody::Activate(bool activate)
@@ -117,19 +124,17 @@ void RigidBody::setDampening(double linear, double angular)
 	rigidBody->setDamping(linear, angular);
 }
 
-btRigidBody* RigidBody::getRigidBody()
+void RigidBody::setCollisionShape(btCollisionShape* shape)
 {
-	return this->rigidBody;
-}
-
-int RigidBody::getNextId()
-{
-	int id = 0;
-
-	while (this->childShapes.find(id) != this->childShapes.end())
+	if (this->physics_world != nullptr)
 	{
-		id++;
+		PhysicsWorld* world = this->physics_world;
+		this->physics_world->removeRigidBody(this);
+		this->rigidBody->setCollisionShape(shape);
+		world->addRigidBody(this);
 	}
-
-	return id;
+	else
+	{
+		this->rigidBody->setCollisionShape(shape);
+	}
 }

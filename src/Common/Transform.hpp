@@ -6,25 +6,22 @@
 class Transform
 {
 public:
-	Transform();
-	Transform(vector3D position);
-	Transform(vector3D position, quaternionD orientation);
+	Transform(vector3D position = vector3D(0.0), quaternionD orientation = quaternionD(1.0, 0.0, 0.0, 0.0));
 
 	vector3D position;
 	quaternionD orientation;
 
 	//Getters for the directional vectors.
-	vector3D getPosition() const;
-	vector3D getForward() const;
-	vector3D getUp() const;
-	vector3D getLeft() const;
+	inline vector3D getPosition() const { return this->position; };
+	inline vector3D getForward() const { return this->orientation * vector3D(0.0f, 0.0f, 1.0f); };
+	inline vector3D getUp() const { return this->orientation * vector3D(0.0f, 1.0f, 0.0f); };
+	inline vector3D getLeft() const { return this->orientation * vector3D(1.0f, 0.0f, 0.0f); };
 	vector3D getDirection(int i) const;
-	quaternionD getOrientation() const;
+	inline quaternionD getOrientation() const { return this->orientation; };
 
-	void setPosition(const vector3D& vec);
-	void setOrientation(const quaternionD& quat);
-	void setTransform(const Transform& transform);
-	void setPositionAndRotationFromTransform(const Transform& transform);
+	inline void setPosition(const vector3D& vec) { this->position = vec; };
+	inline void setOrientation(const quaternionD& quat) { this->orientation = quat; };
+	inline void setTransform(const Transform& trans) { this->setPosition(trans.getPosition()); this->setOrientation(trans.getOrientation()); };
 	Transform transformBy(const Transform&  transform1) const;
 
 	matrix4 getModleMatrix() const;

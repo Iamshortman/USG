@@ -55,7 +55,7 @@ RenderingManager::~RenderingManager()
 	delete this->full_screen_quad_program;
 }
 
-void RenderingManager::renderScene(entityx::EntityX &ecs_system)
+void RenderingManager::renderScene()
 {
 	int windowWidth, windowHeight, bufferWidth, bufferHeight;
 	this->window->getWindowSize(windowWidth, windowHeight);
@@ -69,22 +69,21 @@ void RenderingManager::renderScene(entityx::EntityX &ecs_system)
 		this->ms_g_buffer = new G_Buffer(windowWidth, windowHeight, true, 8);
 	}
 
-	std::set<ComponentModel*> models;
-	std::set<void*> lights;
-	std::set<void*> models_transparent;
-
 	glBindFramebuffer(GL_FRAMEBUFFER, this->ms_g_buffer->getFBO());
 	this->ms_g_buffer->clearBuffer();
 
-	for (Entity entity : ecs_system.entities.entities_with_components<ComponentModel, Transform>())
+	//RENDER MODELS HERE!!!!!!!!!!!!!!!!!!!!!!!!
+
+	while (!models.empty())
 	{
-		ComponentHandle<ComponentModel> model = entity.component<ComponentModel>();
-		ComponentHandle<Transform> transform = entity.component<Transform>();
+		auto model = models.front();
 
-		Camera camera;
+		this->RenderModel(model.first, &this->camera, model.second, this->camera_transform);
 
-		this->RenderModel(model.get(), &camera, getEntityTransform(entity), Transform());
+		models.pop();
 	}
+
+	this->current_texture = "";
 
 	this->g_buffer->clearBuffer();
 	//Blit all 3 color attachments + depth
@@ -127,6 +126,8 @@ void RenderingManager::renderScene(entityx::EntityX &ecs_system)
 	glActiveTexture(GL_TEXTURE2);
 	glBindTexture(GL_TEXTURE_2D, this->g_buffer->getAlbedoTexture());
 
+	//CALC LIGHTING HERE
+
 
 	this->full_screen_quad_program->setActiveProgram();
 	this->full_screen_quad_program->setUniform("gPosition", 0);
@@ -140,7 +141,23 @@ void RenderingManager::renderScene(entityx::EntityX &ecs_system)
 	this->window->updateBuffer(); 
 }
 
-void RenderingManager::RenderModel(ComponentModel* model, Camera* camera, Transform model_transform, Transform camera_tranform)
+void RenderingManager::setCamera(Camera camera, Transform global_transform)
+{
+	this->camera = camera;
+	this->camera_transform = global_transform;
+}
+
+void RenderingManager::addModel(Model* model, Transform global_transform)
+{
+	this->models.push(std::make_pair(model, global_transform));
+}
+
+void RenderingManager::addLight(BaseLight* light, Transform global_transform)
+{
+	//TODO
+}
+
+void RenderingManager::RenderModel(Model* model, Camera* camera, Transform& model_transform, Transform& camera_tranform)
 {
 	matrix4 modelMatrix = model_transform.getModleMatrix(camera_tranform.getPosition());
 	matrix4 mvp = camera->getProjectionMatrix(this->window) * camera_tranform.getOriginViewMatrix() * modelMatrix;
@@ -149,19 +166,22 @@ void RenderingManager::RenderModel(ComponentModel* model, Camera* camera, Transf
 
 	Mesh* mesh = MeshPool::getInstance()->get(model->getMesh());
 
-	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, TexturePool::getInstance()->get(model->getTexture()));
+	if (model->getTexture() != this->current_texture)
+	{
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, TexturePool::getInstance()->get(model->getTexture()));
+		this->current_texture = model->getTexture();
+	}
+
 
 	//Ambient pass
-	ShaderProgram* ambient_shader = ShaderPool::getInstance()->get(model->getAmbientShader());
+	ShaderProgram* ambient_shader = ShaderPool::getInstance()->get(model->getGBufferShader());
 
 	ambient_shader->setActiveProgram();
 	ambient_shader->setUniform("MVP", mvp);
 	ambient_shader->setUniform("modelMatrix", modelMatrix);
 	ambient_shader->setUniform("normalMatrix", model_transform.getNormalMatrix());
 	ambient_shader->setUniform("ambientLight", ambientLight);
-
-	//ambient_shader->setUniform("texture1", TexturePool::getInstance()->get("res/textures/1K_Grid.png"));
 
 	mesh->draw(ambient_shader);
 

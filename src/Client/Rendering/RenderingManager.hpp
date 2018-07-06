@@ -11,12 +11,11 @@
 
 #include "Common/Resource/Mesh.hpp"
 #include "Common/GLM_Include.hpp"
-
-#include "Common/Component/ComponentModel.hpp"
-
+#include "Common/Rendering/Model.hpp"
+#include "Common/Rendering/Lights.hpp"
 #include "Common/Transform.hpp"
 
-#include "Common/EntityX_Include.hpp"
+#include <queue>
 
 class RenderingManager
 {
@@ -24,16 +23,31 @@ public:
 	RenderingManager(Window* window);
 	virtual ~RenderingManager();
 
-	void renderScene(EntityX &ecs_system);
+	void renderScene();
 
-	void RenderModel(ComponentModel* model, Camera* camera, Transform model_transform, Transform camera_tranform);
+	void setCamera(Camera camera, Transform global_transform);
+
+	void addModel(Model* model, Transform global_transform);
+	void addLight(BaseLight* light, Transform global_transform);
 
 private:
-	Skybox* skybox = nullptr;
+	//Storage for models and Lights
+	std::queue<std::pair<Model*, Transform>> models;
 
+	//Settings
+	bool use_lighting = true;
+
+	// Internal Functions
+	void RenderModel(Model* model, Camera* camera, Transform& model_transform, Transform& camera_tranform);
+
+	//Variables
+	Camera camera;
+	Transform camera_transform;
+
+	Skybox* skybox = nullptr;
 	Window* window = nullptr;
 
-	bool use_lighting = true;
+	string current_texture;
 
 	//Deferred Shading
 	G_Buffer* g_buffer = nullptr;
