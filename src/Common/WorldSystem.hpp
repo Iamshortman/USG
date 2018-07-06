@@ -3,37 +3,34 @@
 
 #include "Common/EntityX_Include.hpp"
 #include "Common/Transform.hpp"
-#include <map>
+#include "Common/Physics/PhysicsWorld.hpp"
 
+#include <map>
+#include <set>
 
 typedef uint32_t WorldId;
 
 struct WorldChangeEvent
 {
-	WorldChangeEvent(entityx::Entity entity, WorldId new_world) : entity(entity), new_world(new_world) {}
+	WorldChangeEvent(Entity entity, WorldId new_world) : entity(entity), new_world(new_world) {}
 
-	entityx::Entity entity;
+	Entity entity;
 	WorldId new_world;
 };
 
-struct WorldTransform
+struct World
 {
-	WorldTransform(Transform trans, WorldId world = 0)
-	{
-		transform = trans;
-		worldId = world;
-	}
-	WorldTransform(vector3D position, WorldId world = 0) : WorldTransform(Transform(position), world) {}
-	WorldTransform(vector3D position, quaternionD orientation, WorldId world = 0) : WorldTransform(Transform(position, orientation), world) {}
-
-	Transform transform;
-	WorldId worldId;
+	World(WorldId id) : world_id(id) {}
+	const WorldId world_id;
 };
 
-struct SubWorld
+struct WorldHost
 {
-	SubWorld(WorldId id) : worldId(id) {}
-	const WorldId worldId;
+	WorldHost(WorldId id) : world_id(id) {}
+	const WorldId world_id;
+
+	std::set<Entity> entity_list;
+	PhysicsWorld* physics_world;
 };
 
 class WorldSystem : public System<WorldSystem>, public Receiver<WorldSystem>
@@ -45,20 +42,35 @@ public:
 
 	//Events
 	void configure(entityx::EventManager &event_manager);
-	void receive(const ComponentAddedEvent<SubWorld> &event);
-	void receive(const ComponentRemovedEvent<SubWorld>& event);
 
-	void receive(const ComponentAddedEvent<WorldTransform> &event);
-	void receive(const ComponentRemovedEvent<WorldTransform>& event);
+	void receive(const WorldChangeEvent& event);
 
-	void receive(const ComponentRemovedEvent<WorldChangeEvent>& event);
+	void receive(const ComponentAddedEvent<WorldHost> &event);
+	void receive(const ComponentRemovedEvent<WorldHost>& event);
 
-	bool hasWorld(WorldId id);
-	Entity getWorld(WorldId id);
-
+	void receive(const ComponentAddedEvent<World> &event);
+	void receive(const ComponentRemovedEvent<World>& event);
 private:
-	std::map<WorldId, Entity> worlds;
 };
 
+class WorldList
+{
+public:
+	static WorldList* getInstance();
+
+	~WorldList();
+
+	bool hasWorldHost(WorldId id);
+	Entity getWorldHost(WorldId id);
+
+private:
+	//Instance for the Singleton design pattern;
+	static WorldList* instance;
+	WorldList();
+
+	std::map<WorldId, Entity> worlds;
+
+	friend WorldSystem;
+};
 
 #endif //WORLD_SYSTEM_HPP

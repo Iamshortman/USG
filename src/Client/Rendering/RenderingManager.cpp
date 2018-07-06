@@ -74,14 +74,19 @@ void RenderingManager::renderScene()
 
 	//RENDER MODELS HERE!!!!!!!!!!!!!!!!!!!!!!!!
 
-	while (!models.empty())
+	for (auto model_list : this->models)
 	{
-		auto model = models.front();
+		while (!model_list.second.empty())
+		{
+			auto model = model_list.second.front();
 
-		this->RenderModel(model.first, &this->camera, model.second, this->camera_transform);
+			this->RenderModel(model.first, &this->camera, model.second, this->camera_transform);
 
-		models.pop();
+			model_list.second.pop();
+		}
 	}
+
+	this->models.clear();
 
 	this->current_texture = "";
 
@@ -147,12 +152,12 @@ void RenderingManager::setCamera(Camera camera, Transform global_transform)
 	this->camera_transform = global_transform;
 }
 
-void RenderingManager::addModel(Model* model, Transform global_transform)
+void RenderingManager::addModel(Model* model, Transform global_transform, WorldId world_id)
 {
-	this->models.push(std::make_pair(model, global_transform));
+	this->models[world_id].push(std::make_pair(model, global_transform));
 }
 
-void RenderingManager::addLight(BaseLight* light, Transform global_transform)
+void RenderingManager::addLight(BaseLight* light, Transform global_transform, WorldId world_id)
 {
 	//TODO
 }

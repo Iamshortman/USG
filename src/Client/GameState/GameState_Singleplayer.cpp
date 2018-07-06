@@ -13,17 +13,20 @@ GameState_Singleplayer::GameState_Singleplayer()
 {
 	this->ecs_system.systems.add<PhysicsSystem>();
 	this->ecs_system.systems.add<RenderingSystem>();
+	this->ecs_system.systems.add<WorldSystem>();
 	this->ecs_system.systems.configure();
 
 	Entity root = this->ecs_system.entities.create();
-	root.assign<SubWorld>(0);
+	root.assign<WorldHost>(0);
 
 	entity = this->ecs_system.entities.create();
-	entity.assign<WorldTransform>(vector3D(0.0, -2.0, 10.0));
+	entity.assign<Transform>(vector3D(0.0, -2.0, 10.0));
+	entity.assign<World>(0);
 	entity.assign<Model>("res/models/A-Wing/a-wing-body.obj", "res/textures/A-Wing/a-wing-body.png", "res/shaders/Textured", "");
 	entity.assign<SingleRigidBody>();
 	entity.assign<CollisionShape>()->setConvexMesh("res/models/A-Wing/a-wing-body.obj");
 
+	entity.component<SingleRigidBody>()->Activate(true);
 }
 
 GameState_Singleplayer::~GameState_Singleplayer()

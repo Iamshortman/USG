@@ -14,7 +14,9 @@
 #include "Common/Rendering/Model.hpp"
 #include "Common/Rendering/Lights.hpp"
 #include "Common/Transform.hpp"
+#include "Common/WorldSystem.hpp"
 
+#include <map>
 #include <queue>
 
 class RenderingManager
@@ -27,12 +29,12 @@ public:
 
 	void setCamera(Camera camera, Transform global_transform);
 
-	void addModel(Model* model, Transform global_transform);
-	void addLight(BaseLight* light, Transform global_transform);
+	void addModel(Model* model, Transform global_transform, WorldId world_id);
+	void addLight(BaseLight* light, Transform global_transform, WorldId world_id);
 
 private:
 	//Storage for models and Lights
-	std::queue<std::pair<Model*, Transform>> models;
+	std::map<WorldId, std::queue<std::pair<Model*, Transform>>> models;
 
 	//Settings
 	bool use_lighting = true;

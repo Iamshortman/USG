@@ -26,16 +26,18 @@ RenderingSystem::~RenderingSystem()
 #include "Common/Rendering/Model.hpp"
 #include "Common/Transforms.hpp"
 
-
 inline void RenderingSystem::update(EntityManager& es, EventManager& events, TimeDelta dt)
 {
 	ComponentHandle<Model> model_pattern;
-	for (Entity entity : es.entities_with_components(model_pattern))
+	ComponentHandle<World> world_pattern;
+	for (Entity entity : es.entities_with_components(model_pattern, world_pattern))
 	{
 		ComponentHandle<Model> model = entity.component<Model>();
-		Transform global_transform = Transforms::getLocalTransform(entity);
+		ComponentHandle<World> world = entity.component<World>();
 
-		Client::instance->renderingManager->addModel(model.get(), global_transform);
+		Transform global_transform = Transforms::getGlobalTransform(entity);
+
+		Client::instance->renderingManager->addModel(model.get(), global_transform, world->world_id);
 	}
 }
 

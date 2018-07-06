@@ -10,50 +10,122 @@ WorldSystem::~WorldSystem()
 {
 }
 
-void WorldSystem::update(EntityManager & es, EventManager & events, TimeDelta dt)
+void WorldSystem::update(EntityManager& es, EventManager& events, TimeDelta dt)
 {
 }
 
-void WorldSystem::configure(entityx::EventManager & event_manager)
+void WorldSystem::configure(entityx::EventManager& event_manager)
 {
-	event_manager.subscribe<ComponentAddedEvent<SubWorld>>(*this);
-	event_manager.subscribe<ComponentRemovedEvent<SubWorld>>(*this);
+	event_manager.subscribe<WorldChangeEvent>(*this);
 
-	event_manager.subscribe<ComponentAddedEvent<WorldTransform>>(*this);
-	event_manager.subscribe<ComponentRemovedEvent<WorldTransform>>(*this);
+	event_manager.subscribe<ComponentAddedEvent<WorldHost>>(*this);
+	event_manager.subscribe<ComponentRemovedEvent<WorldHost>>(*this);
+
+	event_manager.subscribe<ComponentAddedEvent<World>>(*this);
+	event_manager.subscribe<ComponentRemovedEvent<World>>(*this);
 }
 
-void WorldSystem::receive(const ComponentAddedEvent<SubWorld>& event)
+void WorldSystem::receive(const WorldChangeEvent& event)
 {
 	Entity entity = event.entity;
 
-	if (this->hasWorld(event.component->worldId))
+	if (entity.has_component<World>())
 	{
-		Logger::getInstance()->logError("World %d already exists\n", event.component->worldId);
-		entity.remove<SubWorld>();
+		entity.remove<World>();
+	}
+
+	entity.assign<World>(event.new_world);
+}
+
+void WorldSystem::receive(const ComponentAddedEvent<WorldHost>& event)
+{
+	Entity entity = event.entity;
+
+	if (WorldList::getInstance()->hasWorldHost(event.component->world_id))
+	{
+		Logger::getInstance()->logError("World %d already exists\n", event.component->world_id);
+		entity.remove<WorldHost>();
 
 		return;
 	}
 
-	worlds[event.component->worldId] = entity;
+	WorldList::getInstance()->worlds[event.component->world_id] = entity;
+
+	entity.component<WorldHost>()->physics_world = new PhysicsWorld();
+	entity.component<WorldHost>()->physics_world->dynamicsWorld->setGravity(btVector3(0.0, -0.98, 0.0));
 }
 
-void WorldSystem::receive(const ComponentRemovedEvent<SubWorld>& event)
+void WorldSystem::receive(const ComponentRemovedEvent<WorldHost>& event)
 {
-	if (this->hasWorld(event.component->worldId))
+	if (WorldList::getInstance()->hasWorldHost(event.component->world_id))
 	{
-		worlds.erase(event.component->worldId);
+		WorldList::getInstance()->worlds.erase(event.component->world_id);
+	}
+
+	//Destory all entities
+	for (Entity child : event.component->entity_list)
+	{
+		child.destroy();
+	}
+
+	Entity entity = event.entity;
+	delete entity.component<WorldHost>()->physics_world;
+}
+
+void WorldSystem::receive(const ComponentAddedEvent<World>& event)
+{
+	Entity entity = event.entity;
+
+	if (WorldList::getInstance()->hasWorldHost(event.component->world_id))
+	{
+		Entity world_host = WorldList::getInstance()->getWorldHost(event.component->world_id);
+		ComponentHandle<WorldHost> world = world_host.component<WorldHost>();
+		world->entity_list.insert(entity);
+	}
+	else
+	{
+		Logger::getInstance()->logError("WorldAdd: World %d doesn't exists\n", event.component->world_id);
+		entity.remove<World>();
 	}
 }
 
-bool WorldSystem::hasWorld(WorldId id)
+void WorldSystem::receive(const ComponentRemovedEvent<World>& event)
+{
+	Entity entity = event.entity;
+
+	if (WorldList::getInstance()->hasWorldHost(event.component->world_id))
+	{
+		Entity world_host = WorldList::getInstance()->getWorldHost(event.component->world_id);
+		ComponentHandle<WorldHost> world = world_host.component<WorldHost>();
+		world->entity_list.erase(entity);
+	}
+}
+
+WorldList* WorldList::instance = nullptr;
+
+WorldList* WorldList::getInstance()
+{
+	if (WorldList::instance == nullptr)
+	{
+		WorldList::instance = new WorldList();
+	}
+
+	return WorldList::instance;
+}
+
+WorldList::~WorldList()
+{
+
+}
+
+bool WorldList::hasWorldHost(WorldId id)
 {
 	return this->worlds.find(id) != this->worlds.end();
 }
 
-Entity WorldSystem::getWorld(WorldId id)
+Entity WorldList::getWorldHost(WorldId id)
 {
-	if (this->hasWorld(id))
+	if (this->hasWorldHost(id))
 	{
 		return this->worlds[id];
 	}
@@ -61,12 +133,7 @@ Entity WorldSystem::getWorld(WorldId id)
 	return Entity(); //Should be invalid
 }
 
-void WorldSystem::receive(const ComponentAddedEvent<WorldTransform>& event)
-{
-
-}
-
-void WorldSystem::receive(const ComponentRemovedEvent<WorldTransform>& event)
+WorldList::WorldList()
 {
 
 }

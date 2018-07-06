@@ -26,23 +26,28 @@ public:
 
 
 private:
-	PhysicsWorld* temp_world;
+	//PhysicsWorld* temp_world;
 };
 
 PhysicsSystem::PhysicsSystem()
 {
-	this->temp_world = new PhysicsWorld();
-	this->temp_world->dynamicsWorld->setGravity(btVector3(0.0, -0.98, 0.0));
+	//this->temp_world = new PhysicsWorld();
+	//this->temp_world->dynamicsWorld->setGravity(btVector3(0.0, -0.98, 0.0));
 }
 
 PhysicsSystem::~PhysicsSystem()
 {
-	delete this->temp_world;
+	//delete this->temp_world;
 }
 
 inline void PhysicsSystem::update(EntityManager& es, EventManager& events, TimeDelta dt)
 {
-	this->temp_world->update(dt);
+	ComponentHandle<WorldHost> world_host_pattern;
+	for (Entity entity : es.entities_with_components(world_host_pattern))
+	{
+		ComponentHandle<WorldHost> world = entity.component<WorldHost>();
+		world->physics_world->update(dt);
+	}
 }
 
 inline void PhysicsSystem::configure(entityx::EventManager& event_manager)
@@ -59,18 +64,23 @@ inline void PhysicsSystem::receive(const ComponentAddedEvent<SingleRigidBody>& e
 	Entity entity = event.entity;
 	ComponentHandle<SingleRigidBody> rigid_body = event.component;
 
-	if (entity.has_component<WorldTransform>())
+	if (entity.has_component<World>())
 	{
-		ComponentHandle<WorldTransform> transform = entity.component<WorldTransform>();
-		this->temp_world->addRigidBody(rigid_body.get());
+		if (entity.has_component<Transform>())
+		{
+			rigid_body->setWorldTransform(*entity.component<Transform>());
+		}
 
-		Transform trans = transform->transform;
+		Entity world_host = WorldList::getInstance()->getWorldHost(entity.component<World>()->world_id);
+		ComponentHandle<WorldHost> world = world_host.component<WorldHost>();
+		PhysicsWorld* physics_world = world->physics_world;
 
-		rigid_body->setWorldTransform(trans);
+		physics_world->addRigidBody(rigid_body.get());
 	}
 	else
 	{
-		Logger::getInstance()->logError("No Transform on Entity #%d\n", entity.id().id());
+		Logger::getInstance()->logError("No World on Entity #%d\n", entity.id().id());
+		entity.remove<SingleRigidBody>();
 	}
 }
 
@@ -78,14 +88,18 @@ inline void PhysicsSystem::receive(const ComponentRemovedEvent<SingleRigidBody>&
 {
 	Entity entity = event.entity;
 	ComponentHandle<SingleRigidBody> rigid_body = event.component;
-
-	if (entity.has_component<WorldTransform>())
+	if (entity.has_component<World>())
 	{
-		ComponentHandle<WorldTransform> transform = entity.component<WorldTransform>();
-		transform->transform = rigid_body->getWorldTransform();
-	}
+		if (entity.has_component<Transform>())
+		{
+			ComponentHandle<Transform> transform = entity.component<Transform>();
+			transform.get()->setTransform(rigid_body->getWorldTransform());
+		}
 
-	this->temp_world->removeRigidBody(rigid_body.get());
+		Entity world_host = WorldList::getInstance()->getWorldHost(entity.component<World>()->world_id);
+		ComponentHandle<WorldHost> world = world_host.component<WorldHost>();
+		world->physics_world->removeRigidBody(rigid_body.get());
+	}
 }
 
 inline void PhysicsSystem::receive(const ComponentAddedEvent<CollisionShape>& event)
@@ -101,6 +115,7 @@ inline void PhysicsSystem::receive(const ComponentAddedEvent<CollisionShape>& ev
 	else
 	{
 		Logger::getInstance()->logError("No RigidBody on Entity #%d\n", entity.id().id());
+		entity.remove<CollisionShape>();
 	}
 }
 
