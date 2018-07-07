@@ -39,6 +39,19 @@ inline void RenderingSystem::update(EntityManager& es, EventManager& events, Tim
 
 		Client::instance->renderingManager->addModel(model.get(), global_transform, world->world_id);
 	}
+
+
+	ComponentHandle<Camera> camera_pattern;
+	for (Entity entity : es.entities_with_components(camera_pattern))
+	{
+		ComponentHandle<Camera> camera = entity.component<Camera>();
+
+		Transform global_transform = Transforms::getGlobalTransform(entity);
+
+		Client::instance->renderingManager->setCamera(*camera.get(), global_transform);
+
+		break; //Use the first camera right now.
+	}
 }
 
 #endif //PHYSICS_SYSTEM_HPP

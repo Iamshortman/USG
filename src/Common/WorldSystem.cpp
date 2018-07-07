@@ -50,9 +50,7 @@ void WorldSystem::receive(const ComponentAddedEvent<WorldHost>& event)
 	}
 
 	WorldList::getInstance()->worlds[event.component->world_id] = entity;
-
 	entity.component<WorldHost>()->physics_world = new PhysicsWorld();
-	entity.component<WorldHost>()->physics_world->dynamicsWorld->setGravity(btVector3(0.0, -0.98, 0.0));
 }
 
 void WorldSystem::receive(const ComponentRemovedEvent<WorldHost>& event)

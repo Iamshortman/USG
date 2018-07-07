@@ -31,7 +31,7 @@ namespace Transforms
 		if (entity.has_component<World>())
 		{
 			Entity parent = WorldList::getInstance()->getWorldHost(entity.component<World>()->world_id);
-			transform.transformBy(Transforms::getGlobalTransform(parent));
+			transform = transform.transformBy(Transforms::getGlobalTransform(parent));
 		}
 
 		return transform;

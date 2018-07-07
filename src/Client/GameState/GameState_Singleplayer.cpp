@@ -27,6 +27,12 @@ GameState_Singleplayer::GameState_Singleplayer()
 	entity.assign<CollisionShape>()->setConvexMesh("res/models/A-Wing/a-wing-body.obj");
 
 	entity.component<SingleRigidBody>()->Activate(true);
+
+	Entity camera = this->ecs_system.entities.create();
+	camera.assign<Transform>();
+	camera.assign<World>(0);
+	camera.assign<Camera>();
+
 }
 
 GameState_Singleplayer::~GameState_Singleplayer()
@@ -39,7 +45,5 @@ GameState_Singleplayer::~GameState_Singleplayer()
 void GameState_Singleplayer::update(Client* client, double delta_time)
 {
 	this->ecs_system.systems.update_all((entityx::TimeDelta) delta_time);
-
-	//client->renderingManager->setCamera(Camera(), Transform());
 	client->renderingManager->renderScene();
 }

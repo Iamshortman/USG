@@ -17,7 +17,7 @@ SingleRigidBody::~SingleRigidBody()
 
 void SingleRigidBody::setShape(CollisionShape* shape)
 {
-	if (shape == nullptr)
+	if (shape == nullptr || shape->getShape() == nullptr)
 	{
 		this->shape = nullptr;
 		this->setCollisionShape(this->empty_shape);

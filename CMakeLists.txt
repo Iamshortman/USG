@@ -48,7 +48,6 @@ include_directories(lib/jsoncons-0.104.0/include)
 #Bullet
 include_directories(lib/bullet3-2.86.1/src/)
 target_link_libraries  (Client BulletCollision_Debug)
-
 target_link_libraries  (Client BulletDynamics_Debug)
 target_link_libraries  (Client LinearMath_Debug)
 target_link_libraries  (Server BulletCollision_Debug)
