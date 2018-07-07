@@ -12,9 +12,10 @@ typedef uint32_t WorldId;
 
 struct WorldChangeEvent
 {
-	WorldChangeEvent(Entity entity, WorldId new_world) : entity(entity), new_world(new_world) {}
+	WorldChangeEvent(Entity entity, WorldId old_world, WorldId new_world) : entity(entity), old_world(old_world), new_world(new_world) {}
 
 	Entity entity;
+	WorldId old_world;
 	WorldId new_world;
 };
 

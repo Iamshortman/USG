@@ -40,8 +40,6 @@ GameState_Singleplayer::~GameState_Singleplayer()
 	this->ecs_system.entities.reset();
 }
 
-#include "Client/Input/InputManager.hpp"
-
 void GameState_Singleplayer::update(Client* client, double delta_time)
 {
 	this->ecs_system.systems.update_all((entityx::TimeDelta) delta_time);
