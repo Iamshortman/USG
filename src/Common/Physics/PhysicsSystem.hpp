@@ -24,6 +24,7 @@ public:
 	void receive(const ComponentAddedEvent<CollisionShape>& event);
 	void receive(const ComponentRemovedEvent<CollisionShape>& event);
 
+	void receive(const WorldChangeEvent& event);
 
 private:
 	//PhysicsWorld* temp_world;
@@ -57,6 +58,27 @@ inline void PhysicsSystem::configure(entityx::EventManager& event_manager)
 
 	event_manager.subscribe<ComponentAddedEvent<CollisionShape>>(*this);
 	event_manager.subscribe<ComponentRemovedEvent<CollisionShape>>(*this);
+}
+
+inline void WorldSystem::receive(const WorldChangeEvent& event)
+{
+	Entity entity = event.entity;
+
+	if (entity.has_component<SingleRigidBody>())
+	{
+		if (entity.has_component<World>())
+		{
+			Entity old_world = WorldList::getInstance()->getWorldHost(event.old_world);
+			old_world.component<WorldHost>()->physics_world->removeRigidBody(entity.component<SingleRigidBody>().get());
+		}
+
+		Entity new_world = WorldList::getInstance()->getWorldHost(event.new_world);
+		new_world.component<WorldHost>()->physics_world->removeRigidBody(entity.component<SingleRigidBody>().get());
+	}
+	else //if Muiltibody
+	{
+
+	}
 }
 
 inline void PhysicsSystem::receive(const ComponentAddedEvent<SingleRigidBody>& event)
