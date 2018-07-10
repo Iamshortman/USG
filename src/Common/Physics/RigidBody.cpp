@@ -33,7 +33,7 @@ double RigidBody::getMass()
 	return this->mass;
 }
 
-void RigidBody::setInertiaTensor(vector3D inertiaToSet)
+void RigidBody::setInertiaTensor(vector3D &inertiaToSet)
 {
 	this->inertia = inertiaToSet;
 	this->rigidBody->setMassProps(this->mass, toBtVec3(this->inertia));
@@ -64,7 +64,7 @@ Transform RigidBody::getWorldTransform()
 	return toTransform(this->rigidBody->getWorldTransform());
 }
 
-void RigidBody::setWorldTransform(Transform transform)
+void RigidBody::setWorldTransform(Transform &transform)
 {
 	this->rigidBody->setCenterOfMassTransform(toBtTransform(transform));
 }
@@ -74,7 +74,7 @@ vector3D RigidBody::getLinearVelocity() const
 	return toVec3(this->rigidBody->getLinearVelocity());
 }
 
-void RigidBody::setLinearVelocity(vector3D velocity)
+void RigidBody::setLinearVelocity(vector3D &velocity)
 {
 	this->rigidBody->setLinearVelocity(toBtVec3(velocity));
 }
@@ -84,7 +84,7 @@ vector3D RigidBody::getAngularVelocity() const
 	return toVec3(this->rigidBody->getAngularVelocity());
 }
 
-void RigidBody::setAngularVelocity(vector3D velocity)
+void RigidBody::setAngularVelocity(vector3D &velocity)
 {
 	this->rigidBody->setAngularVelocity(toBtVec3(velocity));
 }

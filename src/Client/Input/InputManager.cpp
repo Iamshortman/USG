@@ -191,7 +191,7 @@ bool InputManager::getButtonPressed(string name)
 	neg_button_name: the name of the negitive button;
 	return: a double clampled between 1 and -1;
 */
-double InputManager::getButtonAxisCombo(string axis_name, string pos_button_name, string neg_button_name)
+double InputManager::getButtonAxisCombo(string axis_name, string pos_button_name, string neg_button_name, bool clamp_value)
 {
 	double axis_Value = 0.0;
 
@@ -208,13 +208,16 @@ double InputManager::getButtonAxisCombo(string axis_name, string pos_button_name
 	}
 
 	//Clamp value
-	if (axis_Value > 1.0)
+	if (clamp_value)
 	{
-		axis_Value = 1.0;
-	}
-	else if (axis_Value < -1.0)
-	{
-		axis_Value = -1.0;
+		if (axis_Value > 1.0)
+		{
+			axis_Value = 1.0;
+		}
+		else if (axis_Value < -1.0)
+		{
+			axis_Value = -1.0;
+		}
 	}
 
 	return axis_Value;

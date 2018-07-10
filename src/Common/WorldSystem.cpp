@@ -2,14 +2,6 @@
 
 #include "Common/Logger/Logger.hpp"
 
-WorldSystem::WorldSystem()
-{
-}
-
-WorldSystem::~WorldSystem()
-{
-}
-
 void WorldSystem::update(EntityManager& es, EventManager& events, TimeDelta dt)
 {
 }

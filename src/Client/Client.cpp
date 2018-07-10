@@ -14,7 +14,7 @@ Client::Client()
 {
 	Client::instance = this;
 
-	this->window = new Window(800, 450, "USG");
+	this->window = new Window(1920, 1080, "USG");
 
 	this->renderingManager = new RenderingManager(this->window);
 

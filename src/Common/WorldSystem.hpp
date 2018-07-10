@@ -37,8 +37,6 @@ struct WorldHost
 class WorldSystem : public System<WorldSystem>, public Receiver<WorldSystem>
 {
 public:
-	WorldSystem();
-	~WorldSystem();
 	void update(EntityManager &es, EventManager &events, TimeDelta dt) override;
 
 	//Events

@@ -25,7 +25,7 @@ GLuint TexturePool::loadResource(string name)
 
 	if (data == NULL)
 	{
-		Logger::getInstance()->logError("Can't Load the given texture: %s\n", name);
+		Logger::getInstance()->logError("Can't Load the given texture: %s\n", name.c_str());
 		return 0;
 	}
 

@@ -24,20 +24,20 @@ public:
 	void setMass(double massToAdd);
 	double getMass();
 
-	void setInertiaTensor(vector3D inertia);
+	void setInertiaTensor(vector3D &inertia);
 	vector3D getInertiaTensor();
 	void calcInertiaTensorFromShape();
 
 	void Activate(bool activate);
 
 	Transform getWorldTransform();
-	void setWorldTransform(Transform transform);
+	void setWorldTransform(Transform &transform);
 
 	vector3D getLinearVelocity() const;
-	void setLinearVelocity(vector3D velocity);
+	void setLinearVelocity(vector3D &velocity);
 
 	vector3D getAngularVelocity() const;
-	void setAngularVelocity(vector3D velocity);
+	void setAngularVelocity(vector3D &velocity);
 
 	void applyForce(vector3D &force, vector3D &localPos);
 	void applyImpulse(vector3D &impulse, vector3D &localPos);

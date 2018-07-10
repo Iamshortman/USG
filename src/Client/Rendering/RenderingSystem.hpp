@@ -29,17 +29,13 @@ RenderingSystem::~RenderingSystem()
 inline void RenderingSystem::update(EntityManager& es, EventManager& events, TimeDelta dt)
 {
 	ComponentHandle<Model> model_pattern;
-	ComponentHandle<World> world_pattern;
-	for (Entity entity : es.entities_with_components(model_pattern, world_pattern))
+	for (Entity entity : es.entities_with_components(model_pattern))
 	{
 		ComponentHandle<Model> model = entity.component<Model>();
-		ComponentHandle<World> world = entity.component<World>();
-
 		Transform global_transform = Transforms::getGlobalTransform(entity);
 
-		Client::instance->renderingManager->addModel(model.get(), global_transform, world->world_id);
+		Client::instance->renderingManager->addModel(model.get(), global_transform, Transforms::getWorldId(entity));
 	}
-
 
 	ComponentHandle<Camera> camera_pattern;
 	for (Entity entity : es.entities_with_components(camera_pattern))
