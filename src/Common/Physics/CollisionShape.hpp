@@ -14,27 +14,19 @@ enum CollisionShapeType
 	ConvexMesh,
 };
 
-class CollisionShape
+struct CollisionShape
 {
-public:
-	CollisionShape();
-	~CollisionShape();
+	CollisionShape(btCollisionShape* shape, CollisionShapeType type) : shape(shape), type(type) {};
 
-	void setBox(vector3D half_length);
-	void setCapsule(double radius, double height);
-	void setConvexMesh(string file_path);
+	const btCollisionShape* shape;
+	const CollisionShapeType type;
+};
 
-	btCollisionShape* getShape();
-
-	virtual void enable();
-	virtual void disable();
-
-private:
-
-	CollisionShapeType shape_type;
-	btCollisionShape* shape = nullptr;
-
-	int index;
+namespace CollisionShapes
+{
+	CollisionShape createBox(vector3D half_length);
+	CollisionShape createCapsule(double radius, double height);
+	CollisionShape createConvexMesh(string file_path);
 };
 
 #endif //COLLISIONSHAPE_HPP

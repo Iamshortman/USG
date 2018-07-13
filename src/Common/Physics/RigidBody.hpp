@@ -2,15 +2,8 @@
 #define RIGIDBODY_HPP
 
 #include "Common/Physics/Bullet_Include.hpp"
-#include "Common/Physics/CollisionShape.hpp"
 #include "Common/GLM_Include.hpp"
 #include "Common/Transform.hpp"
-
-enum RigidBodyType
-{
-	SINGLE,
-	MULTI,
-};
 
 //Prototype Class
 class PhysicsWorld;
@@ -55,17 +48,17 @@ public:
 	inline PhysicsWorld* getPhysicsWorld() { return this->physics_world; };
 	inline void setPhysicsWorld(PhysicsWorld* world) { this->physics_world = world; };
 
-	virtual RigidBodyType getType() = 0;
-
-protected:
 	void setCollisionShape(btCollisionShape* shape);
 
+protected:
 	double mass = 1.0;
 	vector3D inertia = vector3D(1.0);
 
 	btRigidBody* rigidBody = nullptr;
 
 	PhysicsWorld* physics_world = nullptr;
+
+	btEmptyShape* empty_shape = nullptr;
 };
 
 #endif //RIGIDBODY_HPP

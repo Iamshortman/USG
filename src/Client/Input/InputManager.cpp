@@ -46,6 +46,8 @@ InputManager::InputManager()
 	keyboardMouse->addButton("Flight_YawLeft", KeyboardMouseButton(KEYBOARD, SDL_SCANCODE_LEFT));
 	keyboardMouse->addButton("Flight_YawRight", KeyboardMouseButton(KEYBOARD, SDL_SCANCODE_RIGHT));
 
+
+	keyboardMouse->addButton("Flight_Shoot", KeyboardMouseButton(KEYBOARD, SDL_SCANCODE_F));
 }
 
 InputManager::~InputManager()

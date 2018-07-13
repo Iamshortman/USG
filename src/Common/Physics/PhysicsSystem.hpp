@@ -4,10 +4,12 @@
 #include "Common/Logger/Logger.hpp"
 
 #include "Common/EntityX_Include.hpp"
-#include "Common/Physics/SingleRigidBody.hpp"
+#include "Common/Physics/RigidBody.hpp"
 #include "Common/Transforms.hpp"
 
 #include "Common/Physics/PhysicsWorld.hpp"
+
+#include "Common/Physics/MuiltiCollisionShape.hpp"
 
 class PhysicsSystem : public System<PhysicsSystem>, public Receiver<PhysicsSystem>
 {
@@ -18,13 +20,17 @@ public:
 
 	//Events
 	void configure(entityx::EventManager &event_manager);
-	void receive(const ComponentAddedEvent<SingleRigidBody> &event);
-	void receive(const ComponentRemovedEvent<SingleRigidBody>& event);
+
+	void receive(const WorldChangeEvent& event);
+
+	void receive(const ComponentAddedEvent<RigidBody> &event);
+	void receive(const ComponentRemovedEvent<RigidBody>& event);
 
 	void receive(const ComponentAddedEvent<CollisionShape>& event);
 	void receive(const ComponentRemovedEvent<CollisionShape>& event);
 
-	void receive(const WorldChangeEvent& event);
+	void receive(const ComponentAddedEvent<MuiltiCollisionShape>& event);
+	void receive(const ComponentRemovedEvent<MuiltiCollisionShape>& event);
 
 private:
 	//PhysicsWorld* temp_world;
@@ -53,27 +59,32 @@ inline void PhysicsSystem::update(EntityManager& es, EventManager& events, TimeD
 
 inline void PhysicsSystem::configure(entityx::EventManager& event_manager)
 {
-	event_manager.subscribe<ComponentAddedEvent<SingleRigidBody>>(*this);
-	event_manager.subscribe<ComponentRemovedEvent<SingleRigidBody>>(*this);
+	event_manager.subscribe<WorldChangeEvent>(*this);
+
+	event_manager.subscribe<ComponentAddedEvent<RigidBody>>(*this);
+	event_manager.subscribe<ComponentRemovedEvent<RigidBody>>(*this);
 
 	event_manager.subscribe<ComponentAddedEvent<CollisionShape>>(*this);
 	event_manager.subscribe<ComponentRemovedEvent<CollisionShape>>(*this);
+
+	event_manager.subscribe<ComponentAddedEvent<MuiltiCollisionShape>>(*this);
+	event_manager.subscribe<ComponentRemovedEvent<MuiltiCollisionShape>>(*this);
 }
 
-inline void WorldSystem::receive(const WorldChangeEvent& event)
+inline void PhysicsSystem::receive(const WorldChangeEvent& event)
 {
 	Entity entity = event.entity;
 
-	if (entity.has_component<SingleRigidBody>())
+	if (entity.has_component<RigidBody>())
 	{
 		if (entity.has_component<World>())
 		{
 			Entity old_world = WorldList::getInstance()->getWorldHost(event.old_world);
-			old_world.component<WorldHost>()->physics_world->removeRigidBody(entity.component<SingleRigidBody>().get());
+			old_world.component<WorldHost>()->physics_world->removeRigidBody(entity.component<RigidBody>().get());
 		}
 
 		Entity new_world = WorldList::getInstance()->getWorldHost(event.new_world);
-		new_world.component<WorldHost>()->physics_world->removeRigidBody(entity.component<SingleRigidBody>().get());
+		new_world.component<WorldHost>()->physics_world->removeRigidBody(entity.component<RigidBody>().get());
 	}
 	else //if Muiltibody
 	{
@@ -81,10 +92,10 @@ inline void WorldSystem::receive(const WorldChangeEvent& event)
 	}
 }
 
-inline void PhysicsSystem::receive(const ComponentAddedEvent<SingleRigidBody>& event)
+inline void PhysicsSystem::receive(const ComponentAddedEvent<RigidBody>& event)
 {
 	Entity entity = event.entity;
-	ComponentHandle<SingleRigidBody> rigid_body = event.component;
+	ComponentHandle<RigidBody> rigid_body = event.component;
 
 	if (entity.has_component<World>())
 	{
@@ -102,14 +113,14 @@ inline void PhysicsSystem::receive(const ComponentAddedEvent<SingleRigidBody>& e
 	else
 	{
 		Logger::getInstance()->logError("No World on Entity #%d\n", entity.id().id());
-		entity.remove<SingleRigidBody>();
+		entity.remove<RigidBody>();
 	}
 }
 
-inline void PhysicsSystem::receive(const ComponentRemovedEvent<SingleRigidBody>& event)
+inline void PhysicsSystem::receive(const ComponentRemovedEvent<RigidBody>& event)
 {
 	Entity entity = event.entity;
-	ComponentHandle<SingleRigidBody> rigid_body = event.component;
+	ComponentHandle<RigidBody> rigid_body = event.component;
 	if (entity.has_component<World>())
 	{
 		if (entity.has_component<Transform>())
@@ -129,28 +140,77 @@ inline void PhysicsSystem::receive(const ComponentAddedEvent<CollisionShape>& ev
 	Entity entity = event.entity;
 	ComponentHandle<CollisionShape> shape = event.component;
 
-	if (entity.has_component<SingleRigidBody>())
+	Entity parent = Transforms::getRootParentEntity(entity);
+	if (parent.has_component<MuiltiCollisionShape>())
 	{
-		ComponentHandle<SingleRigidBody> rigid_body = entity.component<SingleRigidBody>();
-		rigid_body->setShape(shape.get());
+		ComponentHandle<MuiltiCollisionShape> muilti_shape = parent.component<MuiltiCollisionShape>();
+		Transform local_transform = Transforms::getParentRelativeTransform(entity);
+
+		muilti_shape->compound_shape->addChildShape(toBtTransform(local_transform), (btCollisionShape*)shape->shape);
+		return;
 	}
-	else
+	else if (entity.has_component<RigidBody>())
 	{
-		Logger::getInstance()->logError("No RigidBody on Entity #%d\n", entity.id().id());
-		entity.remove<CollisionShape>();
+		ComponentHandle<RigidBody> rigid_body = entity.component<RigidBody>();
+		rigid_body->setCollisionShape((btCollisionShape*) shape->shape);
+		return;
 	}
+
+	Logger::getInstance()->logError("No RigidBody on Entity #%d\n", entity.id().id());
+	entity.remove<CollisionShape>();
 }
 
 inline void PhysicsSystem::receive(const ComponentRemovedEvent<CollisionShape>& event)
 {
 	Entity entity = event.entity;
+	ComponentHandle<CollisionShape> shape = event.component;
 
-	if (entity.has_component<SingleRigidBody>())
+	Entity parent = Transforms::getRootParentEntity(entity);
+	if (parent.has_component<MuiltiCollisionShape>())
 	{
-		ComponentHandle<SingleRigidBody> rigid_body = entity.component<SingleRigidBody>();
-		rigid_body->setShape(nullptr);
+		ComponentHandle<MuiltiCollisionShape> muilti_shape = parent.component<MuiltiCollisionShape>();
+
+		muilti_shape->compound_shape->removeChildShape((btCollisionShape*)shape->shape);
 	}
+	if (entity.has_component<RigidBody>())
+	{
+		ComponentHandle<RigidBody> rigid_body = entity.component<RigidBody>();
+		rigid_body->setCollisionShape(nullptr);
+	}
+
+	delete shape->shape;
 }
 
+inline void PhysicsSystem::receive(const ComponentAddedEvent<MuiltiCollisionShape>& event)
+{
+	Entity entity = event.entity;
+	ComponentHandle<MuiltiCollisionShape> shape = event.component;
+
+	shape->compound_shape = new btCompoundShape(true);
+
+	if (entity.has_component<RigidBody>())
+	{
+		ComponentHandle<RigidBody> rigid_body = entity.component<RigidBody>();
+		rigid_body->setCollisionShape((btCollisionShape*)shape->compound_shape);
+		return;
+	}
+
+	Logger::getInstance()->logError("No RigidBody on Entity #%d\n", entity.id().id());
+	entity.remove<CollisionShape>();
+}
+
+inline void PhysicsSystem::receive(const ComponentRemovedEvent<MuiltiCollisionShape>& event)
+{
+	Entity entity = event.entity;
+	ComponentHandle<MuiltiCollisionShape> shape = event.component;
+
+	if (entity.has_component<RigidBody>())
+	{
+		ComponentHandle<RigidBody> rigid_body = entity.component<RigidBody>();
+		rigid_body->setCollisionShape(nullptr);
+	}
+
+	delete shape->compound_shape;
+}
 
 #endif //PHYSICS_SYSTEM_HPP

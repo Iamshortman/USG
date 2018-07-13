@@ -6,10 +6,17 @@
 
 RigidBody::RigidBody()
 {
+	this->empty_shape = new btEmptyShape();
+
+	btDefaultMotionState* motionState = new btDefaultMotionState();
+	btRigidBody::btRigidBodyConstructionInfo boxRigidBodyCI(this->mass, motionState, this->empty_shape, toBtVec3(this->inertia));
+	this->rigidBody = new btRigidBody(boxRigidBodyCI);
 }
 
 RigidBody::~RigidBody()
 {
+	delete this->empty_shape;
+
 	if (this->physics_world != nullptr)
 	{
 		this->physics_world->removeRigidBody(this);
@@ -130,11 +137,26 @@ void RigidBody::setCollisionShape(btCollisionShape* shape)
 	{
 		PhysicsWorld* world = this->physics_world;
 		this->physics_world->removeRigidBody(this);
-		this->rigidBody->setCollisionShape(shape);
+
+		if (shape != nullptr)
+		{
+			this->rigidBody->setCollisionShape(shape);
+		}
+		else
+		{
+			this->rigidBody->setCollisionShape(this->empty_shape);
+		}
 		world->addRigidBody(this);
 	}
 	else
 	{
-		this->rigidBody->setCollisionShape(shape);
+		if (shape != nullptr)
+		{
+			this->rigidBody->setCollisionShape(shape);
+		}
+		else
+		{
+			this->rigidBody->setCollisionShape(this->empty_shape);
+		}
 	}
 }

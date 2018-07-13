@@ -8,7 +8,7 @@ class RenderingSystem : public System<RenderingSystem>
 public:
 	RenderingSystem();
 	~RenderingSystem();
-	void update(EntityManager &es, EventManager &events, TimeDelta dt) override;
+	void update(EntityManager &es, EventManager &events, TimeDelta delta_time) override;
 
 private:
 
@@ -26,7 +26,7 @@ RenderingSystem::~RenderingSystem()
 #include "Common/Rendering/Model.hpp"
 #include "Common/Transforms.hpp"
 
-inline void RenderingSystem::update(EntityManager& es, EventManager& events, TimeDelta dt)
+inline void RenderingSystem::update(EntityManager& es, EventManager& events, TimeDelta delta_time)
 {
 	ComponentHandle<Model> model_pattern;
 	for (Entity entity : es.entities_with_components(model_pattern))

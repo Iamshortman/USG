@@ -5,16 +5,16 @@
 
 #include "Common/Transform.hpp"
 #include "Common/WorldSystem.hpp"
-#include "Common/Physics/SingleRigidBody.hpp"
+#include "Common/Physics/RigidBody.hpp"
 #include "Common/NodeSystem.hpp"
 
 namespace Transforms
 {
 	inline void setLocalTransform(Entity entity, Transform& transform)
 	{
-		if (entity.has_component<SingleRigidBody>())
+		if (entity.has_component<RigidBody>())
 		{
-			entity.component<SingleRigidBody>().get()->setWorldTransform(transform);
+			entity.component<RigidBody>().get()->setWorldTransform(transform);
 		}
 
 		if (entity.has_component<Transform>())
@@ -30,9 +30,9 @@ namespace Transforms
 
 	inline Transform getLocalTransform(Entity entity)
 	{
-		if (entity.has_component<SingleRigidBody>())
+		if (entity.has_component<RigidBody>())
 		{
-			return entity.component<SingleRigidBody>().get()->getWorldTransform();
+			return entity.component<RigidBody>().get()->getWorldTransform();
 		}
 
 		if (entity.has_component<Transform>())
@@ -48,18 +48,38 @@ namespace Transforms
 		return Transform();
 	}
 
+	inline Transform getParentRelativeTransform(Entity entity)
+	{
+		if (entity.has_component<Node>())
+		{
+			return entity.component<Node>()->local_transform.transformBy(getParentRelativeTransform(entity.component<Node>()->parent_entity));
+		}
+
+		return Transform(); //Root of the tree is at orgin
+	}
+
+	inline Transform getWorldTransform(Entity entity)
+	{
+		if (entity.has_component<Node>())
+		{
+			return entity.component<Node>()->local_transform.transformBy(getParentRelativeTransform(entity.component<Node>()->parent_entity));
+		}
+
+		return getLocalTransform(entity);
+	}
+
 	inline Transform getGlobalTransform(Entity entity)
 	{
-		Transform transform = Transforms::getLocalTransform(entity);
+		Transform transform = getLocalTransform(entity);
 
 		if (entity.has_component<World>())
 		{
 			Entity parent = WorldList::getInstance()->getWorldHost(entity.component<World>()->world_id);
-			transform = transform.transformBy(Transforms::getGlobalTransform(parent));
+			transform = transform.transformBy(getGlobalTransform(parent));
 		}
 		else if(entity.has_component<Node>())
 		{
-			transform = transform.transformBy(Transforms::getGlobalTransform(entity.component<Node>()->parent_entity));
+			transform = transform.transformBy(getGlobalTransform(entity.component<Node>()->parent_entity));
 		}
 
 		return transform;
@@ -74,10 +94,20 @@ namespace Transforms
 
 		if (entity.has_component<Node>())
 		{
-			return Transforms::getWorldId(entity.component<Node>()->parent_entity);
+			return getWorldId(entity.component<Node>()->parent_entity);
 		}
 
 		return 0;//TODO invalid world id
+	}
+
+	inline Entity getRootParentEntity(Entity entity)
+	{
+		if (entity.has_component<Node>() && entity.component<Node>()->parent_entity.valid())
+		{
+			return getRootParentEntity(entity.component<Node>()->parent_entity);
+		}
+
+		return entity;
 	}
 
 };
