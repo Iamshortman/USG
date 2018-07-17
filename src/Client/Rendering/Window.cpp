@@ -53,6 +53,9 @@ Window::Window(int width, int height, string windowTitle)
 	GLint major, minor;
 	glGetIntegerv(GL_MAJOR_VERSION, &major);
 	glGetIntegerv(GL_MINOR_VERSION, &minor);
+
+	Logger::getInstance()->log("Graphics Vendor: %s\n", glGetString(GL_VENDOR));
+	Logger::getInstance()->log("Graphics Card: %s\n", glGetString(GL_RENDERER));
 	Logger::getInstance()->log("OpenGL Version: %d.%d\n", major, minor);
 
 	if ((major > 4 || (major == 4 && minor >= 5)) || SDL_GL_ExtensionSupported("GL_ARB_clip_control"))

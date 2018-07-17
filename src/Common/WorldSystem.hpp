@@ -10,6 +10,8 @@
 
 typedef uint32_t WorldId;
 
+#define INVALID_WORLD 0
+
 struct WorldChangeEvent
 {
 	WorldChangeEvent(Entity entity, WorldId old_world, WorldId new_world) : entity(entity), old_world(old_world), new_world(new_world) {}

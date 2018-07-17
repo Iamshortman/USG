@@ -47,6 +47,11 @@ void WorldSystem::receive(const ComponentAddedEvent<WorldHost>& event)
 
 void WorldSystem::receive(const ComponentRemovedEvent<WorldHost>& event)
 {
+	if (event.component->world_id == INVALID_WORLD)
+	{
+		return;
+	}
+
 	if (WorldList::getInstance()->hasWorldHost(event.component->world_id))
 	{
 		WorldList::getInstance()->worlds.erase(event.component->world_id);
@@ -66,12 +71,16 @@ void WorldSystem::receive(const ComponentAddedEvent<World>& event)
 {
 	Entity entity = event.entity;
 
-	if (WorldList::getInstance()->hasWorldHost(event.component->world_id))
+	if (event.component->world_id == INVALID_WORLD)
+	{
+		//Do nothing for an invalid world
+	}
+	else if (WorldList::getInstance()->hasWorldHost(event.component->world_id))
 	{
 		Entity world_host = WorldList::getInstance()->getWorldHost(event.component->world_id);
 		ComponentHandle<WorldHost> world = world_host.component<WorldHost>();
 		world->entity_list.insert(entity);
-	}
+	} 
 	else
 	{
 		Logger::getInstance()->logError("WorldAdd: World %d doesn't exists\n", event.component->world_id);
@@ -110,6 +119,11 @@ WorldList::~WorldList()
 
 bool WorldList::hasWorldHost(WorldId id)
 {
+	if (id == INVALID_WORLD)
+	{
+		return true;
+	}
+
 	return this->worlds.find(id) != this->worlds.end();
 }
 

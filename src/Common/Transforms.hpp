@@ -72,7 +72,7 @@ namespace Transforms
 	{
 		Transform transform = getLocalTransform(entity);
 
-		if (entity.has_component<World>())
+		if (entity.has_component<World>() && entity.component<World>()->world_id != INVALID_WORLD)
 		{
 			Entity parent = WorldList::getInstance()->getWorldHost(entity.component<World>()->world_id);
 			transform = transform.transformBy(getGlobalTransform(parent));
@@ -97,7 +97,7 @@ namespace Transforms
 			return getWorldId(entity.component<Node>()->parent_entity);
 		}
 
-		return 0;//TODO invalid world id
+		return INVALID_WORLD;
 	}
 
 	inline Entity getRootParentEntity(Entity entity)

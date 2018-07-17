@@ -10,6 +10,10 @@ int main()
 
 	SDL_Init(SDL_INIT_EVERYTHING);
 
+	Logger::getInstance()->log("Platform: %s\n", SDL_GetPlatform());
+	Logger::getInstance()->log("CPU Cores: %d\n", SDL_GetCPUCount());
+	Logger::getInstance()->log("Memory: %d MB\n", SDL_GetSystemRAM());
+
 	Client* game = new Client();
 
 	InputManager::getInstance()->centerMouse();

@@ -12,6 +12,7 @@ enum CollisionShapeType
 	Box,
 	Capsule,
 	ConvexMesh,
+	ConcaveMesh,
 };
 
 struct CollisionShape
@@ -27,6 +28,7 @@ namespace CollisionShapes
 	CollisionShape createBox(vector3D half_length);
 	CollisionShape createCapsule(double radius, double height);
 	CollisionShape createConvexMesh(string file_path);
+	CollisionShape createConcaveMesh(string file_path);
 };
 
 #endif //COLLISIONSHAPE_HPP

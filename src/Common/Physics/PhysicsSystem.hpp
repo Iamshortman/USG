@@ -86,10 +86,6 @@ inline void PhysicsSystem::receive(const WorldChangeEvent& event)
 		Entity new_world = WorldList::getInstance()->getWorldHost(event.new_world);
 		new_world.component<WorldHost>()->physics_world->removeRigidBody(entity.component<RigidBody>().get());
 	}
-	else //if Muiltibody
-	{
-
-	}
 }
 
 inline void PhysicsSystem::receive(const ComponentAddedEvent<RigidBody>& event)
@@ -104,11 +100,14 @@ inline void PhysicsSystem::receive(const ComponentAddedEvent<RigidBody>& event)
 			rigid_body->setWorldTransform(*entity.component<Transform>());
 		}
 
-		Entity world_host = WorldList::getInstance()->getWorldHost(entity.component<World>()->world_id);
-		ComponentHandle<WorldHost> world = world_host.component<WorldHost>();
-		PhysicsWorld* physics_world = world->physics_world;
+		if (entity.component<World>()->world_id != INVALID_WORLD)
+		{
+			Entity world_host = WorldList::getInstance()->getWorldHost(entity.component<World>()->world_id);
+			ComponentHandle<WorldHost> world = world_host.component<WorldHost>();
+			PhysicsWorld* physics_world = world->physics_world;
 
-		physics_world->addRigidBody(rigid_body.get());
+			physics_world->addRigidBody(rigid_body.get());
+		}
 	}
 	else
 	{
@@ -129,9 +128,12 @@ inline void PhysicsSystem::receive(const ComponentRemovedEvent<RigidBody>& event
 			transform.get()->setTransform(rigid_body->getWorldTransform());
 		}
 
-		Entity world_host = WorldList::getInstance()->getWorldHost(entity.component<World>()->world_id);
-		ComponentHandle<WorldHost> world = world_host.component<WorldHost>();
-		world->physics_world->removeRigidBody(rigid_body.get());
+		if (entity.component<World>()->world_id != INVALID_WORLD)
+		{
+			Entity world_host = WorldList::getInstance()->getWorldHost(entity.component<World>()->world_id);
+			ComponentHandle<WorldHost> world = world_host.component<WorldHost>();
+			world->physics_world->removeRigidBody(rigid_body.get());
+		}
 	}
 }
 

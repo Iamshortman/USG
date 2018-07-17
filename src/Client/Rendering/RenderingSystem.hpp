@@ -31,10 +31,14 @@ inline void RenderingSystem::update(EntityManager& es, EventManager& events, Tim
 	ComponentHandle<Model> model_pattern;
 	for (Entity entity : es.entities_with_components(model_pattern))
 	{
-		ComponentHandle<Model> model = entity.component<Model>();
-		Transform global_transform = Transforms::getGlobalTransform(entity);
+		WorldId world_id = Transforms::getWorldId(entity);
+		if (world_id != INVALID_WORLD)
+		{
+			ComponentHandle<Model> model = entity.component<Model>();
+			Transform global_transform = Transforms::getGlobalTransform(entity);
 
-		Client::instance->renderingManager->addModel(model.get(), global_transform, Transforms::getWorldId(entity));
+			Client::instance->renderingManager->addModel(model.get(), global_transform, world_id);
+		}
 	}
 
 	ComponentHandle<Camera> camera_pattern;
