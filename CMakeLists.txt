@@ -26,7 +26,7 @@ link_directories(lib/glew-1.12.0/lib/Release/x64/)
 link_directories(lib/bullet3-2.86.1/build/lib/Debug/)
 link_directories(lib/assimp-3.3.1/build/code/Debug/)
 link_directories(lib/assimp-3.3.1/build/contrib/zlib/Debug/)
-link_directories(lib/angelscript_2.31.2/sdk/angelscript/lib/)
+#link_directories(lib/angelscript_2.31.2/sdk/angelscript/lib/)
 link_directories(lib/RakNet-master/build/Lib/DLL/Debug/)
 
 #Create Projects
@@ -77,9 +77,9 @@ target_link_libraries (Server assimp-vc140-mt)
 target_link_libraries (Client assimp-vc140-mt)
 
 #AngelScript
-include_directories(lib/angelscript_2.31.2/sdk/angelscript/include/)
-target_link_libraries (Client angelscript64d)
-target_link_libraries (Server angelscript64d)
+#include_directories(lib/angelscript_2.31.2/sdk/angelscript/include/)
+#target_link_libraries (Client angelscript64d)
+#target_link_libraries (Server angelscript64d)
 
 #RakNet-master/build/Lib/DLL/Debug/
 include_directories(lib/RakNet-master/source/)
