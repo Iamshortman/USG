@@ -31,10 +31,6 @@ public:
 	void addRigidBody(RigidBody* rigidBody);
 	void removeRigidBody(RigidBody* entity);
 
-	void addSubWorld(World* world);
-	void removeSubWorld(World* world);
-	std::set<World*>* getSubWorlds();
-
 	vector3D getGravity();
 	void setGravity(vector3D gravity);
 
@@ -56,7 +52,6 @@ protected:
 	World* parentWorld = nullptr;
 
 	std::set<Entity*> entitiesInWorld;
-	std::set<World*> subWorlds;
 };
 
 #endif //WORLD_HPP

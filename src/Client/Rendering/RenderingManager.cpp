@@ -73,6 +73,11 @@ void RenderingManager::RenderWorld(World* world, Camera* camera)
 	{
 		Entity* entity = *it;
 
+		if (entity->hasSubWorld())
+		{
+			this->RenderWorld(entity->getSubWorld(), camera);
+		}
+
 		if (entity != nullptr)
 		{
 			if (entity->getType() == EntityType::ENTITY)

@@ -7,17 +7,17 @@
 	#include "Client/Input/InputManager.hpp"
 #endif // CLIENT
 
-ComponentShipFlight::ComponentShipFlight(Entity* entity)
+ShipFlightController::ShipFlightController(Entity* entity)
 	:ComponentEntity(entity)
 {
 
 }
 
-ComponentShipFlight::~ComponentShipFlight()
+ShipFlightController::~ShipFlightController()
 {
 }
 
-void ComponentShipFlight::update(double delta_time)
+void ShipFlightController::update(double delta_time)
 {
 	if (!this->enabled || this->parent_entity->getRigidBody() == nullptr)
 	{
@@ -28,9 +28,9 @@ void ComponentShipFlight::update(double delta_time)
 	this->linear_input.x = InputManager::getInstance()->getButtonAxisCombo("Flight_LeftRight", "Flight_Left", "Flight_Right");
 	this->linear_input.y = InputManager::getInstance()->getButtonAxisCombo("Flight_UpDown", "Flight_Up", "Flight_Down");
 	this->linear_input.z = InputManager::getInstance()->getButtonAxisCombo("Flight_ForwardBackward", "Flight_Forward", "Flight_Backward");
-	this->angular_input.x = InputManager::getInstance()->getButtonAxisCombo("Flight_Pitch", "Flight_PitchUp", "Flight_PitchDown");
-	this->angular_input.y = InputManager::getInstance()->getButtonAxisCombo("Flight_Yaw", "Flight_YawLeft", "Flight_YawRight");
-	this->angular_input.z = -InputManager::getInstance()->getButtonAxisCombo("Flight_Roll", "Flight_RollLeft", "Flight_RollRight");
+	this->angular_input.x = InputManager::getInstance()->getButtonAxisCombo("Flight_Pitch", "Flight_PitchUp", "Flight_PitchDown", false);
+	this->angular_input.y = InputManager::getInstance()->getButtonAxisCombo("Flight_Yaw", "Flight_YawLeft", "Flight_YawRight", false);
+	this->angular_input.z = -InputManager::getInstance()->getButtonAxisCombo("Flight_Roll", "Flight_RollLeft", "Flight_RollRight", false);
 #endif // CLIENT
 
 	this->UpdateAngularVelocity(delta_time);
@@ -43,7 +43,7 @@ void ComponentShipFlight::update(double delta_time)
 	}
 }
 
-void ComponentShipFlight::UpdateLinearVelocity(double delta_time)
+void ShipFlightController::UpdateLinearVelocity(double delta_time)
 {
 	Transform transform = this->parent_entity->getLocalTransform();
 	RigidBody* rigidBody = this->parent_entity->getRigidBody();
@@ -61,7 +61,7 @@ void ComponentShipFlight::UpdateLinearVelocity(double delta_time)
 	rigidBody->setLinearVelocity(linear_velocity);
 }
 
-void ComponentShipFlight::UpdateAngularVelocity(double delta_time)
+void ShipFlightController::UpdateAngularVelocity(double delta_time)
 {
 	Transform transform = this->parent_entity->getLocalTransform();
 	RigidBody* rigidBody = this->parent_entity->getRigidBody();

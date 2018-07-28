@@ -5,6 +5,8 @@
 
 #include "Common/Component/EntityHealth.hpp"
 
+#include "Common/Logger/Logger.hpp"
+
 Projectile::Projectile(Entity* entity, vector3D velocity)
 	:ComponentEntity(entity)
 {
@@ -29,6 +31,8 @@ void Projectile::update(double delta_time)
 
 		if (result.hasHit == true)
 		{
+			Logger::getInstance()->log("Hit\n");
+
 			//TODO: damage
 			this->parent_entity->kill();
 

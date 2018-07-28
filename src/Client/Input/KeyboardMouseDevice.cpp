@@ -50,8 +50,8 @@ void KeyboardMouseDevice::processEvent(SDL_Event event)
 
 void KeyboardMouseDevice::resetPreviousValues()
 {
-	//this->mouse_axis_state[0] = 0;
-	//this->mouse_axis_state[1] = 0;
+	this->mouse_axis_state[0] = 0;
+	this->mouse_axis_state[1] = 0;
 
 	for (int i = 0; i < 8; i++)
 	{
@@ -102,7 +102,7 @@ AxisReturn KeyboardMouseDevice::getAxis(string name)
 
 		if (mouse.direction == MouseDirection::Mouse_X)
 		{
-			value = (double)this->mouse_axis_state[0] / ((double)width / 2.0);
+			value = (double)this->mouse_axis_state[0] / ((double)height / 2.0);
 		}
 		else
 		{

@@ -13,7 +13,7 @@ public:
 
 	virtual void update(double delta_time);
 
-	virtual void addRigidBody();
+	virtual RigidBody* addRigidBody();
 	virtual void removeRigidBody();
 
 	void addChild(Node* node);

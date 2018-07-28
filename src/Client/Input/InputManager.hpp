@@ -21,7 +21,7 @@ public:
 	double getAxis(string name);
 	bool getButtonDown(string name);
 	bool getButtonPressed(string name);
-	double getButtonAxisCombo(string axis_name, string pos_button_name, string neg_button_name);
+	double getButtonAxisCombo(string axis_name, string pos_button_name, string neg_button_name, bool clamp_value = true);
 
 	~InputManager();
 	void update(double deltaTime);

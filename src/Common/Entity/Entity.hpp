@@ -83,9 +83,13 @@ public:
 	virtual void addToWorld(World* world);
 	inline World* getWorld() { return this->world; };
 
-	virtual void addRigidBody();
+	virtual RigidBody* addRigidBody();
 	virtual void removeRigidBody();
 	inline RigidBody* getRigidBody() { return this->rigidBody; };
+
+	void setSubWorld(World* world);
+	bool hasSubWorld();
+	World* getSubWorld();
 
 	virtual EntityType getType() { return EntityType::ENTITY; };
 
@@ -99,6 +103,8 @@ protected:
 	bool alive = true;
 
 	RigidBody* rigidBody = nullptr;
+
+	World* sub_world = nullptr;
 
 	Entity(EntityId objectId); //protected for EntityManager use only
 	friend class EntityManager;

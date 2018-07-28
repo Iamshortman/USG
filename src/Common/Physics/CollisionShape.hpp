@@ -13,6 +13,7 @@ enum CollisionShapeType
 	Box,
 	Capsule,
 	ConvexMesh,
+	ConcaveMesh,
 };
 
 class CollisionShape : public ComponentNode
@@ -24,6 +25,7 @@ public:
 	void setBox(vector3D half_length);
 	void setCapsule(double radius, double height);
 	void setConvexMesh(string file_path);
+	void setConcaveMesh(string file_path);
 
 	btCollisionShape* getShape();
 

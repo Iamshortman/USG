@@ -61,8 +61,6 @@ void CollisionShape::setConvexMesh(string file_path)
 		delete this->shape;
 	}
 
-	this->shape_type = ConvexMesh;
-
 	btConvexHullShape* hull_shape = new btConvexHullShape();
 
 	Assimp::Importer import;
@@ -87,7 +85,61 @@ void CollisionShape::setConvexMesh(string file_path)
 		hull_shape->recalcLocalAabb();
 	}
 
+	this->shape_type = ConvexMesh;
 	this->shape = hull_shape;
+
+	this->enable();
+}
+
+void CollisionShape::setConcaveMesh(string file_path)
+{
+	this->disable();
+
+	if (this->shape != nullptr)
+	{
+		delete this->shape;
+	}
+
+	btTriangleMesh* triMesh = nullptr;
+
+	Assimp::Importer import;
+	const aiScene *scene = import.ReadFile(file_path, aiProcess_Triangulate);
+
+	if (scene == nullptr || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || scene->mRootNode == nullptr)
+	{
+		Logger::getInstance()->logError("ASSIMP:: %s\n", import.GetErrorString());
+		return;
+	}
+
+	if (scene->HasMeshes())
+	{
+		//Only Support 1 mesh for now
+		aiMesh* mesh = scene->mMeshes[0];
+
+		vector<vector3D> vertices;
+
+		for (unsigned int i = 0; i < mesh->mNumVertices; i++)
+		{
+			vector3D vertex;
+			vertex.x = mesh->mVertices[i].x;
+			vertex.y = mesh->mVertices[i].y;
+			vertex.z = mesh->mVertices[i].z;
+			vertices.push_back(vertex);
+		}
+
+		triMesh = new btTriangleMesh();
+		for (unsigned int i = 0; i < mesh->mNumFaces; i++)
+		{
+			aiFace face = mesh->mFaces[i];
+
+			triMesh->addTriangle(toBtVec3(vertices[face.mIndices[0]]), toBtVec3(vertices[face.mIndices[1]]), toBtVec3(vertices[face.mIndices[2]]), true);
+		}
+	}
+
+	import.FreeScene();
+
+	this->shape_type = ConcaveMesh;
+	this->shape = new btBvhTriangleMeshShape(triMesh, true);
 
 	this->enable();
 }
@@ -99,7 +151,7 @@ btCollisionShape* CollisionShape::getShape()
 
 void CollisionShape::enable()
 {
-	if (this->shape != nullptr)
+	if (this->shape == nullptr)
 	{
 		//Null shape don't bother
 		return;

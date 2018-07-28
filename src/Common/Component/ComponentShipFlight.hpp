@@ -6,11 +6,11 @@
 #include "Common/GLM_Include.hpp"
 #include "Common/Rotation.hpp"
 
-class ComponentShipFlight : public ComponentEntity
+class ShipFlightController : public ComponentEntity
 {
 public:
-	ComponentShipFlight(Entity* entity);
-	virtual ~ComponentShipFlight();
+	ShipFlightController(Entity* entity);
+	virtual ~ShipFlightController();
 
 	virtual void update(double delta_time);
 

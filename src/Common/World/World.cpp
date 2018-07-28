@@ -64,23 +64,6 @@ void  World::removeRigidBody(RigidBody* rigidBody)
 	this->physicsWorld->removeRigidBody(rigidBody);
 }
 
-void World::addSubWorld(World* world)
-{
-	this->subWorlds.insert(world);
-	world->parentWorld = this;
-}
-
-void World::removeSubWorld(World* world)
-{
-	this->subWorlds.erase(world);
-	world->parentWorld = nullptr;
-}
-
-std::set<World*>* World::getSubWorlds()
-{
-	return &this->subWorlds;
-}
-
 vector3D World::getGravity()
 {
 	return toVec3(this->physicsWorld->dynamicsWorld->getGravity());

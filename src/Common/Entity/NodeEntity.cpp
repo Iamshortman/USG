@@ -26,7 +26,7 @@ void NodeEntity::update(double delta_time)
 	}
 }
 
-void NodeEntity::addRigidBody()
+RigidBody* NodeEntity::addRigidBody()
 {
 	if (this->rigidBody == nullptr)
 	{
@@ -38,6 +38,8 @@ void NodeEntity::addRigidBody()
 			this->world->addRigidBody(this->rigidBody);
 		}
 	}
+
+	return this->rigidBody;
 }
 
 void NodeEntity::removeRigidBody()

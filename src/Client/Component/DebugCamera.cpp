@@ -27,9 +27,9 @@ void DebugCamera::update(double delta_time)
 		transform.setPosition(position);
 
 		quaternionD orientation = transform.getOrientation();
-		orientation = glm::angleAxis(InputManager::getInstance()->getButtonAxisCombo("Debug_Pitch", "Debug_PitchUp", "Debug_PitchDown") * this->angularSpeed * (M_PI * 2.0) * delta_time, transform.getLeft()) * orientation;
-		orientation = glm::angleAxis(InputManager::getInstance()->getButtonAxisCombo("Debug_Yaw", "Debug_YawLeft", "Debug_YawRight") * this->angularSpeed * (M_PI * 2.0) * delta_time, transform.getUp()) * orientation;
-		orientation = glm::angleAxis(InputManager::getInstance()->getButtonAxisCombo("Debug_Roll", "Debug_RollRight", "Debug_RollLeft") * this->angularSpeed * (M_PI) * delta_time, transform.getForward()) * orientation;
+		orientation = glm::angleAxis(InputManager::getInstance()->getButtonAxisCombo("Debug_Pitch", "Debug_PitchUp", "Debug_PitchDown", false) * this->angularSpeed * (M_PI * 2.0) * delta_time, transform.getLeft()) * orientation;
+		orientation = glm::angleAxis(InputManager::getInstance()->getButtonAxisCombo("Debug_Yaw", "Debug_YawLeft", "Debug_YawRight", false) * this->angularSpeed * (M_PI * 2.0) * delta_time, transform.getUp()) * orientation;
+		orientation = glm::angleAxis(InputManager::getInstance()->getButtonAxisCombo("Debug_Roll", "Debug_RollRight", "Debug_RollLeft", false) * this->angularSpeed * (M_PI) * delta_time, transform.getForward()) * orientation;
 		transform.setOrientation(orientation);
 
 		this->parent_entity->setLocalTransform(transform);

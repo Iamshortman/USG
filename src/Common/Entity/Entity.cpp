@@ -106,7 +106,7 @@ void Entity::addToWorld(World* world)
 	}
 }
 
-void Entity::addRigidBody()
+RigidBody* Entity::addRigidBody()
 {
 	if (this->rigidBody == nullptr)
 	{
@@ -118,6 +118,8 @@ void Entity::addRigidBody()
 			this->world->addRigidBody(this->rigidBody);
 		}
 	}
+
+	return this->rigidBody;
 }
 
 void Entity::removeRigidBody()
@@ -132,4 +134,29 @@ void Entity::removeRigidBody()
 		delete this->rigidBody;
 		this->rigidBody = nullptr;
 	}
+}
+
+void Entity::setSubWorld(World* world)
+{
+	if (this->hasSubWorld())
+	{
+		this->sub_world->setParent(nullptr);
+	}
+
+	this->sub_world = world;
+
+	if (this->hasSubWorld())
+	{
+		this->sub_world->setParent(this);
+	}
+}
+
+bool Entity::hasSubWorld()
+{
+	return this->sub_world != nullptr;
+}
+
+World* Entity::getSubWorld()
+{
+	return this->sub_world;
 }
