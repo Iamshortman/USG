@@ -3,6 +3,7 @@
 
 #include "Client/Rendering/OpenGL_Include.hpp"
 #include "Client/SDL2_Include.hpp"
+#include "Common/GLM_Include.hpp"
 
 #include <string>
 
@@ -21,6 +22,7 @@ class Window
 		void clearBuffer();
         void resizeWindow(int width, int height);
         void getWindowSize(int &width, int &height);
+		vector2I getWindowSize();
         SDL_Window *window;
         bool isWindowActive();
         void setMousePos(int x, int y);

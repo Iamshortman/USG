@@ -12,7 +12,7 @@ public:
 	Camera(I_Node* node);
 
 	matrix4 getProjectionMatrix(int screenWidth, int screenheight);
-	matrix4 getProjectionMatrix(Window* window);
+	matrix4 getProjectionMatrix(vector2I& screen_size);
 	matrix4 getOrthographicMatrix(float x_bounds, float y_bounds);
 
 	float frame_of_view = 70.0f;

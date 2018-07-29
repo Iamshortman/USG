@@ -15,31 +15,29 @@
 #include "Common/Entity/Entity.hpp"
 #include "Common/Component/Model.hpp"
 
+#include "Client/Rendering/RenderingSystem.hpp"
+
 class RenderingManager
 {
 public:
 	RenderingManager(Window* window);
 	virtual ~RenderingManager();
 
-	void RenderWorld(World* world, Camera* camera);
-	void Render(World* baseWorld, Camera* camera);
-
-	void RenderModel(Model* model, Camera* camera);
+	void Render(World* world, Camera* camera);
 
 private:
+	void SubmitWorld(World* world);
+
+
 	Skybox* skybox = nullptr;
 
 	Window* window = nullptr;
-
-	bool use_lighting = true;
 
 	//Deferred Shading
 	G_Buffer* g_buffer = nullptr;
 	G_Buffer* ms_g_buffer = nullptr;
 
-	ShaderProgram* full_screen_quad_program = nullptr;
-	TexturedMesh* full_screen_quad = nullptr;
-
+	RenderingSystem* rendering_system = nullptr;
 };
 
 #endif //RENDERINGMANAGER_HPP

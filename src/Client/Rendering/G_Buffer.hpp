@@ -2,15 +2,16 @@
 #define G_BUFFER_HPP
 
 #include "Client/Rendering/OpenGL_Include.hpp"
+#include "Common/GLM_Include.hpp"
 
 class G_Buffer
 {
 public:
-	G_Buffer(int width, int height, bool multisample = false, int number_of_samples = 0);
+	G_Buffer(vector2I buffer_size, bool multisample = false, int number_of_samples = 0);
 	~G_Buffer();
 
 	GLuint getFBO();
-	void getBufferSize(int &width, int &height);
+	vector2I getBufferSize();
 
 	void clearBuffer();
 
@@ -26,8 +27,7 @@ private:
 	GLuint albedo_texture;
 	GLuint depth_texture;
 
-	int width;
-	int height;
+	vector2I size;
 	bool multisample;
 	int number_of_samples;
 };

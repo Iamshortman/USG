@@ -91,6 +91,13 @@ void Window::getWindowSize(int &width, int &height)
     SDL_GetWindowSize(window, &width, &height);
 }
 
+vector2I Window::getWindowSize()
+{
+	vector2I size;
+	SDL_GetWindowSize(window, &size.x, &size.y);
+	return size;
+}
+
 void Window::HandleEvent(SDL_Event& e)
 {
      if( e.type == SDL_WINDOWEVENT )

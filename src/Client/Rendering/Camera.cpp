@@ -24,11 +24,9 @@ matrix4 Camera::getProjectionMatrix(int screenWidth, int screenHeight)
 		0.0f, 0.0f, this->z_near, 0.0f);
 }
 
-matrix4 Camera::getProjectionMatrix(Window* window)
+matrix4 Camera::getProjectionMatrix(vector2I& screen_size)
 {
-	int width, height;
-	window->getWindowSize(width, height);
-	return this->getProjectionMatrix(width, height);
+	return this->getProjectionMatrix(screen_size.x, screen_size.y);
 }
 
 matrix4 Camera::getOrthographicMatrix(float x_bounds, float y_bounds)

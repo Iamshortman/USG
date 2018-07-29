@@ -1,5 +1,5 @@
-#ifndef RENDERINGMANAGER_HPP
-#define RENDERINGMANAGER_HPP
+#ifndef RENDERING_SYSTEM_HPP
+#define RENDERING_SYSTEM_HPP
 
 #include "Client/Rendering/Camera.hpp"
 #include "Client/Rendering/ShaderProgram.hpp"
@@ -11,9 +11,10 @@
 #include "Common/Resource/Mesh.hpp"
 #include "Common/GLM_Include.hpp"
 
+#include "Client/Rendering/OpenGL_Include.hpp"
 #include "Common/Component/Model.hpp"
 
-#include <queue>
+#include <vector>
 
 class RenderingSystem
 {
@@ -23,20 +24,21 @@ public:
 
 	void generateShadowMaps() {};
 
-	void renderMS(GLuint frame_buffer, G_Buffer& ms_g_buffer, G_Buffer* g_buffer, Camera* camera) {};
-	void render(GLuint frame_buffer, G_Buffer* g_buffer, Camera* camera) {};
+	void renderMS(GLuint render_target, G_Buffer* ms_g_buffer, G_Buffer* g_buffer, Camera* camera);
+	void render(GLuint render_target, G_Buffer* g_buffer, Camera* camera) {};
 
-	void addModel(Model* mdoel, Transform global_transform) {};
-	void addLight(void* light, Transform global_transform) {};
+	void addModel(Model* model, Transform global_transform);
+	void addLight(void* light, Transform global_transform);
 
-	void setSkybox(Skybox* box) {};
+	void setSkybox(Skybox* box);
 
-	void clearScene() {};
+	void clearScene();
 
 private:
-	void RenderModel(Model* model, Camera* camera) {};
+	void RenderModel(Mesh* mesh, GLuint& texture, ShaderProgram* program, Transform& transform, Camera* camera, vector2I& screen_size);
 
-	std::queue<std::pair<Model*, Transform>> models;
+	//std::map<Model, std::vector<Transform>> models;
+	std::vector<std::pair<Model*, Transform>> models;
 
 	Skybox* skybox = nullptr;
 
@@ -47,4 +49,4 @@ private:
 	bool use_lighting = true;
 };
 
-#endif //RENDERINGMANAGER_HPP
+#endif //RENDERING_SYSTEM_HPP

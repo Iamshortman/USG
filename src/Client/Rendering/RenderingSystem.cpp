@@ -4,7 +4,7 @@
 #include "Client/Resource/ShaderPool.hpp"
 #include "Client/Resource/TexturePool.hpp"
 
-/*RenderingSystem::RenderingSystem()
+RenderingSystem::RenderingSystem()
 {
 	glEnable(GL_DEPTH_TEST);
 	glDepthFunc(GL_GREATER);
@@ -16,16 +16,11 @@
 	glEnable(GL_MULTISAMPLE);
 	glEnable(GL_TEXTURE_2D);
 
-	int windowWidth, windowHeight;
-	this->window->getWindowSize(windowWidth, windowHeight);
-	this->g_buffer = new G_Buffer(windowWidth, windowHeight, false);
-	this->ms_g_buffer = new G_Buffer(windowWidth, windowHeight, true, 8);
-
 	vector<TexturedVertex> vertices;
 	vertices.push_back({ vector3F(-1.0f,  1.0f, 0.5f), vector3F(0.0f),  vector2F(0.0f, 1.0f) });
 	vertices.push_back({ vector3F(-1.0f, -1.0f, 0.5f), vector3F(0.0f),  vector2F(0.0f, 0.0f) });
-	vertices.push_back({ vector3F( 1.0f,  1.0f, 0.5f), vector3F(0.0f),  vector2F(1.0f, 1.0f) });
-	vertices.push_back({ vector3F( 1.0f, -1.0f, 0.5f), vector3F(0.0f),  vector2F(1.0f, 0.0f) });
+	vertices.push_back({ vector3F(1.0f,  1.0f, 0.5f), vector3F(0.0f),  vector2F(1.0f, 1.0f) });
+	vertices.push_back({ vector3F(1.0f, -1.0f, 0.5f), vector3F(0.0f),  vector2F(1.0f, 0.0f) });
 
 	vector<unsigned int> indices;
 	indices.push_back(0);
@@ -38,91 +33,82 @@
 
 	this->full_screen_quad = new TexturedMesh(vertices, indices);
 	this->full_screen_quad_program = new ShaderProgram("res/shaders/ScreenTexture.vs", "res/shaders/ScreenTexture.fs");
-	this->skybox = new Skybox("res/textures/Skybox/space", "res/shaders/Skybox");
 }
 
 RenderingSystem::~RenderingSystem()
 {
-	delete this->g_buffer;
-	delete this->ms_g_buffer;
 	delete this->full_screen_quad;
 	delete this->full_screen_quad_program;
 }
 
-
-void RenderingSystem::Render(Camera* camera)
+void RenderingSystem::renderMS(GLuint render_target, G_Buffer* ms_g_buffer, G_Buffer* g_buffer, Camera* camera)
 {
-	int windowWidth, windowHeight, bufferWidth, bufferHeight;
-	this->window->getWindowSize(windowWidth, windowHeight);
-	this->g_buffer->getBufferSize(bufferWidth, bufferHeight);
-	if ((windowWidth != bufferWidth) || (windowHeight != bufferHeight))
-	{
-		//Window Size changed, rebuild Gbuffer
-		delete this->g_buffer;
-		delete this->ms_g_buffer;
-		this->g_buffer = new G_Buffer(windowWidth, windowHeight, false);
-		this->ms_g_buffer = new G_Buffer(windowWidth, windowHeight, true, 8);
-	}
+	vector2I ms_buffer_size = ms_g_buffer->getBufferSize();
+	vector2I g_buffer_size = g_buffer->getBufferSize();
 
-	glBindFramebuffer(GL_FRAMEBUFFER, this->ms_g_buffer->getFBO());
-	this->ms_g_buffer->clearBuffer();
+	//TODO global clear buffer fuctions
+	glBindFramebuffer(GL_FRAMEBUFFER, ms_g_buffer->getFBO());
+	glClearDepth(0.0f);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	if (this->skybox != nullptr)
 	{
-		skybox->draw(camera, windowWidth, windowHeight);
-		
+		skybox->draw(camera, ms_buffer_size.x, ms_buffer_size.y);
+
 		glClearDepth(0.0f);
 		glClear(GL_DEPTH_BUFFER_BIT);
 	}
 
-	World* world = baseWorld;
-
-	while (world->hasParentWorld())
+	//DRAW ALL MESHES
+	for (int i = 0; i < this->models.size(); i++)
 	{
-		world = world->getParentWorld();
+		Mesh* mesh = MeshPool::getInstance()->get(this->models[i].first->getMesh());
+		GLuint texture = TexturePool::getInstance()->get(this->models[i].first->getTexture());
+		ShaderProgram* program = ShaderPool::getInstance()->get(this->models[i].first->getAmbientShader());
+
+		this->RenderModel(mesh, texture, program, this->models[i].second, camera, ms_buffer_size);
 	}
 
-	this->RenderWorld(world, camera);
-
-	//Blit all 3 color attachments + depth
-	glBindFramebuffer(GL_READ_FRAMEBUFFER, this->ms_g_buffer->getFBO());
-	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, this->g_buffer->getFBO());
+	//Blit all color attachments + depth
+	glBindFramebuffer(GL_READ_FRAMEBUFFER, ms_g_buffer->getFBO());
+	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, g_buffer->getFBO());
 
 	glReadBuffer(GL_COLOR_ATTACHMENT0);
 	glDrawBuffer(GL_COLOR_ATTACHMENT0);
 	glBlitFramebuffer(
-		0, 0, windowWidth, windowHeight,
-		0, 0, windowWidth, windowHeight,
+		0, 0, ms_buffer_size.x, ms_buffer_size.y,
+		0, 0, g_buffer_size.x, g_buffer_size.y,
 		GL_COLOR_BUFFER_BIT, GL_LINEAR);
 
 	glReadBuffer(GL_COLOR_ATTACHMENT1);
 	glDrawBuffer(GL_COLOR_ATTACHMENT1);
 	glBlitFramebuffer(
-		0, 0, windowWidth, windowHeight,
-		0, 0, windowWidth, windowHeight,
+		0, 0, ms_buffer_size.x, ms_buffer_size.y,
+		0, 0, g_buffer_size.x, g_buffer_size.y,
 		GL_COLOR_BUFFER_BIT, GL_LINEAR);
 
 	glReadBuffer(GL_COLOR_ATTACHMENT2);
 	glDrawBuffer(GL_COLOR_ATTACHMENT2);
 	glBlitFramebuffer(
-		0, 0, windowWidth, windowHeight,
-		0, 0, windowWidth, windowHeight,
+		0, 0, ms_buffer_size.x, ms_buffer_size.y,
+		0, 0, g_buffer_size.x, g_buffer_size.y,
 		GL_COLOR_BUFFER_BIT, GL_LINEAR);
 
 	glBlitFramebuffer(
-		0, 0, windowWidth, windowHeight,
-		0, 0, windowWidth, windowHeight,
+		0, 0, ms_buffer_size.x, ms_buffer_size.y,
+		0, 0, g_buffer_size.x, g_buffer_size.y,
 		GL_DEPTH_BUFFER_BIT, GL_NEAREST);
 
-	glBindFramebuffer(GL_FRAMEBUFFER, 0);
-	this->window->clearBuffer();
+	glBindFramebuffer(GL_FRAMEBUFFER, render_target);
+	glClearDepth(0.0f);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, this->g_buffer->getPositionTexture());
+	glBindTexture(GL_TEXTURE_2D, g_buffer->getPositionTexture());
 	glActiveTexture(GL_TEXTURE1);
-	glBindTexture(GL_TEXTURE_2D, this->g_buffer->getNormalTexture());
+	glBindTexture(GL_TEXTURE_2D, g_buffer->getNormalTexture());
 	glActiveTexture(GL_TEXTURE2);
-	glBindTexture(GL_TEXTURE_2D, this->g_buffer->getAlbedoTexture());
+	glBindTexture(GL_TEXTURE_2D, g_buffer->getAlbedoTexture());
 
 	this->full_screen_quad_program->setActiveProgram();
 	this->full_screen_quad_program->setUniform("gPosition", 0);
@@ -132,34 +118,48 @@ void RenderingSystem::Render(Camera* camera)
 	this->full_screen_quad->draw(this->full_screen_quad_program);
 
 	this->full_screen_quad_program->deactivateProgram();
-
-	this->window->updateBuffer();
 }
 
-void RenderingSystem::RenderModel(Model* model, Camera* camera)
+void RenderingSystem::addModel(Model* model, Transform global_transform)
 {
-	Transform globalTransform = model->parent_node->getGlobalTransform();
+	this->models.push_back({model, global_transform});
+}
+
+void RenderingSystem::addLight(void* light, Transform global_transform)
+{
+
+}
+
+void RenderingSystem::setSkybox(Skybox* box)
+{
+	this->skybox = box;
+}
+
+void RenderingSystem::clearScene()
+{
+	this->skybox = nullptr;
+
+	this->models.clear();
+}
+
+void RenderingSystem::RenderModel(Mesh* mesh, GLuint& texture, ShaderProgram* program, Transform& transform, Camera* camera, vector2I& screen_size)
+{
 	Transform cameraTransform = camera->parent_node->getGlobalTransform();
-	matrix4 modelMatrix = globalTransform.getModleMatrix(cameraTransform.getPosition());
-	matrix4 mvp = camera->getProjectionMatrix(this->window) * cameraTransform.getOriginViewMatrix() * modelMatrix;
+	matrix4 modelMatrix = transform.getModleMatrix(cameraTransform.getPosition());
+	matrix4 mvp = camera->getProjectionMatrix(screen_size.x, screen_size.y) * cameraTransform.getOriginViewMatrix() * modelMatrix;
 
 	vector3F ambientLight = vector3F(1.0f);//TODO ambient Light
 
-	Mesh* mesh = MeshPool::getInstance()->get(model->getMesh());
-
 	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, TexturePool::getInstance()->get(model->getTexture()));
+	glBindTexture(GL_TEXTURE_2D, texture);
 
-	//Ambient pass
-	ShaderProgram* ambient_shader = ShaderPool::getInstance()->get(model->getAmbientShader());
+	program->setActiveProgram();
+	program->setUniform("MVP", mvp);
+	program->setUniform("modelMatrix", modelMatrix);
+	program->setUniform("normalMatrix", transform.getNormalMatrix());
+	program->setUniform("ambientLight", ambientLight);
 
-	ambient_shader->setActiveProgram();
-	ambient_shader->setUniform("MVP", mvp);
-	ambient_shader->setUniform("modelMatrix", modelMatrix);
-	ambient_shader->setUniform("normalMatrix", globalTransform.getNormalMatrix());
-	ambient_shader->setUniform("ambientLight", ambientLight);
+	mesh->draw(program);
 
-	mesh->draw(ambient_shader);
-
-	ambient_shader->deactivateProgram();
-}*/
+	program->deactivateProgram();
+}

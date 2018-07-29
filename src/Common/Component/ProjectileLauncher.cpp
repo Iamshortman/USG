@@ -45,7 +45,7 @@ void ProjectileLauncher::update(double delta_time)
 			bullet->addToWorld(entity->getWorld());
 			bullet->setLocalTransform(transform);
 
-			bullet->addNodeComponent<Model>("res/models/bullet.obj", "res/textures/Purple.png", "res/shaders/Textured", "", "");
+			bullet->addNodeComponent<Model>("res/models/bullet.obj", "res/textures/Purple.png", "res/shaders/Textured", "");
 
 			bullet->addComponent<TimeToLive>(1.0);
 			bullet->addComponent<Projectile>((transform.getForward() * velocity) + entity->getRigidBody()->getLinearVelocity());
