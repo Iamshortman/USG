@@ -162,7 +162,7 @@ GameState_Singleplayer::GameState_Singleplayer()
 	character->addChild(head);
 	head->setLocalTransform(vector3D(0.0, 0.5, 0.0));
 	//this->camera = head->addNodeComponent<Camera>();
-	camera_entity->addNodeComponent<SpotLight>(vector3F(0.0, 0.0, 1.0), 0.5f, 50.0f, vector3F(0.0f, 0.01f, 0.0f), vector3F(1.0f), 0.4f);
+	head->addNodeComponent<SpotLight>(vector3F(0.0, 0.0, 1.0), 0.95f, 1000.0f, vector3F(0.0f, 0.01f, 0.0f), vector3F(1.0f), 0.4f);
 }
 
 GameState_Singleplayer::~GameState_Singleplayer()

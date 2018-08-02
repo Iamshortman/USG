@@ -12,13 +12,13 @@ uniform vec3 ambientLight = vec3(1.0f);
 void main(void) 
 {	
 	vec4 color = texture(gAlbedoSpec, out_TexCoord);	
-	if(texture(gPosition, tex_coord).xyz == vec3(0.0, 0.0, 0.0))
+	if(texture(gPosition, out_TexCoord).xyz == vec3(0.0, 0.0, 0.0))
 	{
-		return color;
+		fragmentColor = color;
 	}
 	else
 	{
-		return color * vec4(ambientLight, 1.0);
+		fragmentColor = color * vec4(ambientLight, 1.0);
 	}
 	//fragmentColor = texture(gPosition, out_TexCoord);
 }
