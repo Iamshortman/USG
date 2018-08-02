@@ -8,7 +8,8 @@
 
 #include "Client/Component/DebugCamera.hpp"
 #include "Client/Rendering/Camera.hpp"
-#include "Common/Component/Model.hpp"
+#include "Common/Rendering/Model.hpp"
+#include "Common/Rendering/Lights.hpp"
 
 #include "Common/Component/ComponentShipFlight.hpp"
 
@@ -140,16 +141,16 @@ GameState_Singleplayer::GameState_Singleplayer()
 	cobra_fighter->setLocalTransform(Transform(vector3D(-2.0, 0.0, 1.0)));
 	cobra_fighter->getRigidBody()->setLinearVelocity(vector3D(0.0, 0.0, 10.0));*/
 
-	//Entity* camera_entity = EntityManager::getInstance()->createEntity();
-	//this->camera = camera_entity->addNodeComponent<Camera>();
-	//camera_entity->addComponent<DebugCamera>(5.0, 0.25);
-	//camera_entity->addToWorld(big_ship->getSubWorld());
+	Entity* camera_entity = EntityManager::getInstance()->createEntity();
+	this->camera = camera_entity->addNodeComponent<Camera>();
+	camera_entity->addComponent<DebugCamera>(5.0, 0.25);
+	camera_entity->addToWorld(big_ship->getSubWorld());
 
 	character = EntityManager::getInstance()->createNodeEntity();
 	character->addToWorld(big_ship->getSubWorld());
 	character->addRigidBody()->setInertiaTensor(vector3D(0.0));
 	character->getRigidBody()->getRigidBody()->forceActivationState(DISABLE_DEACTIVATION);
-	character->addComponent<CharacterController>();
+	//character->addComponent<CharacterController>();
 	character->setLocalTransform(Transform(vector3D(0.0, 0.0, 10.0)));
 
 	Node* body = new Node();
@@ -160,7 +161,8 @@ GameState_Singleplayer::GameState_Singleplayer()
 	Node* head = new Node();
 	character->addChild(head);
 	head->setLocalTransform(vector3D(0.0, 0.5, 0.0));
-	this->camera = head->addNodeComponent<Camera>();
+	//this->camera = head->addNodeComponent<Camera>();
+	camera_entity->addNodeComponent<SpotLight>(vector3F(0.0, 0.0, 1.0), 0.5f, 50.0f, vector3F(0.0f, 0.01f, 0.0f), vector3F(1.0f), 0.4f);
 }
 
 GameState_Singleplayer::~GameState_Singleplayer()
@@ -171,12 +173,14 @@ GameState_Singleplayer::~GameState_Singleplayer()
 void GameState_Singleplayer::update(Client* client, double delta_time)
 {
 	//TEMP CHAR INPUT
-	CharacterController* controller = this->character->getComponent<CharacterController>();
-	double forward = InputManager::getInstance()->getButtonAxisCombo("Debug_ForwardBackward", "Debug_Forward", "Debug_Backward");
-	double left = InputManager::getInstance()->getButtonAxisCombo("Debug_LeftRight", "Debug_Left", "Debug_Right");
-	controller->linear_input = vector3D(left, 0.0, forward);
-	controller->jump = InputManager::getInstance()->getButtonPressed("Char_Jump");
-
+	if (this->character != nullptr && this->character->hasComponent<CharacterController>())
+	{
+		CharacterController* controller = this->character->getComponent<CharacterController>();
+		double forward = InputManager::getInstance()->getButtonAxisCombo("Debug_ForwardBackward", "Debug_Forward", "Debug_Backward");
+		double left = InputManager::getInstance()->getButtonAxisCombo("Debug_LeftRight", "Debug_Left", "Debug_Right");
+		controller->linear_input = vector3D(left, 0.0, forward);
+		controller->jump = InputManager::getInstance()->getButtonPressed("Char_Jump");
+	}
 
 	WorldManager::getInstance()->update(delta_time);
 	EntityManager::getInstance()->update();

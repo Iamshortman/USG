@@ -13,7 +13,7 @@
 #include "Common/GLM_Include.hpp"
 
 #include "Common/Entity/Entity.hpp"
-#include "Common/Component/Model.hpp"
+#include "Common/Rendering/Model.hpp"
 
 #include "Client/Rendering/RenderingSystem.hpp"
 

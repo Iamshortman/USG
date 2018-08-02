@@ -30,7 +30,7 @@ void setPointLight(std::string prefix, ShaderProgram* program, PointLight* light
 void setSpotLight(std::string prefix, ShaderProgram* program, SpotLight* light, Transform worldTransform, vector3D camPos)
 {
 	setPointLight(prefix + ".point", program, light, worldTransform, camPos);
-	program->setUniform(prefix + ".direction", ((quaternionF)worldTransform.getOrientation()) * light->getDirection());
+	program->setUniform(prefix + ".direction", worldTransform.getForward()); //((quaternionF)worldTransform.getOrientation()) * light->getDirection());
 	program->setUniform(prefix + ".cutoff", light->getCutoff());
 };
 

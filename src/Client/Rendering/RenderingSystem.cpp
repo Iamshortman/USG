@@ -4,6 +4,8 @@
 #include "Client/Resource/ShaderPool.hpp"
 #include "Client/Resource/TexturePool.hpp"
 
+#include "Client/Rendering/LightShaderUtil.hpp"
+
 RenderingSystem::RenderingSystem()
 {
 	glEnable(GL_DEPTH_TEST);
@@ -32,13 +34,18 @@ RenderingSystem::RenderingSystem()
 	indices.push_back(3);
 
 	this->full_screen_quad = new TexturedMesh(vertices, indices);
-	this->full_screen_quad_program = new ShaderProgram("res/shaders/ScreenTexture.vs", "res/shaders/ScreenTexture.fs");
+
+	this->deferred_ambient = new ShaderProgram("res/shaders/Deferred.vs", "res/shaders/Deferred.fs");
+	this->deferred_light_directional = new ShaderProgram("res/shaders/Deferred.vs", "res/shaders/Deferred_Light_Directional.fs");
+	this->deferred_light_point = new ShaderProgram("res/shaders/Deferred.vs", "res/shaders/Deferred_Light_Point.fs");
+	this->deferred_light_spot = new ShaderProgram("res/shaders/Deferred.vs", "res/shaders/Deferred_Light_Spot.fs");
 }
 
 RenderingSystem::~RenderingSystem()
 {
 	delete this->full_screen_quad;
-	delete this->full_screen_quad_program;
+	delete this->deferred_ambient;
+	delete this->deferred_light_directional;
 }
 
 void RenderingSystem::renderMS(GLuint render_target, G_Buffer* ms_g_buffer, G_Buffer* g_buffer, Camera* camera)
@@ -46,28 +53,7 @@ void RenderingSystem::renderMS(GLuint render_target, G_Buffer* ms_g_buffer, G_Bu
 	vector2I ms_buffer_size = ms_g_buffer->getBufferSize();
 	vector2I g_buffer_size = g_buffer->getBufferSize();
 
-	//TODO global clear buffer fuctions
-	glBindFramebuffer(GL_FRAMEBUFFER, ms_g_buffer->getFBO());
-	glClearDepth(0.0f);
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-	if (this->skybox != nullptr)
-	{
-		skybox->draw(camera, ms_buffer_size.x, ms_buffer_size.y);
-
-		glClearDepth(0.0f);
-		glClear(GL_DEPTH_BUFFER_BIT);
-	}
-
-	//DRAW ALL MESHES
-	for (int i = 0; i < this->models.size(); i++)
-	{
-		Mesh* mesh = MeshPool::getInstance()->get(this->models[i].first->getMesh());
-		GLuint texture = TexturePool::getInstance()->get(this->models[i].first->getTexture());
-		ShaderProgram* program = ShaderPool::getInstance()->get(this->models[i].first->getAmbientShader());
-
-		this->RenderModel(mesh, texture, program, this->models[i].second, camera, ms_buffer_size);
-	}
+	this->generateGBuffer(ms_g_buffer, camera);
 
 	//Blit all color attachments + depth
 	glBindFramebuffer(GL_READ_FRAMEBUFFER, ms_g_buffer->getFBO());
@@ -99,25 +85,13 @@ void RenderingSystem::renderMS(GLuint render_target, G_Buffer* ms_g_buffer, G_Bu
 		0, 0, g_buffer_size.x, g_buffer_size.y,
 		GL_DEPTH_BUFFER_BIT, GL_NEAREST);
 
-	glBindFramebuffer(GL_FRAMEBUFFER, render_target);
-	glClearDepth(0.0f);
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	this->drawAmbient(render_target, g_buffer, camera);
+}
 
-	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, g_buffer->getPositionTexture());
-	glActiveTexture(GL_TEXTURE1);
-	glBindTexture(GL_TEXTURE_2D, g_buffer->getNormalTexture());
-	glActiveTexture(GL_TEXTURE2);
-	glBindTexture(GL_TEXTURE_2D, g_buffer->getAlbedoTexture());
-
-	this->full_screen_quad_program->setActiveProgram();
-	this->full_screen_quad_program->setUniform("gPosition", 0);
-	this->full_screen_quad_program->setUniform("gNormal", 1);
-	this->full_screen_quad_program->setUniform("gAlbedoSpec", 2);
-
-	this->full_screen_quad->draw(this->full_screen_quad_program);
-
-	this->full_screen_quad_program->deactivateProgram();
+void RenderingSystem::render(GLuint render_target, G_Buffer* g_buffer, Camera* camera)
+{
+	this->generateGBuffer(g_buffer, camera);
+	this->drawAmbient(render_target, g_buffer, camera);
 }
 
 void RenderingSystem::addModel(Model* model, Transform global_transform)
@@ -125,9 +99,14 @@ void RenderingSystem::addModel(Model* model, Transform global_transform)
 	this->models.push_back({model, global_transform});
 }
 
-void RenderingSystem::addLight(void* light, Transform global_transform)
+void RenderingSystem::addPointLight(PointLight* point, Transform global_transform)
 {
+	this->point_lights.push_back({ point, global_transform });
+}
 
+void RenderingSystem::addSpotLight(SpotLight* spot, Transform global_transform)
+{
+	this->spot_lights.push_back({ spot, global_transform });
 }
 
 void RenderingSystem::setSkybox(Skybox* box)
@@ -135,11 +114,17 @@ void RenderingSystem::setSkybox(Skybox* box)
 	this->skybox = box;
 }
 
+void RenderingSystem::setAmbientLight(vector3F ambient_light)
+{
+	this->ambient_light = ambient_light;
+}
+
 void RenderingSystem::clearScene()
 {
 	this->skybox = nullptr;
 
 	this->models.clear();
+	this->spot_lights.clear();
 }
 
 void RenderingSystem::RenderModel(Mesh* mesh, GLuint& texture, ShaderProgram* program, Transform& transform, Camera* camera, vector2I& screen_size)
@@ -148,8 +133,6 @@ void RenderingSystem::RenderModel(Mesh* mesh, GLuint& texture, ShaderProgram* pr
 	matrix4 modelMatrix = transform.getModleMatrix(cameraTransform.getPosition());
 	matrix4 mvp = camera->getProjectionMatrix(screen_size.x, screen_size.y) * cameraTransform.getOriginViewMatrix() * modelMatrix;
 
-	vector3F ambientLight = vector3F(1.0f);//TODO ambient Light
-
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, texture);
 
@@ -157,9 +140,117 @@ void RenderingSystem::RenderModel(Mesh* mesh, GLuint& texture, ShaderProgram* pr
 	program->setUniform("MVP", mvp);
 	program->setUniform("modelMatrix", modelMatrix);
 	program->setUniform("normalMatrix", transform.getNormalMatrix());
-	program->setUniform("ambientLight", ambientLight);
 
 	mesh->draw(program);
 
 	program->deactivateProgram();
+}
+
+void RenderingSystem::generateGBuffer(G_Buffer* g_buffer, Camera* camera)
+{
+	vector2I g_buffer_size = g_buffer->getBufferSize();
+
+	//TODO global clear buffer fuctions
+	glBindFramebuffer(GL_FRAMEBUFFER, g_buffer->getFBO());
+	glClearDepth(0.0f);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+	if (this->skybox != nullptr)
+	{
+		skybox->draw(camera, g_buffer_size.x, g_buffer_size.y);
+
+		glClearDepth(0.0f);
+		glClear(GL_DEPTH_BUFFER_BIT);
+	}
+
+	//DRAW ALL MESHES
+	for (int i = 0; i < this->models.size(); i++)
+	{
+		Mesh* mesh = MeshPool::getInstance()->get(this->models[i].first->getMesh());
+		GLuint texture = TexturePool::getInstance()->get(this->models[i].first->getTexture());
+		ShaderProgram* program = ShaderPool::getInstance()->get(this->models[i].first->getAmbientShader());
+
+		this->RenderModel(mesh, texture, program, this->models[i].second, camera, g_buffer_size);
+	}
+}
+
+void RenderingSystem::drawAmbient(GLuint render_target, G_Buffer* g_buffer, Camera* camera)
+{
+	glBindFramebuffer(GL_FRAMEBUFFER, render_target);
+	glClearDepth(0.0f);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+	glDepthMask(GL_FALSE);
+	glDisable(GL_DEPTH_TEST);
+
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, g_buffer->getPositionTexture());
+	glActiveTexture(GL_TEXTURE1);
+	glBindTexture(GL_TEXTURE_2D, g_buffer->getNormalTexture());
+	glActiveTexture(GL_TEXTURE2);
+	glBindTexture(GL_TEXTURE_2D, g_buffer->getAlbedoTexture());
+
+	this->deferred_ambient->setActiveProgram();
+	this->deferred_ambient->setUniform("gPosition", 0);
+	this->deferred_ambient->setUniform("gNormal", 1);
+	this->deferred_ambient->setUniform("gAlbedoSpec", 2);
+	this->deferred_ambient->setUniform("ambientLight", this->ambient_light);
+
+	this->full_screen_quad->draw(this->deferred_ambient);
+
+	this->deferred_ambient->deactivateProgram();
+
+	if (this->use_lighting)
+	{
+		this->drawLights(render_target, g_buffer, camera);
+	}
+
+	glDepthMask(GL_TRUE);
+	glEnable(GL_DEPTH_TEST);
+	glDepthFunc(GL_GREATER);
+}
+
+void RenderingSystem::drawLights(GLuint render_target, G_Buffer* g_buffer, Camera* camera)
+{
+	Transform camera_transform = camera->parent_node->getGlobalTransform();
+
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_ONE, GL_ONE);
+
+	this->deferred_light_directional->setActiveProgram();
+	this->deferred_light_directional->setUniform("gPosition", 0);
+	this->deferred_light_directional->setUniform("gNormal", 1);
+	this->deferred_light_directional->setUniform("gAlbedoSpec", 2);
+	this->deferred_light_directional->setUniform("ambientLight", this->ambient_light);
+
+
+	//this->full_screen_quad->draw(this->deferred_light_directional);
+
+	this->deferred_light_point->deactivateProgram();
+	this->deferred_light_point->setActiveProgram();
+	this->deferred_light_point->setUniform("gPosition", 0);
+	this->deferred_light_point->setUniform("gNormal", 1);
+	this->deferred_light_point->setUniform("gAlbedoSpec", 2);
+	this->deferred_light_point->setUniform("ambientLight", this->ambient_light);
+	for (int i = 0; i < this->point_lights.size(); i++)
+	{
+		setPointLight("point_light", this->deferred_light_point, this->point_lights[i].first, this->point_lights[i].second, camera_transform.position);
+		this->full_screen_quad->draw(this->deferred_light_point);
+	}
+	this->deferred_light_point->deactivateProgram();
+
+	this->deferred_light_directional->deactivateProgram();
+	this->deferred_light_spot->setActiveProgram();
+	this->deferred_light_spot->setUniform("gPosition", 0);
+	this->deferred_light_spot->setUniform("gNormal", 1);
+	this->deferred_light_spot->setUniform("gAlbedoSpec", 2);
+	this->deferred_light_spot->setUniform("ambientLight", this->ambient_light);
+	for (int i = 0; i < this->spot_lights.size(); i++)
+	{
+		setSpotLight("spot_light", this->deferred_light_spot, this->spot_lights[i].first, this->spot_lights[i].second, camera_transform.position);
+		this->full_screen_quad->draw(this->deferred_light_spot);
+	}
+	this->deferred_light_spot->deactivateProgram();
+
+	glDisable(GL_BLEND);
 }

@@ -13,7 +13,7 @@ G_Buffer::G_Buffer(vector2I buffer_size, bool multisample, int number_of_samples
 
 	if (this->multisample == true)
 	{
-		//position color buffer
+		//position color buffer + glow
 		glGenTextures(1, &this->position_texture);
 		glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, this->position_texture);
 		glTexImage2DMultisample(GL_TEXTURE_2D_MULTISAMPLE, this->number_of_samples, GL_RGB, this->size.x, this->size.y, true);
@@ -28,7 +28,7 @@ G_Buffer::G_Buffer(vector2I buffer_size, bool multisample, int number_of_samples
 		//color + specular color buffer
 		glGenTextures(1, &this->albedo_texture);
 		glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, this->albedo_texture);
-		glTexImage2DMultisample(GL_TEXTURE_2D_MULTISAMPLE, this->number_of_samples, GL_RGB, this->size.x, this->size.y, true);
+		glTexImage2DMultisample(GL_TEXTURE_2D_MULTISAMPLE, this->number_of_samples, GL_RGBA, this->size.x, this->size.y, true);
 		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT2, GL_TEXTURE_2D_MULTISAMPLE, this->albedo_texture, 0);
 
 		//Depth
@@ -41,7 +41,7 @@ G_Buffer::G_Buffer(vector2I buffer_size, bool multisample, int number_of_samples
 	{
 		this->number_of_samples = 0;
 
-		//position color buffer
+		//position color buffer + glow
 		glGenTextures(1, &this->position_texture);
 		glBindTexture(GL_TEXTURE_2D, this->position_texture);
 		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB16F, this->size.x, this->size.y, 0, GL_RGB, GL_FLOAT, NULL);

@@ -6,8 +6,7 @@
 #include "Client/Resource/TexturePool.hpp"
 #endif
 
-Model::Model(I_Node* node, string mesh, string texture, string ambient_shader, string shadow_shader)
-	:ComponentNode(node)
+Model::Model(string mesh, string texture, string ambient_shader, string shadow_shader)
 {
 	this->mesh_file_path = mesh;
 	this->texture_name = texture;

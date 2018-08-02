@@ -15,12 +15,12 @@ public:
 	virtual void update(Client* client, double delta_time);
 
 protected:
-	World* world;
+	World* world = nullptr;
 
 	Camera* camera = nullptr;
 
 	//Entity* camera;
-	NodeEntity* character;
+	NodeEntity* character = nullptr;
 };
 
 #endif //GAMESTATE_SINGLEPLAYER_HPP

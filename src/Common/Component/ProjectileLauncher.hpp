@@ -6,7 +6,7 @@
 class ProjectileLauncher : public ComponentNode
 {
 public:
-	ProjectileLauncher(I_Node* node);
+	ProjectileLauncher();
 
 	virtual void update(double delta_time);
 

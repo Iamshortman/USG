@@ -2,8 +2,7 @@
 #include "Common/Entity/Entity.hpp"
 #include "Common/Entity/Node.hpp"
 
-Camera::Camera(I_Node* node)
-	:ComponentNode(node)
+Camera::Camera()
 {
 	this->frame_of_view = 90.0;
 }

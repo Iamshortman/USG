@@ -3,6 +3,8 @@
 
 #include "Common/GLM_Include.hpp"
 
+#include "Common/Component/ComponentNode.hpp"
+
 enum LightType
 {
 	Directional,
@@ -10,7 +12,7 @@ enum LightType
 	Spot,
 };
 
-class BaseLight
+class BaseLight : public ComponentNode
 {
 public:
 	BaseLight(vector3F color, float intensity);
@@ -26,9 +28,9 @@ public:
 	virtual LightType getLightType() = 0;
 
 private:
-	vector3F m_color;
-	float m_intensity;
-	bool m_enabled;
+	vector3F color;
+	float intensity;
+	bool enabled;
 };
 
 class DirectionalLight : public BaseLight
@@ -43,7 +45,7 @@ public:
 	virtual LightType getLightType() { return LightType::Directional; };
 
 private:
-	vector3F m_direction;
+	vector3F direction;
 };
 
 class PointLight : public BaseLight
@@ -60,8 +62,8 @@ public:
 	virtual LightType getLightType() { return LightType::Point; };
 
 private:
-	float m_range;
-	vector3F m_attenuation;
+	float range;
+	vector3F attenuation;
 };
 
 class SpotLight : public PointLight
@@ -78,8 +80,8 @@ public:
 	virtual LightType getLightType() { return LightType::Spot; };
 
 private:
-	vector3F m_direction;
-	float m_cutoff;
+	vector3F direction;
+	float cutoff;
 };
 
 #endif //LIGHTS_HPP

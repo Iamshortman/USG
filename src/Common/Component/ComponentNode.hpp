@@ -6,19 +6,12 @@ class I_Node;
 class ComponentNode
 {
 public:
-	ComponentNode(I_Node* node) : parent_node(node) {};
-
+	ComponentNode() {};
 	virtual void update(double delta_time) {};
 
-	virtual void enable() { this->enabled = true; };
-	virtual void disable() { this->enabled = false; };
-	virtual bool isEnabled() { return this->enabled; };
-
-	I_Node* const parent_node;
+	I_Node* parent_node = nullptr;
 
 protected:
-	bool enabled = true;
-
 	friend class I_Node;
 };
 

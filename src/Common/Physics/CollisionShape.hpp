@@ -19,7 +19,7 @@ enum CollisionShapeType
 class CollisionShape : public ComponentNode
 {
 public:
-	CollisionShape(I_Node* node);
+	CollisionShape();
 	~CollisionShape();
 
 	void setBox(vector3D half_length);
@@ -29,8 +29,8 @@ public:
 
 	btCollisionShape* getShape();
 
-	virtual void enable() override;
-	virtual void disable() override;
+	void enable();
+	void disable();
 
 private:
 

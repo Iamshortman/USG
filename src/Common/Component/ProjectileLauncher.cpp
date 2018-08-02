@@ -6,7 +6,7 @@
 
 #include "Common/Entity/EntityManager.hpp"
 
-#include "Common/Component/Model.hpp"
+#include "Common/Rendering/Model.hpp"
 #include "Common/Component/TimeToLive.hpp"
 #include "Common/Component/Projectile.hpp"
 
@@ -14,8 +14,7 @@
 #include "Client/Input/InputManager.hpp"
 #endif // CLIENT
 
-ProjectileLauncher::ProjectileLauncher(I_Node* node)
-	:ComponentNode(node)
+ProjectileLauncher::ProjectileLauncher()
 {
 }
 

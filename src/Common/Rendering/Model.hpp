@@ -12,7 +12,7 @@
 class Model : public ComponentNode
 {
 public:
-	Model(I_Node* node, string mesh, string texture, string ambient_shader, string shadow_shader);
+	Model(string mesh, string texture, string ambient_shader, string shadow_shader);
 	virtual ~Model();
 
 	string getMesh() const { return this->mesh_file_path; };

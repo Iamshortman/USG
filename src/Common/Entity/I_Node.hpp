@@ -41,7 +41,8 @@ public:
 	{
 		if (!this->hasNodeComponent<T>())
 		{
-			ComponentNode* component = new T(this, std::forward<TArgs>(mArgs)...);
+			ComponentNode* component = new T(std::forward<TArgs>(mArgs)...);
+			component->parent_node = this;
 			this->node_component_map[typeid(T).hash_code()] = component;
 			return (T*)component;
 		}

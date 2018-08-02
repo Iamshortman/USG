@@ -1,6 +1,6 @@
 #include "Common/Entity/EntityManager.hpp"
 
-#include "Common/Component/Model.hpp"
+#include "Common/Rendering/Model.hpp"
 #include "Common/Physics/RigidBody.hpp"
 #include "Common/Component/ComponentShipFlight.hpp"
 

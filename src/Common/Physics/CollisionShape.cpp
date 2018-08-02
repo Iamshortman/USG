@@ -9,11 +9,8 @@
 #include "Common/Resource/Assimp_Include.hpp"
 #include "Common/Logger/Logger.hpp"
 
-CollisionShape::CollisionShape(I_Node* node)
-	:ComponentNode(node)
+CollisionShape::CollisionShape()
 {
-	this->enabled = false;
-	this->enable();
 }
 
 CollisionShape::~CollisionShape()
@@ -24,7 +21,6 @@ CollisionShape::~CollisionShape()
 void CollisionShape::setBox(vector3D half_length)
 {
 	this->disable();
-
 
 	if (this->shape != nullptr)
 	{
@@ -157,25 +153,21 @@ void CollisionShape::enable()
 		return;
 	}
 
-	if (!this->enabled)
+	RigidBody* rigid_body = this->parent_node->getEntity()->getRigidBody();
+	if (rigid_body != nullptr)
 	{
-		RigidBody* rigid_body = this->parent_node->getEntity()->getRigidBody();
-		if (rigid_body != nullptr)
+		if (rigid_body->getType() == RigidBodyType::SINGLE)
 		{
-			if (rigid_body->getType() == RigidBodyType::SINGLE)
-			{
-				SingleRigidBody* single_body = (SingleRigidBody*)rigid_body;
-				single_body->setShape(this);
-			}
-			else if (rigid_body->getType() == RigidBodyType::MULTI)
-			{
-				MuiltiRigidBody* muilti_body = (MuiltiRigidBody*)rigid_body;
-				muilti_body->addChildShape(this->parent_node);
-			}
-
-			ComponentNode::enable();
-			return;
+			SingleRigidBody* single_body = (SingleRigidBody*)rigid_body;
+			single_body->setShape(this);
 		}
+		else if (rigid_body->getType() == RigidBodyType::MULTI)
+		{
+			MuiltiRigidBody* muilti_body = (MuiltiRigidBody*)rigid_body;
+			muilti_body->addChildShape(this->parent_node);
+		}
+
+		return;
 	}
 
 	Logger::getInstance()->logError("Shape could not attach\n");
@@ -183,7 +175,7 @@ void CollisionShape::enable()
 
 void CollisionShape::disable()
 {
-	if (this->enabled && this->shape != nullptr)
+	if (this->shape != nullptr)
 	{
 		RigidBody* rigid_body = this->parent_node->getEntity()->getRigidBody();
 		if (rigid_body != nullptr)
@@ -200,6 +192,4 @@ void CollisionShape::disable()
 			}
 		}
 	}
-
-	ComponentNode::disable();
 }

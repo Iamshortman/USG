@@ -8,13 +8,13 @@ out vec2 out_TexCoord;
 out vec3 out_FragPos;
 
 uniform mat4 MVP;
+uniform mat4 modelMatrix;
 uniform mat3 normalMatrix;  
  
 void main(void) 
 {	
-	vec4 fragPos = MVP * vec4(in_Position, 1.0f);
-	out_FragPos = fragPos.xyz;
-	gl_Position = fragPos;
+	out_FragPos = (modelMatrix * vec4(in_Position, 1.0f)).xyz;
+	gl_Position = MVP * vec4(in_Position, 1.0f);
 	out_Normal = normalMatrix * in_Normal;
 	out_TexCoord = in_TexCoord;
 }
