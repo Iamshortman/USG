@@ -131,17 +131,17 @@ void RenderingManager::Render(World* world, Camera* camera)
 	}
 	World* base_world = world;
 
-	while (base_world->hasParentWorld())
+	while (base_world->getParent() != nullptr)
 	{
-		base_world = base_world->getParentWorld();
+		base_world = base_world->getParent()->getWorld();
 	}
 
 	this->SubmitWorld(base_world);
 	
 	this->rendering_system->setSkybox(this->skybox);
 
-	//this->rendering_system->renderMS(0, this->ms_g_buffer, this->g_buffer, camera);
-	this->rendering_system->render(0, this->g_buffer, camera);
+	this->rendering_system->renderMS(0, this->ms_g_buffer, this->g_buffer, camera);
+	//this->rendering_system->render(0, this->g_buffer, camera);
 
 	this->window->updateBuffer();
 }
