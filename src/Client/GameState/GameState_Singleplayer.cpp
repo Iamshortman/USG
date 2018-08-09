@@ -63,9 +63,6 @@ NodeEntity* build_big_ship()
 NodeEntity* build_cobra()
 {
 	NodeEntity* node_entity = EntityManager::getInstance()->createNodeEntity();
-
-	//node_entity->addComponent<ComponentShipFlight>();
-
 	node_entity->addRigidBody();
 
 	Node* hull = new Node();
@@ -118,12 +115,11 @@ NodeEntity* build_cobra()
 	Node* gun = new Node();
 	node_entity->addChild(gun);
 	gun->setLocalTransform(Transform(vector3D(0.0, -0.75, 5.0)));
-	//gun->addNodeComponent<ProjectileLauncher>();
+	gun->addNodeComponent<ProjectileLauncher>();
 
-	node_entity->getRigidBody()->setMass(5000.0);
-	node_entity->getRigidBody()->setInertiaTensor(vector3D(1000.0));
+	node_entity->getRigidBody()->setMass(4000.0);
+	node_entity->getRigidBody()->setInertiaTensor(vector3D(0.0));
 	node_entity->getRigidBody()->getRigidBody()->forceActivationState(DISABLE_DEACTIVATION);
-
 	return node_entity;
 }
 
@@ -136,33 +132,40 @@ GameState_Singleplayer::GameState_Singleplayer()
 	big_ship->addToWorld(this->world);
 	big_ship->setLocalTransform(Transform(vector3D(0.0, 0.0, 50.0), quaternionD(0.793353, 0.0, -0.608761, 0.0)));
 
-	/*NodeEntity* cobra_fighter = build_cobra();
-	cobra_fighter->addToWorld(this->world);
-	cobra_fighter->setLocalTransform(Transform(vector3D(-2.0, 0.0, 1.0)));
-	cobra_fighter->getRigidBody()->setLinearVelocity(vector3D(0.0, 0.0, 10.0));*/
+	this->ship = build_cobra();
+	this->ship->addComponent<ShipFlightController>();
+	this->ship->addToWorld(this->world);
+	this->ship->setLocalTransform(Transform(vector3D(0.0, 20.0, 0.0)));
 
-	Entity* camera_entity = EntityManager::getInstance()->createEntity();
+	/*Entity* camera_entity = EntityManager::getInstance()->createEntity();
 	this->camera = camera_entity->addNodeComponent<Camera>();
 	camera_entity->addComponent<DebugCamera>(5.0, 0.25);
 	camera_entity->addToWorld(big_ship->getSubWorld());
+	camera_entity->setLocalTransform(Transform(vector3D(0.0, -6.5, 8.5)));*/
 
-	character = EntityManager::getInstance()->createNodeEntity();
-	character->addToWorld(big_ship->getSubWorld());
-	character->addRigidBody()->setInertiaTensor(vector3D(0.0));
-	character->getRigidBody()->getRigidBody()->forceActivationState(DISABLE_DEACTIVATION);
-	//character->addComponent<CharacterController>();
-	character->setLocalTransform(Transform(vector3D(0.0, 0.0, 10.0)));
+	this->character = EntityManager::getInstance()->createNodeEntity();
+	this->character->addToWorld(big_ship->getSubWorld());
+	this->character->addRigidBody()->setInertiaTensor(vector3D(0.0));
+	this->character->getRigidBody()->getRigidBody()->forceActivationState(DISABLE_DEACTIVATION);
+	//this->character->addComponent<CharacterController>();
+	this->character->setLocalTransform(Transform(vector3D(0.0, 0.0, 10.0)));
 
 	Node* body = new Node();
-	character->addChild(body);
+	this->character->addChild(body);
 	body->addNodeComponent<Model>("res/models/capsule.obj", "res/textures/Purple.png", "res/shaders/Textured", "");
 	body->addNodeComponent<CollisionShape>()->setCapsule(0.25, 1.0);
 
 	Node* head = new Node();
-	character->addChild(head);
-	head->setLocalTransform(vector3D(0.0, 0.5, 0.0));
-	//this->camera = head->addNodeComponent<Camera>();
-	camera_entity->addNodeComponent<SpotLight>(vector3F(0.0, 0.0, 1.0), 0.95f, 1000.0f, vector3F(0.0f, 0.01f, 0.0f), vector3F(1.0f), 0.4f);
+	
+	//this->character->addChild(head);
+	//this->character->getComponent<CharacterController>()->setHead(head);
+	//head->setLocalTransform(vector3D(0.0, 0.5, 0.0));
+	//head->addNodeComponent<SpotLight>(vector3F(0.0, 0.0, 1.0), 0.95f, 1000.0f, vector3F(0.0f, 0.01f, 0.0f), vector3F(1.0f), 0.4f);
+
+	this->ship->addChild(head);
+	this->camera = head->addNodeComponent<Camera>();
+	head->setLocalTransform(vector3D(0.0, 0.95, -0.75));
+
 }
 
 GameState_Singleplayer::~GameState_Singleplayer()
@@ -180,7 +183,30 @@ void GameState_Singleplayer::update(Client* client, double delta_time)
 		double left = InputManager::getInstance()->getButtonAxisCombo("Debug_LeftRight", "Debug_Left", "Debug_Right");
 		controller->linear_input = vector3D(left, 0.0, forward);
 		controller->jump = InputManager::getInstance()->getButtonPressed("Char_Jump");
+
+		controller->angular_input.x = InputManager::getInstance()->getButtonAxisCombo("Debug_Pitch", "Debug_PitchUp", "Debug_PitchDown", false);
+		controller->angular_input.y = InputManager::getInstance()->getButtonAxisCombo("Debug_Yaw", "Debug_YawLeft", "Debug_YawRight", false);
 	}
+	
+	if (this->ship != nullptr && this->ship->hasComponent<ShipFlightController>())
+	{
+		ShipFlightController* controller = this->ship->getComponent<ShipFlightController>();
+
+		controller->linear_input.x = InputManager::getInstance()->getButtonAxisCombo("Debug_LeftRight", "Debug_Left", "Debug_Right");
+		controller->linear_input.y = InputManager::getInstance()->getButtonAxisCombo("Debug_UpDown", "Debug_Up", "Debug_Down");
+		controller->linear_input.z = InputManager::getInstance()->getButtonAxisCombo("Debug_ForwardBackward", "Debug_Forward", "Debug_Backward");
+
+		controller->angular_input.x = InputManager::getInstance()->getButtonAxisCombo("Debug_Pitch", "Debug_PitchUp", "Debug_PitchDown");
+		controller->angular_input.y = InputManager::getInstance()->getButtonAxisCombo("Debug_Yaw", "Debug_YawLeft", "Debug_YawRight");
+		controller->angular_input.z = InputManager::getInstance()->getButtonAxisCombo("Debug_Roll", "Debug_RollLeft", "Debug_RollRight");
+
+		controller->flight_assist = InputManager::getInstance()->getButtonDown("Debug_FlightAssist");
+
+		/*printf("Pitch: %lf\n", controller->angular_input.x);
+		printf("Yaw: %lf\n", controller->angular_input.y);
+		printf("Roll: %lf\n\n", controller->angular_input.z);*/
+	}
+
 
 	WorldManager::getInstance()->update(delta_time);
 	EntityManager::getInstance()->update();

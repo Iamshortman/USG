@@ -17,7 +17,7 @@ RenderingManager::RenderingManager(Window* window)
 
 	vector2I window_size = this->window->getWindowSize();
 	this->g_buffer = new G_Buffer(window_size, false);
-	this->ms_g_buffer = new G_Buffer(window_size, true, 2);
+	this->ms_g_buffer = new G_Buffer(window_size, true, 8);
 
 	this->skybox = new Skybox("res/textures/Skybox/space", "res/shaders/Skybox");
 
@@ -127,7 +127,7 @@ void RenderingManager::Render(World* world, Camera* camera)
 		delete this->g_buffer;
 		delete this->ms_g_buffer;
 		this->g_buffer = new G_Buffer(window_size, false);
-		this->ms_g_buffer = new G_Buffer(window_size, true, 2);
+		this->ms_g_buffer = new G_Buffer(window_size, true, 8);
 	}
 	World* base_world = world;
 

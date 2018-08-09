@@ -21,6 +21,7 @@ protected:
 
 	//Entity* camera;
 	NodeEntity* character = nullptr;
+	NodeEntity* ship = nullptr;
 };
 
 #endif //GAMESTATE_SINGLEPLAYER_HPP

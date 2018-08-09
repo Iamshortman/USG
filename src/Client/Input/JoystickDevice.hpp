@@ -12,6 +12,13 @@ using std::string;
 using std::unordered_map;
 using std::vector;
 
+enum JoystickAxisRange
+{
+	FULL,
+	FORWARD,
+	BACKWARD
+};
+
 struct JoystickAxisValue
 {
 	int16_t current_value = 0;
@@ -28,16 +35,18 @@ struct JoystickButtonValue
 struct JoystickAxis
 {
 	JoystickAxis() {};
-	JoystickAxis(int axisIndex, double deadzone = 0.0, bool inverted = false)
+	JoystickAxis(int axisIndex, double deadzone = 0.0, bool inverted = false, JoystickAxisRange range = JoystickAxisRange::FULL)
 	{
 		this->axisIndex = axisIndex;
 		this->deadzone = deadzone;
 		this->inverted = inverted;
+		this->range = range;
 	}
 
 	int axisIndex = 0;
 	double deadzone = 0.0;
 	bool inverted = false;
+	JoystickAxisRange range = JoystickAxisRange::FULL;
 };
 
 struct JoystickButton

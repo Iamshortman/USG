@@ -29,22 +29,6 @@ InputManager::InputManager()
 
 	keyboardMouse = new KeyboardMouseDevice();
 
-	keyboardMouse->addButton("Flight_Forward", KeyboardMouseButton(KEYBOARD, SDL_SCANCODE_W));
-	keyboardMouse->addButton("Flight_Backward", KeyboardMouseButton(KEYBOARD, SDL_SCANCODE_S));
-	keyboardMouse->addButton("Flight_Left", KeyboardMouseButton(KEYBOARD, SDL_SCANCODE_A));
-	keyboardMouse->addButton("Flight_Right", KeyboardMouseButton(KEYBOARD, SDL_SCANCODE_D));
-	keyboardMouse->addButton("Flight_Up", KeyboardMouseButton(KEYBOARD, SDL_SCANCODE_LSHIFT));
-	keyboardMouse->addButton("Flight_Down", KeyboardMouseButton(KEYBOARD, SDL_SCANCODE_LCTRL));
-	keyboardMouse->addAxis("Flight_Pitch", MouseAxis(MouseDirection::Mouse_Y, 1.0, 0.1, false));
-	keyboardMouse->addAxis("Flight_Yaw", MouseAxis(MouseDirection::Mouse_X, 1.0, 0.1, false));
-	keyboardMouse->addButton("Flight_Shoot", KeyboardMouseButton(MOUSE, SDL_BUTTON_LEFT));
-	keyboardMouse->addButton("Flight_PitchUp", KeyboardMouseButton(KEYBOARD, SDL_SCANCODE_UP));
-	keyboardMouse->addButton("Flight_PitchDown", KeyboardMouseButton(KEYBOARD, SDL_SCANCODE_DOWN));
-	keyboardMouse->addButton("Flight_RollLeft", KeyboardMouseButton(KEYBOARD, SDL_SCANCODE_Q));
-	keyboardMouse->addButton("Flight_RollRight", KeyboardMouseButton(KEYBOARD, SDL_SCANCODE_E));
-	keyboardMouse->addButton("Flight_YawLeft", KeyboardMouseButton(KEYBOARD, SDL_SCANCODE_LEFT));
-	keyboardMouse->addButton("Flight_YawRight", KeyboardMouseButton(KEYBOARD, SDL_SCANCODE_RIGHT));
-
 	keyboardMouse->addButton("Debug_Forward", KeyboardMouseButton(KEYBOARD, SDL_SCANCODE_W));
 	keyboardMouse->addButton("Debug_Backward", KeyboardMouseButton(KEYBOARD, SDL_SCANCODE_S));
 	keyboardMouse->addButton("Debug_Left", KeyboardMouseButton(KEYBOARD, SDL_SCANCODE_A));
@@ -52,8 +36,8 @@ InputManager::InputManager()
 	keyboardMouse->addButton("Debug_Up", KeyboardMouseButton(KEYBOARD, SDL_SCANCODE_LSHIFT));
 	keyboardMouse->addButton("Debug_Down", KeyboardMouseButton(KEYBOARD, SDL_SCANCODE_LCTRL));
 
-	keyboardMouse->addAxis("Debug_Pitch", MouseAxis(MouseDirection::Mouse_Y, 50.0, 0.01, false));
-	keyboardMouse->addAxis("Debug_Yaw", MouseAxis(MouseDirection::Mouse_X, 50.0, 0.01, false));
+	keyboardMouse->addAxis("Debug_Pitch", MouseAxis(MouseDirection::Mouse_Y, 25.0, 0.0, false));
+	keyboardMouse->addAxis("Debug_Yaw", MouseAxis(MouseDirection::Mouse_X, 25.0, 0.0, false));
 	keyboardMouse->addButton("Debug_RollLeft", KeyboardMouseButton(KEYBOARD, SDL_SCANCODE_Q));
 	keyboardMouse->addButton("Debug_RollRight", KeyboardMouseButton(KEYBOARD, SDL_SCANCODE_E));
 
@@ -326,26 +310,37 @@ void InputManager::loadJoystick(SDL_Joystick* joystick)
 	Logger::getInstance()->logDebug("Loaded Joystick: %s\n", SDL_JoystickName(joystick));
 	if (device->name == "CH PRO THROTTLE USB ")
 	{
-		JoystickButton axis(0);
-		device->addButton("Throttle", axis);
+		device->addAxis("Debug_ForwardBackward", JoystickAxis(2, 0.0, true, JoystickAxisRange::FORWARD));
+		device->addAxis("Debug_UpDown", JoystickAxis(1, 0.25, true));
+		device->addAxis("Debug_LeftRight", JoystickAxis(0, 0.25, true));
+
 	}
 	else if (device->name == "Logitech Extreme 3D")
 	{
-		JoystickButton axis(0);
-		device->addButton("Throttle", axis);
+		device->addAxis("Debug_Pitch", JoystickAxis(1, 0.15, true));
+		device->addAxis("Debug_Yaw", JoystickAxis(2, 0.2, true));
+		device->addAxis("Debug_Roll", JoystickAxis(0, 0.15, false));
+
+		device->addAxis("Debug_ForwardBackward", JoystickAxis(3, 0.1, true, JoystickAxisRange::FORWARD));
+
+		device->addButton("Debug_FlightAssist", JoystickButton(6));
+
+		device->addButton("Flight_Shoot", JoystickButton(0));
 	}
 	else if (device->name == "DUALSHOCK®4 USB Wireless Adaptor")
 	{
-		device->addAxis("DebugForwardBackward", JoystickAxis(1, 0.1, true));
-		device->addAxis("DebugLeftRight", JoystickAxis(0, 0.1, true));
+		device->addAxis("Debug_ForwardBackward", JoystickAxis(1, 0.1, true));
+		device->addAxis("Debug_LeftRight", JoystickAxis(0, 0.1, true));
 
-		device->addAxis("DebugPitch", JoystickAxis(5, 0.1, false));
-		device->addAxis("DebugYaw", JoystickAxis(2, 0.1, true));
+		device->addAxis("Debug_Pitch", JoystickAxis(5, 0.1, false));
+		device->addAxis("Debug_Yaw", JoystickAxis(2, 0.1, true));
 
-		device->addButton("DebugRollRight", JoystickButton(5));
-		device->addButton("DebugRollLeft", JoystickButton(4));
+		device->addButton("Debug_RollRight", JoystickButton(5));
+		device->addButton("Debug_RollLeft", JoystickButton(4));
 
 		device->addButton("DebugInteract", JoystickButton(0));
+
+		device->addButton("Char_Jump", JoystickButton(1));
 	}
 
 	this->device_map[joystick] = device;
@@ -355,6 +350,7 @@ void InputManager::unloadJoystick(SDL_Joystick* joystick)
 {
 	if (this->device_map.find(joystick) != this->device_map.end())
 	{
+		Logger::getInstance()->logDebug("unloaded Joystick: %s\n", SDL_JoystickName(joystick));
 		delete this->device_map[joystick];
 		this->device_map.erase(joystick);
 	}

@@ -52,7 +52,7 @@ private:
 
 
 	Skybox* skybox = nullptr;
-	vector3F ambient_light = vector3F(0.1f);
+	vector3F ambient_light = vector3F(0.2f);
 
 	ShaderProgram* full_screen_quad_program = nullptr;
 	TexturedMesh* full_screen_quad = nullptr;

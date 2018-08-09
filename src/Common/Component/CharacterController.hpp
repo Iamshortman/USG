@@ -6,6 +6,8 @@
 
 #include "Common/GLM_Include.hpp"
 
+#include "Common/Entity/Node.hpp"
+
 class CharacterController : public ComponentEntity
 {
 public:
@@ -14,31 +16,26 @@ public:
 
 	virtual void update(double delta_time);
 
+	void setHead(Node* head);
+
+
 	vector3D linear_input = vector3D(0.0);
+	vector3D angular_input = vector3D(0.0);
+
 	bool jump = false;
 
 private:
 
-	bool checkOnGround();
-
-
+	void checkOnGround();
+	void doMovement(double delta_time);
+	void doRotation(double delta_time);
+	void doHeadRotation(double delta_time);
 
 	bool on_ground = false;
 	double ray_distance = 1.0;
 
-	double move_force = 0.8;
-	double inair_move_force = 0.02;
-	double brake_force = 0.2;
-	double jump_force = 7.0f;
-
-	/*
-	const float MOVE_FORCE = 0.8f;
-	const float INAIR_MOVE_FORCE = 0.02f;
-	const float BRAKE_FORCE = 0.2f;
-	const float JUMP_FORCE = 7.0f;
-	const float YAW_SENSITIVITY = 0.1f;
-	const float INAIR_THRESHOLD_TIME = 0.1f;
-	*/
+	double head_rotation = 0.0;
+	Node* head_node = nullptr;
 };
 
 #endif //CHARACTER_CONTROLLER_HPP
