@@ -10,7 +10,6 @@ uniform sampler2D gNormal;
 uniform sampler2D gAlbedoSpec;
 
 uniform SpotLight spot_light;
-uniform vec3 ambientLight = vec3(1.0f);
 
 void main(void) 
 {	

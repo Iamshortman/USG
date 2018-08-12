@@ -1,0 +1,201 @@
+{
+  "NodeEntity": {
+    "transform": {
+      "position": [
+        0,
+        0,
+        1
+      ],
+      "orientation": [
+        1,
+        0,
+        0,
+        0
+      ]
+    },
+    "rigidBody": {
+      "mass": 4000,
+      "inertia_tensor": [
+        10000,
+        10000,
+        10000
+      ]
+    },
+    "children": [
+      {
+        "node_components": {
+          "model": {
+            "file_path": "res/models/Cobra/Hull.obj",
+            "texture": "res/textures/1K_Grid.png",
+            "ambient_shader": "res/shaders/Textured",
+            "shadow_shader": ""
+          },
+          "collision_shape": {
+            "convex": "res/models/Cobra/Hull.obj"
+          }
+        }
+      },
+      {
+        "node_components": {
+          "collision_shape": {
+            "convex": "res/models/Cobra/Col_Hull_Nose.obj"
+          }
+        }
+      },
+      {
+        "transform": {
+          "position": [
+            -1.7,
+            0,
+            -4.25
+          ]
+        },
+        "node_components": {
+          "model": {
+            "file_path": "res/models/Cobra/Engine_R.obj",
+            "texture": "res/textures/1K_Grid.png",
+            "ambient_shader": "res/shaders/Textured",
+            "shadow_shader": ""
+          },
+          "collision_shape": {
+            "convex": "res/models/Cobra/Engine_R.obj"
+          }
+        },
+        "children": [
+          {
+            "transform": {
+              "position": [
+                -2.5,
+                0,
+                0.7
+              ]
+            },
+            "node_components": {
+              "model": {
+                "file_path": "res/models/Cobra/Wing_R.obj",
+                "texture": "res/textures/1K_Grid.png",
+                "ambient_shader": "res/shaders/Textured",
+                "shadow_shader": ""
+              },
+              "collision_shape": {
+                "convex": "res/models/Cobra/Wing_R.obj"
+              }
+            },
+            "children": [
+              {
+                "transform": {
+                  "position": [
+                    0,
+                    -0.2,
+                    1
+                  ]
+                },
+                "node_components": {
+                  "projectile_launcher": {}
+                }
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "transform": {
+          "position": [
+            1.7,
+            0,
+            -4.25
+          ]
+        },
+        "node_components": {
+          "model": {
+            "file_path": "res/models/Cobra/Engine_L.obj",
+            "texture": "res/textures/1K_Grid.png",
+            "ambient_shader": "res/shaders/Textured",
+            "shadow_shader": ""
+          },
+          "collision_shape": {
+            "convex": "res/models/Cobra/Engine_L.obj"
+          }
+        },
+        "children": [
+          {
+            "transform": {
+              "position": [
+                2.5,
+                0,
+                0.7
+              ]
+            },
+            "node_components": {
+              "model": {
+                "file_path": "res/models/Cobra/Wing_L.obj",
+                "texture": "res/textures/1K_Grid.png",
+                "ambient_shader": "res/shaders/Textured",
+                "shadow_shader": ""
+              },
+              "collision_shape": {
+                "convex": "res/models/Cobra/Wing_L.obj"
+              }
+            },
+            "children": [
+              {
+                "transform": {
+                  "position": [
+                    0,
+                    -0.2,
+                    1
+                  ]
+                },
+                "node_components": {
+                  "projectile_launcher": {}
+                }
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "transform": {
+          "position": [
+            0,
+            1.3,
+            -2.6
+          ]
+        },
+        "node_components": {
+          "model": {
+            "file_path": "res/models/Cobra/Canopy_Outside.obj",
+            "texture": "res/textures/1K_Grid.png",
+            "ambient_shader": "res/shaders/Textured",
+            "shadow_shader": ""
+          },
+          "collision_shape": {
+            "convex": "res/models/Cobra/Canopy_Outside.obj"
+          }
+        },
+        "children": [
+          {
+            "node_components": {
+              "model": {
+                "file_path": "res/models/Cobra/Canopy_Inside.obj",
+                "texture": "res/textures/Green.png",
+                "ambient_shader": "res/shaders/Textured",
+                "shadow_shader": ""
+              }
+            }
+          }
+        ]
+      },
+      {
+        "node_components": {
+          "model": {
+            "file_path": "res/models/Cobra/Cockpit.obj",
+            "texture": "res/textures/Red.png",
+            "ambient_shader": "res/shaders/Textured",
+            "shadow_shader": ""
+          }
+        }
+      }
+    ]
+  }
+}

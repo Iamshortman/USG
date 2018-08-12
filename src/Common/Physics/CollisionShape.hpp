@@ -19,20 +19,22 @@ enum CollisionShapeType
 class CollisionShape : public ComponentNode
 {
 public:
-	CollisionShape();
+	CollisionShape(CollisionShapeType type, vector3D vec);
+	CollisionShape(CollisionShapeType type, vector2D vec);
+	CollisionShape(CollisionShapeType type, string string);
+
 	~CollisionShape();
 
+	btCollisionShape* getShape();
+
+	virtual void addToEntity();
+	virtual void removeFromEntity();
+
+private:
 	void setBox(vector3D half_length);
 	void setCapsule(double radius, double height);
 	void setConvexMesh(string file_path);
 	void setConcaveMesh(string file_path);
-
-	btCollisionShape* getShape();
-
-	void enable();
-	void disable();
-
-private:
 
 	CollisionShapeType shape_type;
 	btCollisionShape* shape = nullptr;

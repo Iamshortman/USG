@@ -34,7 +34,7 @@ public:
 	void UpdateLinearVelocity(double delta_time);
 	void UpdateAngularVelocity(double delta_time);
 
-	double thruster_force[6] = {6000.0, 6000.0, 6000.0, 6000.0, 60000.0, 20000.0 };
+	double thruster_force[6] = { 20000.0, 20000.0, 20000.0, 20000.0, 60000.0, 30000.0 };
 };
 
 

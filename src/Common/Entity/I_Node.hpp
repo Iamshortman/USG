@@ -44,6 +44,11 @@ public:
 			ComponentNode* component = new T(std::forward<TArgs>(mArgs)...);
 			component->parent_node = this;
 			this->node_component_map[typeid(T).hash_code()] = component;
+			
+			if (this->getEntity() != nullptr)
+			{
+				component->addToEntity();
+			}
 			return (T*)component;
 		}
 		else

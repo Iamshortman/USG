@@ -9,6 +9,9 @@ public:
 	ComponentNode() {};
 	virtual void update(double delta_time) {};
 
+	virtual void addToEntity() {};
+	virtual void removeFromEntity() {};
+
 	I_Node* parent_node = nullptr;
 
 protected:

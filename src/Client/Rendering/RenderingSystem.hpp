@@ -29,6 +29,7 @@ public:
 	void render(GLuint render_target, G_Buffer* g_buffer, Camera* camera);
 
 	void addModel(Model* model, Transform global_transform);
+	void addDirectionalLight(DirectionalLight* directional);
 	void addPointLight(PointLight* point, Transform global_transform);
 	void addSpotLight(SpotLight* spot, Transform global_transform);
 
@@ -47,6 +48,7 @@ private:
 	//std::map<Model, std::vector<Transform>> models;
 	std::vector<std::pair<Model*, Transform>> models;
 
+	std::vector<DirectionalLight*> directional_lights;
 	std::vector<std::pair<PointLight*, Transform>> point_lights;
 	std::vector<std::pair<SpotLight*, Transform>> spot_lights;
 

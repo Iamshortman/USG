@@ -45,12 +45,12 @@ DirectionalLight::DirectionalLight(vector3F direction, vector3F color, float int
 
 vector3F DirectionalLight::getDirection()
 { 
-	return direction; 
+	return this->direction; 
 }
 
 void DirectionalLight::setDirection(vector3F direction)
 {
-	direction = direction;
+	this->direction = direction;
 }
 
 PointLight::PointLight(float range, vector3F attenuation, vector3F color, float intensity)

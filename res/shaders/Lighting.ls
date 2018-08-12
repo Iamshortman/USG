@@ -65,7 +65,7 @@ vec4 CalcLight(BaseLight base, vec3 direction, vec3 normal, vec3 worldPos)
 
 vec4 CalcDirectionalLight(DirectionalLight directional, vec3 normal, vec3 worldPos)
 {
-    return CalcLight(directional.base, -directional.direction, normal, worldPos);
+    return CalcLight(directional.base, directional.direction, normal, worldPos);
 }
 
 vec4 CalcPointLight(PointLight point, vec3 normal, vec3 worldPos)

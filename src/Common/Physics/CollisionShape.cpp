@@ -9,49 +9,66 @@
 #include "Common/Resource/Assimp_Include.hpp"
 #include "Common/Logger/Logger.hpp"
 
-CollisionShape::CollisionShape()
+CollisionShape::CollisionShape(CollisionShapeType type, vector3D vec)
 {
+	if (type == CollisionShapeType::Box)
+	{
+		this->setBox(vec);
+	}
+}
+
+CollisionShape::CollisionShape(CollisionShapeType type, vector2D vec)
+{
+	if (type == CollisionShapeType::Capsule)
+	{
+		this->setCapsule(vec.x, vec.y);
+	}
+}
+
+CollisionShape::CollisionShape(CollisionShapeType type, string string)
+{
+	if (type == CollisionShapeType::ConvexMesh)
+	{
+		this->setConvexMesh(string);
+	}
+	else if (type == CollisionShapeType::ConcaveMesh)
+	{
+		this->setConcaveMesh(string);
+	}
 }
 
 CollisionShape::~CollisionShape()
 {
-	this->disable();
+	if (this->shape != nullptr)
+	{
+		delete this->shape;
+	}
 }
 
 void CollisionShape::setBox(vector3D half_length)
 {
-	this->disable();
-
 	if (this->shape != nullptr)
 	{
 		delete this->shape;
 	}
 
-	this->shape_type = Box;
+	this->shape_type = CollisionShapeType::Box;
 	this->shape = new btBoxShape(toBtVec3(half_length));
-
-	this->enable();
 }
 
 void CollisionShape::setCapsule(double radius, double height)
 {
-	this->disable();
-
 	if (this->shape != nullptr)
 	{
 		delete this->shape;
 	}
 
-	this->shape_type = Capsule;
+	this->shape_type = CollisionShapeType::Capsule;
 	this->shape = new btCapsuleShape(radius, height);
-
-	this->enable();
 }
 
 void CollisionShape::setConvexMesh(string file_path)
 {
-	this->disable();
-
 	if (this->shape != nullptr)
 	{
 		delete this->shape;
@@ -81,15 +98,12 @@ void CollisionShape::setConvexMesh(string file_path)
 		hull_shape->recalcLocalAabb();
 	}
 
-	this->shape_type = ConvexMesh;
+	this->shape_type = CollisionShapeType::ConvexMesh;
 	this->shape = hull_shape;
-
-	this->enable();
 }
 
 void CollisionShape::setConcaveMesh(string file_path)
 {
-	this->disable();
 
 	if (this->shape != nullptr)
 	{
@@ -134,10 +148,8 @@ void CollisionShape::setConcaveMesh(string file_path)
 
 	import.FreeScene();
 
-	this->shape_type = ConcaveMesh;
+	this->shape_type = CollisionShapeType::ConcaveMesh;
 	this->shape = new btBvhTriangleMeshShape(triMesh, true);
-
-	this->enable();
 }
 
 btCollisionShape* CollisionShape::getShape()
@@ -145,7 +157,7 @@ btCollisionShape* CollisionShape::getShape()
 	return this->shape;
 }
 
-void CollisionShape::enable()
+void CollisionShape::addToEntity()
 {
 	if (this->shape == nullptr)
 	{
@@ -173,7 +185,7 @@ void CollisionShape::enable()
 	Logger::getInstance()->logError("Shape could not attach\n");
 }
 
-void CollisionShape::disable()
+void CollisionShape::removeFromEntity()
 {
 	if (this->shape != nullptr)
 	{

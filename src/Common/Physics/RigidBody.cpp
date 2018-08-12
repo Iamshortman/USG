@@ -87,31 +87,37 @@ void RigidBody::setAngularVelocity(vector3D velocity)
 
 void RigidBody::applyForce(vector3D &force, vector3D &localPos)
 {
+	this->rigidBody->activate(true);
 	this->rigidBody->applyForce(toBtVec3(force), toBtVec3(localPos));
 }
 
 void RigidBody::applyImpulse(vector3D &impulse, vector3D &localPos)
 {
+	this->rigidBody->activate(true);
 	this->rigidBody->applyImpulse(toBtVec3(impulse), toBtVec3(localPos));
 }
 
 void RigidBody::applyCentralForce(vector3D &force)
 {
+	this->rigidBody->activate(true);
 	this->rigidBody->applyCentralForce(toBtVec3(force));
 }
 
 void RigidBody::applyCentralImpulse(vector3D &impulse)
 {
+	this->rigidBody->activate(true);
 	this->rigidBody->applyCentralImpulse(toBtVec3(impulse));
 }
 
 void RigidBody::applyTorque(vector3D &torque)
 {
+	this->rigidBody->activate(true);
 	this->rigidBody->applyTorque(toBtVec3(torque));
 }
 
 void RigidBody::applyTorqueImpulse(vector3D &torque)
 {
+	this->rigidBody->activate(true);
 	this->rigidBody->applyTorqueImpulse(toBtVec3(torque));
 }
 

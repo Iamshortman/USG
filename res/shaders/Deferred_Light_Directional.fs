@@ -9,18 +9,13 @@ uniform sampler2D gPosition;
 uniform sampler2D gNormal;
 uniform sampler2D gAlbedoSpec;
 
-uniform vec3 ambientLight = vec3(1.0f);
+uniform DirectionalLight directional_light;
 
 void main(void) 
-{
-	DirectionalLight light;
-	light.base.color = vec3(1.0, 0.1, 1.0);
-	light.base.intensity = 0.4;
-	light.direction = vec3(0.4, 1.0, 0.4);
-	
+{	
 	vec3 position = texture(gPosition, out_TexCoord).xyz;
 	vec3 normal = texture(gNormal, out_TexCoord).xyz;
 	vec4 color = texture(gAlbedoSpec, out_TexCoord);
 	
-	fragmentColor = color * CalcDirectionalLight(light, normal, position);
+	fragmentColor = color * CalcDirectionalLight(directional_light, normal, position);
 }

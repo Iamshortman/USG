@@ -99,6 +99,11 @@ void RenderingSystem::addModel(Model* model, Transform global_transform)
 	this->models.push_back({model, global_transform});
 }
 
+void RenderingSystem::addDirectionalLight(DirectionalLight* directional)
+{
+	this->directional_lights.push_back(directional);
+}
+
 void RenderingSystem::addPointLight(PointLight* point, Transform global_transform)
 {
 	this->point_lights.push_back({ point, global_transform });
@@ -124,6 +129,9 @@ void RenderingSystem::clearScene()
 	this->skybox = nullptr;
 
 	this->models.clear();
+
+	this->directional_lights.clear();
+	this->point_lights.clear();
 	this->spot_lights.clear();
 }
 
@@ -222,11 +230,13 @@ void RenderingSystem::drawLights(GLuint render_target, G_Buffer* g_buffer, Camer
 	this->deferred_light_directional->setUniform("gNormal", 1);
 	this->deferred_light_directional->setUniform("gAlbedoSpec", 2);
 	this->deferred_light_directional->setUniform("ambientLight", this->ambient_light);
-
-
-	//this->full_screen_quad->draw(this->deferred_light_directional);
-
+	for (int i = 0; i < this->directional_lights.size(); i++)
+	{
+		setDirectionalLight("directional_light", this->deferred_light_directional, directional_lights[i], camera_transform.position);
+		this->full_screen_quad->draw(this->deferred_light_directional);
+	}
 	this->deferred_light_point->deactivateProgram();
+	
 	this->deferred_light_point->setActiveProgram();
 	this->deferred_light_point->setUniform("gPosition", 0);
 	this->deferred_light_point->setUniform("gNormal", 1);

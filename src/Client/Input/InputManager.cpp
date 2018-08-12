@@ -33,13 +33,16 @@ InputManager::InputManager()
 	keyboardMouse->addButton("Debug_Backward", KeyboardMouseButton(KEYBOARD, SDL_SCANCODE_S));
 	keyboardMouse->addButton("Debug_Left", KeyboardMouseButton(KEYBOARD, SDL_SCANCODE_A));
 	keyboardMouse->addButton("Debug_Right", KeyboardMouseButton(KEYBOARD, SDL_SCANCODE_D));
-	keyboardMouse->addButton("Debug_Up", KeyboardMouseButton(KEYBOARD, SDL_SCANCODE_LSHIFT));
-	keyboardMouse->addButton("Debug_Down", KeyboardMouseButton(KEYBOARD, SDL_SCANCODE_LCTRL));
+	keyboardMouse->addButton("Debug_Up", KeyboardMouseButton(KEYBOARD, SDL_SCANCODE_SPACE));
+	keyboardMouse->addButton("Debug_Down", KeyboardMouseButton(KEYBOARD, SDL_SCANCODE_LSHIFT));
 
 	keyboardMouse->addAxis("Debug_Pitch", MouseAxis(MouseDirection::Mouse_Y, 25.0, 0.0, false));
 	keyboardMouse->addAxis("Debug_Yaw", MouseAxis(MouseDirection::Mouse_X, 25.0, 0.0, false));
 	keyboardMouse->addButton("Debug_RollLeft", KeyboardMouseButton(KEYBOARD, SDL_SCANCODE_Q));
 	keyboardMouse->addButton("Debug_RollRight", KeyboardMouseButton(KEYBOARD, SDL_SCANCODE_E));
+
+	keyboardMouse->addButton("Flight_Shoot", KeyboardMouseButton(MOUSE, SDL_BUTTON_LEFT));
+
 
 	keyboardMouse->addButton("Debug_Interact", KeyboardMouseButton(MOUSE, SDL_BUTTON_LEFT));
 
@@ -319,7 +322,7 @@ void InputManager::loadJoystick(SDL_Joystick* joystick)
 	{
 		device->addAxis("Debug_Pitch", JoystickAxis(1, 0.15, true));
 		device->addAxis("Debug_Yaw", JoystickAxis(2, 0.2, true));
-		device->addAxis("Debug_Roll", JoystickAxis(0, 0.15, false));
+		device->addAxis("Debug_Roll", JoystickAxis(0, 0.15, true));
 
 		device->addAxis("Debug_ForwardBackward", JoystickAxis(3, 0.1, true, JoystickAxisRange::FORWARD));
 

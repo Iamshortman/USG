@@ -126,7 +126,7 @@ void ShipFlightController::UpdateAngularVelocity(double delta_time)
 
 	transform.orientation = glm::angleAxis(this->angular_input.x * this->max_angular_speed.x * (M_PI * 2.0) * delta_time, transform.getLeft()) * transform.orientation;
 	transform.orientation = glm::angleAxis(this->angular_input.y * this->max_angular_speed.y * (M_PI * 2.0) * delta_time, transform.getUp()) * transform.orientation;
-	transform.orientation = glm::angleAxis(this->angular_input.z * this->max_angular_speed.z * (M_PI * 1.5)* delta_time, transform.getForward()) * transform.orientation;
+	transform.orientation = glm::angleAxis(this->angular_input.z * -this->max_angular_speed.z * (M_PI * 1.5)* delta_time, transform.getForward()) * transform.orientation;
 
 	this->parent_entity->setLocalTransform(transform);
 }
