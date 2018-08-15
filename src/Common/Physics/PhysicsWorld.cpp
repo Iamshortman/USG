@@ -30,7 +30,7 @@ PhysicsWorld::~PhysicsWorld()
 void PhysicsWorld::update(double delta_time)
 {
 	//Run Physics Simulation
-	this->dynamicsWorld->stepSimulation(delta_time, 8, 1.0 / 120.0);
+	this->dynamicsWorld->stepSimulation(delta_time, 8, 1.0 / 240.0);
 }
 
 void PhysicsWorld::addRigidBody(RigidBody* rigidBody)

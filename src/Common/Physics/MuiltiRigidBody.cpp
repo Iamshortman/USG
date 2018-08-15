@@ -37,6 +37,7 @@ void MuiltiRigidBody::addChildShape(I_Node* node)
 		CollisionShape* shape = node->getNodeComponent<CollisionShape>();
 
 		this->compound_shape->addChildShape(toBtTransform(node->getRelativeTransform()), shape->getShape());
+		shape->getShape()->setUserPointer(node);
 	}
 }
 
@@ -52,6 +53,7 @@ void MuiltiRigidBody::removeChildShape(I_Node* node)
 		{
 			this->setCollisionShape(this->empty_shape);
 		}
+
 	}
 }
 

@@ -25,7 +25,7 @@ void ProjectileLauncher::update(double delta_time)
 	bool shoot = false;
 
 #ifdef CLIENT
-	shoot = InputManager::getInstance()->getButtonDown("Flight_Shoot");
+	//shoot = InputManager::getInstance()->getButtonDown("Flight_Shoot");
 #endif // CLIENT
 
 	if (shoot)

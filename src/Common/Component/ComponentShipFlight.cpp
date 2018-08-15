@@ -56,10 +56,10 @@ void ShipFlightController::update(double delta_time)
 	this->UpdateLinearVelocity(delta_time);
 
 	RigidBody* rigidBody = this->parent_entity->getRigidBody();
-	/*if (rigidBody->getLinearVelocity() != vector3D(0.0) || rigidBody->getAngularVelocity() != vector3D(0.0))
+	if (rigidBody->getLinearVelocity() != vector3D(0.0) || rigidBody->getAngularVelocity() != vector3D(0.0))
 	{
 		rigidBody->Activate(true);
-	}*/
+	}
 }
 
 void ShipFlightController::UpdateLinearVelocity(double delta_time)
@@ -76,12 +76,10 @@ void ShipFlightController::UpdateLinearVelocity(double delta_time)
 		vector3D direction = transform.getDirection(i);
 		double velocity = glm::dot(direction, linearVelocity);
 		size_t input_direction = (this->linear_input[i] > 0) ? (i * 2) : ((i * 2) + 1); //i*2 = positive direction (i*2)+1 = negitive direction
-		double current_force = this->linear_input[i] * this->thruster_force[input_direction];
-		rigidBody->applyCentralImpulse(direction * current_force  * delta_time);
-	}
+		double force = this->linear_input[i] * this->thruster_force[input_direction];
 
-	//Update velocity
-	linearVelocity = rigidBody->getLinearVelocity();
+		linearVelocity += (direction * (force / mass)  * delta_time);
+	}
 
 	//When Flight Assist is enabled the ship will attempt to stop any movement on axes not currently being used.
 	if (this->flight_assist)
@@ -94,36 +92,66 @@ void ShipFlightController::UpdateLinearVelocity(double delta_time)
 				double velocity = glm::dot(direction, linearVelocity);
 				if (velocity != 0.0)
 				{
-					double brakeing_sign = (velocity > 0) ? -1.0 : 1.0;
-					size_t brakeing_direction = (velocity > 0) ? ((i * 2) + 1) : (i * 2);
-					double current_force = this->thruster_force[brakeing_direction] * delta_time;
-					rigidBody->applyCentralImpulse(direction * current_force * brakeing_sign);
+					double braking_sign = (velocity > 0) ? -1.0 : 1.0;
+					size_t braking_direction = (velocity > 0) ? ((i * 2) + 1) : (i * 2);
+					double braking_force = this->thruster_force[braking_direction] * delta_time;
+					double velocity_change = (braking_force / mass) * braking_sign;
+
+					if (velocity > 0.0 && (velocity + velocity_change) < 0.0)
+					{
+						velocity_change = -velocity;
+					}
+					else if (velocity < 0.0 && (velocity + velocity_change) > 0.0)
+					{
+						velocity_change = -velocity;
+					}
+
+					linearVelocity += (direction * velocity_change);
 				}
 			}
 		}
-
-		//Update velocity
-		linearVelocity = glm::inverse(transform.getOrientation()) * rigidBody->getLinearVelocity();
-		//Round down small velocities to zero
-		for (int i = 0; i < 3; i++)
-		{
-			if (abs(linearVelocity[i]) <= 0.1)
-			{
-				linearVelocity[i] = 0.0;
-			}
-		}
-		rigidBody->setLinearVelocity(transform.getOrientation() * linearVelocity);
 	}
-
+	rigidBody->setLinearVelocity(linearVelocity);
+	
 	linearVelocity = rigidBody->getLinearVelocity();
-	//printf("X: %lf Y: %lf Z: %lf\n", linearVelocity.x, linearVelocity.y, linearVelocity.z);
-	//printf("Speed: %lf\n\n", glm::length(linearVelocity));
 }
 
 void ShipFlightController::UpdateAngularVelocity(double delta_time)
 {
-	Transform transform = this->parent_entity->getLocalTransform();
+	/*vector3D thruster_torque = vector3D(100.0);
+	double angular_flight_assist = true;
 
+	Transform transform = this->parent_entity->getLocalTransform();
+	RigidBody* rigidBody = this->parent_entity->getRigidBody();
+
+
+	vector3D angular_velocity = rigidBody->getAngularVelocity();
+
+	double mass = rigidBody->getMass();
+
+	for (int i = 0; i < 3; i++)
+	{
+		vector3D direction = transform.getDirection(i);
+		double velocity = glm::dot(direction, angular_velocity);
+
+		if (this->angular_input[i] != 0.0)
+		{
+			double force = this->angular_input[i] * thruster_torque[i];
+			angular_velocity += (direction * force * delta_time);
+		}
+		else if (angular_flight_assist)
+		{
+			//Slow down force
+			//double force = this->angular_input[i] * thruster_torque[i];
+			//angular_velocity += (direction * (force / mass)  * delta_time);
+		}
+
+
+	}
+
+	rigidBody->setAngularVelocity(angular_velocity);*/
+
+	Transform transform = this->parent_entity->getLocalTransform();
 	transform.orientation = glm::angleAxis(this->angular_input.x * this->max_angular_speed.x * (M_PI * 2.0) * delta_time, transform.getLeft()) * transform.orientation;
 	transform.orientation = glm::angleAxis(this->angular_input.y * this->max_angular_speed.y * (M_PI * 2.0) * delta_time, transform.getUp()) * transform.orientation;
 	transform.orientation = glm::angleAxis(this->angular_input.z * -this->max_angular_speed.z * (M_PI * 1.5)* delta_time, transform.getForward()) * transform.orientation;

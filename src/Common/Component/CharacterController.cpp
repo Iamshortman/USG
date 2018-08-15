@@ -5,6 +5,8 @@
 
 #include "Common/Logger/Logger.hpp"
 
+#include "Common/Entity/NodeEntity.hpp"
+
 CharacterController::CharacterController(Entity* entity)
 	:ComponentEntity(entity)
 {
@@ -20,6 +22,7 @@ void CharacterController::update(double delta_time)
 	this->doMovement(delta_time);
 	this->doRotation(delta_time);
 	this->doHeadRotation(delta_time);
+	this->doInteraction(delta_time);
 }
 
 void CharacterController::setHead(Node* head)
@@ -50,7 +53,7 @@ void CharacterController::doMovement(double delta_time)
 	const double movement_speed = 5.0;
 
 	const double ground_acceleration = 25.0;
-	const double air_acceleration = 2.0;
+	const double air_acceleration = 5.0;
 
 	const double jump_speed = 6.0;
 
@@ -148,7 +151,7 @@ void CharacterController::doMovement(double delta_time)
 
 void CharacterController::doRotation(double delta_time)
 {
-	const double turn_speed = 1.5;
+	const double turn_speed = 1.0;
 
 	RigidBody* rigid_body = this->parent_entity->getRigidBody();
 	Transform transform = this->parent_entity->getLocalTransform();
@@ -181,7 +184,6 @@ double clamp(double value, double min, double max)
 	return value;
 }
 
-
 void CharacterController::doHeadRotation(double delta_time)
 {
 	const double turn_speed = 1.5;
@@ -195,5 +197,44 @@ void CharacterController::doHeadRotation(double delta_time)
 
 		head_transform.setOrientation(glm::angleAxis(this->head_rotation, head_transform.getLeft()));
 		this->head_node->setLocalTransform(head_transform);
+	}
+}
+
+#ifdef CLIENT
+#include "Client/Client.hpp"
+#endif // CLIENT
+
+void CharacterController::doInteraction(double delta_time)
+{
+	if (this->interact)
+	{
+		I_Node* node = this->parent_entity;
+
+		if (this->head_node != nullptr)
+		{
+			node = this->head_node;
+		}
+
+		Transform transform = node->getWorldTransform();
+
+		double rayDistance = 5.0;
+		vector3D startPos = transform.getPosition();
+		vector3D endPos = startPos + (transform.getForward() * rayDistance);
+		SingleRayTestResult result = this->parent_entity->getWorld()->singleRayTest(startPos, endPos);
+
+		if (result.hasHit)
+		{
+			if (result.node != nullptr && result.entity->getType() == EntityType::NODE_ENTITY)
+			{
+				NodeEntity* node_entity = (NodeEntity*)result.entity;
+				Node* node = result.node;
+
+				
+
+			}
+
+		}
+
+		this->interact = false;
 	}
 }

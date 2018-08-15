@@ -94,6 +94,8 @@ public:
 	virtual EntityType getType() { return EntityType::ENTITY; };
 
 	const EntityId entityId;
+
+	void* active_camera;
 protected:
 	std::map<size_t, ComponentEntity*> component_map;
 

@@ -7,6 +7,8 @@
 #include "Common/Entity/NodeEntity.hpp"
 #include "Client/Rendering/Camera.hpp"
 
+#include "Client/PlayerController.hpp"
+
 class GameState_Singleplayer : public GameState
 {
 public:
@@ -15,11 +17,10 @@ public:
 	virtual void update(Client* client, double delta_time);
 
 protected:
+	PlayerController player_controller;
+
 	World* world = nullptr;
 
-	Camera* camera = nullptr;
-
-	//Entity* camera;
 	NodeEntity* character = nullptr;
 	NodeEntity* ship = nullptr;
 };

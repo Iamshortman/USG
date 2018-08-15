@@ -23,13 +23,14 @@ public:
 	vector3D angular_input = vector3D(0.0);
 
 	bool jump = false;
-
+	bool interact = false;
 private:
 
 	void checkOnGround();
 	void doMovement(double delta_time);
 	void doRotation(double delta_time);
 	void doHeadRotation(double delta_time);
+	void doInteraction(double delta_time); 
 
 	bool on_ground = false;
 	double ray_distance = 1.0;

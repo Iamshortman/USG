@@ -33,7 +33,6 @@ void Projectile::update(double delta_time)
 		{
 			Logger::getInstance()->log("Hit\n");
 
-			//TODO: damage
 			this->parent_entity->kill();
 
 			if (result.entity->hasComponent<EntityHealth>())
