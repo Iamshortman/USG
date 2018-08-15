@@ -201,7 +201,7 @@ void RenderingSystem::generateGBuffer(G_Buffer* g_buffer, Camera* camera)
 
 	if (this->skybox != nullptr)
 	{
-		skybox->draw(camera, g_buffer_size.x, g_buffer_size.y);
+		//skybox->draw(camera, g_buffer_size.x, g_buffer_size.y);
 
 		glClearDepth(0.0f);
 		glClear(GL_DEPTH_BUFFER_BIT);
@@ -240,7 +240,7 @@ void RenderingSystem::drawAmbient(GLuint render_target, G_Buffer* g_buffer, Came
 	this->deferred_ambient->setUniform("gAlbedoSpec", 2);
 	this->deferred_ambient->setUniform("ambientLight", this->ambient_light);
 
-	this->full_screen_quad->draw(this->deferred_ambient);
+	//this->full_screen_quad->draw(this->deferred_ambient);
 
 	this->deferred_ambient->deactivateProgram();
 
@@ -260,8 +260,8 @@ void RenderingSystem::drawLights(GLuint render_target, G_Buffer* g_buffer, Camer
 
 	glBindFramebuffer(GL_FRAMEBUFFER, render_target);
 
-	glEnable(GL_BLEND);
-	glBlendFunc(GL_ONE, GL_ONE);
+	//glEnable(GL_BLEND);
+	//glBlendFunc(GL_ONE, GL_ONE);
 
 	this->deferred_light_directional->setActiveProgram();
 	this->deferred_light_directional->setUniform("gPosition", 0);
@@ -271,7 +271,7 @@ void RenderingSystem::drawLights(GLuint render_target, G_Buffer* g_buffer, Camer
 	for (int i = 0; i < this->directional_lights.size(); i++)
 	{
 		setDirectionalLight("directional_light", this->deferred_light_directional, directional_lights[i], camera_transform.position);
-		this->full_screen_quad->draw(this->deferred_light_directional);
+		//this->full_screen_quad->draw(this->deferred_light_directional);
 	}
 	this->deferred_light_point->deactivateProgram();
 	
@@ -310,7 +310,7 @@ void RenderingSystem::drawLights(GLuint render_target, G_Buffer* g_buffer, Camer
 
 			glActiveTexture(GL_TEXTURE3);
 			glBindTexture(GL_TEXTURE_2D, this->shadow_map->getShadowTexture());
-			this->deferred_light_spot->setUniform("shadowMap", 0);
+			this->deferred_light_spot->setUniform("shadowMap", 3);
 			this->deferred_light_spot->setUniform("shadowMatrix", light_space_matrix);
 
 			setSpotLight("spot_light", this->deferred_light_spot, this->spot_lights[i].first, this->spot_lights[i].second, camera_transform.position);

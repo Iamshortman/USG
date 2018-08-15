@@ -104,7 +104,7 @@ GameState_Singleplayer::GameState_Singleplayer()
 	json_entity->addComponent<ShipFlightController>();
 
 	Entity* entity = EntityManager::getInstance()->createEntity();
-	entity->setLocalTransform(Transform(vector3D(0.0, 0.0, 20.0), quaternionD(0.707107, 0.707107, 0.0, 0.0)));
+	entity->setLocalTransform(Transform(vector3D(0.0, 5.0, 20.0), quaternionD(0.707107, 0.707107, 0.0, 0.0)));
 	entity->addNodeComponent<SpotLight>(vector3F(0.0, 0.0, 1.0), 0.5f, 1000.0f, vector3F(0.0f, 0.01f, 0.0f), vector3F(1.0f), 0.4f);
 	entity->addToWorld(big_ship->getSubWorld());
 

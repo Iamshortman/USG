@@ -7,6 +7,7 @@ layout (location = 2) out vec4 gPosition;
 in vec3 out_Normal;
 in vec2 out_TexCoord;
 in vec3 out_FragPos;
+in float temp;
 
 uniform sampler2D texture1;
 
@@ -14,5 +15,5 @@ void main(void)
 {
 	gAlbedoSpec = texture(texture1, out_TexCoord);
 	gNormal = normalize(out_Normal);
-	gPosition = vec4(out_FragPos, 0.0);
+	gPosition = vec4(out_FragPos, temp);
 }
