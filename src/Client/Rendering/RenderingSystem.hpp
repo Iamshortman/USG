@@ -6,6 +6,8 @@
 #include "Client/Resource/TexturePool.hpp"
 #include "Client/Resource/TexturedMesh.hpp"
 #include "Client/Rendering/G_Buffer.hpp"
+#include "Client/Rendering/ShadowMap.hpp"
+
 #include "Client/Rendering/Skybox.hpp"
 
 #include "Common/Resource/Mesh.hpp"
@@ -23,10 +25,10 @@ public:
 	RenderingSystem();
 	virtual ~RenderingSystem();
 
-	void generateShadowMaps() {};
+	void setBufferSize(vector2I size);
 
-	void renderMS(GLuint render_target, G_Buffer* ms_g_buffer, G_Buffer* g_buffer, Camera* camera);
-	void render(GLuint render_target, G_Buffer* g_buffer, Camera* camera);
+	void renderMS(GLuint render_target, Camera* camera);
+	void render(GLuint render_target, Camera* camera);
 
 	void addModel(Model* model, Transform global_transform);
 	void addDirectionalLight(DirectionalLight* directional);
@@ -40,10 +42,19 @@ public:
 
 private:
 	void RenderModel(Mesh* mesh, GLuint& texture, ShaderProgram* program, Transform& transform, Camera* camera, vector2I& screen_size);
+	void RenderModelShadow(Mesh* mesh, ShaderProgram* program, Transform& transform, vector3D& camera_position, matrix4& light_space_matrix);
 
 	void generateGBuffer(G_Buffer* g_buffer, Camera* camera);
 	void drawAmbient(GLuint render_target, G_Buffer* g_buffer, Camera* camera);
 	void drawLights(GLuint render_target, G_Buffer* g_buffer, Camera* camera);
+	void drawShadowMap(ShadowMap* target, vector3D& camera_position, matrix4& light_space_matrix);
+
+	G_Buffer* g_buffer = nullptr;
+	G_Buffer* ms_g_buffer = nullptr;
+
+	ShadowMap* shadow_map = nullptr;
+
+
 
 	//std::map<Model, std::vector<Transform>> models;
 	std::vector<std::pair<Model*, Transform>> models;
@@ -54,7 +65,7 @@ private:
 
 
 	Skybox* skybox = nullptr;
-	vector3F ambient_light = vector3F(0.2f);
+	vector3F ambient_light = vector3F(0.5f);
 
 	ShaderProgram* full_screen_quad_program = nullptr;
 	TexturedMesh* full_screen_quad = nullptr;

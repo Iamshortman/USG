@@ -28,14 +28,9 @@ public:
 private:
 	void SubmitWorld(World* world);
 
-
 	Skybox* skybox = nullptr;
 
 	Window* window = nullptr;
-
-	//Deferred Shading
-	G_Buffer* g_buffer = nullptr;
-	G_Buffer* ms_g_buffer = nullptr;
 
 	RenderingSystem* rendering_system = nullptr;
 };

@@ -28,7 +28,7 @@
             "file_path": "res/models/Cobra/Hull.obj",
             "texture": "res/textures/1K_Grid.png",
             "ambient_shader": "res/shaders/Textured",
-            "shadow_shader": ""
+            "shadow_shader": "res/shaders/Shadow"
           },
           "collision_shape": {
             "convex": "res/models/Cobra/Hull.obj"
@@ -55,7 +55,7 @@
             "file_path": "res/models/Cobra/Engine_R.obj",
             "texture": "res/textures/1K_Grid.png",
             "ambient_shader": "res/shaders/Textured",
-            "shadow_shader": ""
+            "shadow_shader": "res/shaders/Shadow"
           },
           "collision_shape": {
             "convex": "res/models/Cobra/Engine_R.obj"
@@ -75,7 +75,7 @@
                 "file_path": "res/models/Cobra/Wing_R.obj",
                 "texture": "res/textures/1K_Grid.png",
                 "ambient_shader": "res/shaders/Textured",
-                "shadow_shader": ""
+                "shadow_shader": "res/shaders/Shadow"
               },
               "collision_shape": {
                 "convex": "res/models/Cobra/Wing_R.obj"
@@ -111,7 +111,7 @@
             "file_path": "res/models/Cobra/Engine_L.obj",
             "texture": "res/textures/1K_Grid.png",
             "ambient_shader": "res/shaders/Textured",
-            "shadow_shader": ""
+            "shadow_shader": "res/shaders/Shadow"
           },
           "collision_shape": {
             "convex": "res/models/Cobra/Engine_L.obj"
@@ -131,7 +131,7 @@
                 "file_path": "res/models/Cobra/Wing_L.obj",
                 "texture": "res/textures/1K_Grid.png",
                 "ambient_shader": "res/shaders/Textured",
-                "shadow_shader": ""
+                "shadow_shader": "res/shaders/Shadow"
               },
               "collision_shape": {
                 "convex": "res/models/Cobra/Wing_L.obj"
@@ -167,7 +167,7 @@
             "file_path": "res/models/Cobra/Canopy_Outside.obj",
             "texture": "res/textures/1K_Grid.png",
             "ambient_shader": "res/shaders/Textured",
-            "shadow_shader": ""
+            "shadow_shader": "res/shaders/Shadow"
           },
           "collision_shape": {
             "convex": "res/models/Cobra/Canopy_Outside.obj"
@@ -180,7 +180,7 @@
                 "file_path": "res/models/Cobra/Canopy_Inside.obj",
                 "texture": "res/textures/Green.png",
                 "ambient_shader": "res/shaders/Textured",
-                "shadow_shader": ""
+                "shadow_shader": "res/shaders/Shadow"
               }
             }
           }
@@ -192,7 +192,7 @@
             "file_path": "res/models/Cobra/Cockpit.obj",
             "texture": "res/textures/Red.png",
             "ambient_shader": "res/shaders/Textured",
-            "shadow_shader": ""
+            "shadow_shader": "res/shaders/Shadow"
           }
         }
       }

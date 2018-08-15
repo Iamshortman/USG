@@ -27,6 +27,7 @@ public:
 
 	matrix4 getModleMatrix() const;
 	matrix4 getModleMatrix(vector3D cameraPos, double divisorPosScale = 1.0) const;
+	matrix4 getViewMatrix(vector3D cameraPos) const;
 	matrix4 getOriginViewMatrix() const;
 	matrix3 getNormalMatrix() const;
 

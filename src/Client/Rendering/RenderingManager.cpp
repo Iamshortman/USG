@@ -16,19 +16,15 @@ RenderingManager::RenderingManager(Window* window)
 	this->window = window;
 
 	vector2I window_size = this->window->getWindowSize();
-	this->g_buffer = new G_Buffer(window_size, false);
-	this->ms_g_buffer = new G_Buffer(window_size, true, 8);
 
 	this->skybox = new Skybox("res/textures/Skybox/space", "res/shaders/Skybox");
 
 	this->rendering_system = new RenderingSystem();
+	this->rendering_system->setBufferSize(window_size);
 }
 
 RenderingManager::~RenderingManager()
 {
-	delete this->g_buffer;
-	delete this->ms_g_buffer;
-
 	delete this->rendering_system;
 }
 
@@ -120,18 +116,12 @@ void RenderingManager::Render(World* world, Camera* camera)
 	DirectionalLight light = DirectionalLight(vector3F(0.1, -1.0, -0.25), vector3F(1.0), 0.4);
 
 	this->rendering_system->clearScene();
-	this->rendering_system->addDirectionalLight(&light);
+	//this->rendering_system->addDirectionalLight(&light);
 
 	vector2I window_size = this->window->getWindowSize();
-	vector2I buffer_size = this->g_buffer->getBufferSize();
-	if (window_size != buffer_size)
-	{
-		//Window Size changed, rebuild Gbuffer
-		delete this->g_buffer;
-		delete this->ms_g_buffer;
-		this->g_buffer = new G_Buffer(window_size, false);
-		this->ms_g_buffer = new G_Buffer(window_size, true, 8);
-	}
+
+	this->rendering_system->setBufferSize(window_size);
+
 	World* base_world = world;
 
 	while (base_world->getParent() != nullptr)
@@ -143,8 +133,7 @@ void RenderingManager::Render(World* world, Camera* camera)
 	
 	this->rendering_system->setSkybox(this->skybox);
 
-	this->rendering_system->renderMS(0, this->ms_g_buffer, this->g_buffer, camera);
-	//this->rendering_system->render(0, this->g_buffer, camera);
+	this->rendering_system->renderMS(0, camera);
 
 	this->window->updateBuffer();
 }

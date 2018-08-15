@@ -54,7 +54,6 @@ vec4 CalcLight(BaseLight base, vec3 direction, vec3 normal, vec3 worldPos)
         
         if(specularFactor > 0.0)
         {
-            //specularColor = vec4(base.color, 1.0) * specularIntensity * specularFactor;
 			specularColor = vec4(base.color, 1.0) * 0.5 * specularFactor;
         }
     }
@@ -112,8 +111,8 @@ float CalcShadow(sampler2D shadow_map, vec4 fragPosLightSpace)
 	float currentDepth = projCoords.z;
 	float closestDepth = texture2D(shadow_map, projCoords.xy).r;
 	
-	float bias = 0.005;
-	float shadow = currentDepth - bias > closestDepth  ? 0.0 : 1.0;  
+	float bias = 0.000005;
+	float shadow = currentDepth - bias > closestDepth  ? 1.0 : 0.0;   
 
     return shadow;
 }

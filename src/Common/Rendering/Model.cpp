@@ -19,7 +19,7 @@ Model::Model(string mesh, string texture, string ambient_shader, string shadow_s
 	TexturePool::getInstance()->setUsing(this->texture_name);
 
 	ShaderPool::getInstance()->setUsing(this->ambient_shader_name);
-	//ShaderPool::getInstance()->setUsing(this->shadow_shader_name);
+	ShaderPool::getInstance()->setUsing(this->shadow_shader_name);
 #endif
 }
 
@@ -30,6 +30,6 @@ Model::~Model()
 	TexturePool::getInstance()->releaseUsing(this->texture_name);
 
 	ShaderPool::getInstance()->releaseUsing(this->ambient_shader_name);
-	//ShaderPool::getInstance()->releaseUsing(this->shadow_shader_name);
+	ShaderPool::getInstance()->releaseUsing(this->shadow_shader_name);
 #endif
 }

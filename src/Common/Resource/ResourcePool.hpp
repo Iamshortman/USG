@@ -19,6 +19,11 @@ public:
 
 	void setUsing(string name)
 	{
+		if (name == "")
+		{
+			return;
+		}
+
 		if (this->hasResource(name))
 		{
 			this->resources[name].usingCount++;

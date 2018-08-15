@@ -6,6 +6,8 @@
 
 #include "Client/Rendering/LightShaderUtil.hpp"
 
+#include <math.h>
+
 RenderingSystem::RenderingSystem()
 {
 	glEnable(GL_DEPTH_TEST);
@@ -38,17 +40,38 @@ RenderingSystem::RenderingSystem()
 	this->deferred_ambient = new ShaderProgram("res/shaders/Deferred.vs", "res/shaders/Deferred.fs");
 	this->deferred_light_directional = new ShaderProgram("res/shaders/Deferred.vs", "res/shaders/Deferred_Light_Directional.fs");
 	this->deferred_light_point = new ShaderProgram("res/shaders/Deferred.vs", "res/shaders/Deferred_Light_Point.fs");
-	this->deferred_light_spot = new ShaderProgram("res/shaders/Deferred.vs", "res/shaders/Deferred_Light_Spot.fs");
+	//this->deferred_light_spot = new ShaderProgram("res/shaders/Deferred.vs", "res/shaders/Deferred_Light_Spot.fs");
+	this->deferred_light_spot = new ShaderProgram("res/shaders/Deferred.vs", "res/shaders/Deferred_Light_Spot_Shadow.fs");
+
+	this->shadow_map = new ShadowMap(vector2I(1024));
 }
 
 RenderingSystem::~RenderingSystem()
 {
+	delete this->g_buffer;
+	delete this->ms_g_buffer;
+
 	delete this->full_screen_quad;
 	delete this->deferred_ambient;
 	delete this->deferred_light_directional;
+	delete this->deferred_light_point;
+	delete this->deferred_light_spot;
 }
 
-void RenderingSystem::renderMS(GLuint render_target, G_Buffer* ms_g_buffer, G_Buffer* g_buffer, Camera* camera)
+void RenderingSystem::setBufferSize(vector2I size)
+{
+	if (this->g_buffer == nullptr || this->g_buffer->getBufferSize() != size)
+	{
+		this->g_buffer = new G_Buffer(size, false);
+	}
+
+	if (this->ms_g_buffer == nullptr || this->ms_g_buffer->getBufferSize() != size)
+	{
+		this->ms_g_buffer = new G_Buffer(size, true, 8);
+	}
+}
+
+void RenderingSystem::renderMS(GLuint render_target, Camera* camera)
 {
 	vector2I ms_buffer_size = ms_g_buffer->getBufferSize();
 	vector2I g_buffer_size = g_buffer->getBufferSize();
@@ -88,7 +111,7 @@ void RenderingSystem::renderMS(GLuint render_target, G_Buffer* ms_g_buffer, G_Bu
 	this->drawAmbient(render_target, g_buffer, camera);
 }
 
-void RenderingSystem::render(GLuint render_target, G_Buffer* g_buffer, Camera* camera)
+void RenderingSystem::render(GLuint render_target, Camera* camera)
 {
 	this->generateGBuffer(g_buffer, camera);
 	this->drawAmbient(render_target, g_buffer, camera);
@@ -154,6 +177,17 @@ void RenderingSystem::RenderModel(Mesh* mesh, GLuint& texture, ShaderProgram* pr
 	program->deactivateProgram();
 }
 
+void RenderingSystem::RenderModelShadow(Mesh* mesh, ShaderProgram* program, Transform& transform, vector3D& camera_position, matrix4& light_space_matrix)
+{
+	program->setActiveProgram();
+	program->setUniform("LightMatrix", light_space_matrix);
+	program->setUniform("ModelMatrix", transform.getModleMatrix(camera_position));
+
+	mesh->draw(program);
+
+	program->deactivateProgram();
+}
+
 void RenderingSystem::generateGBuffer(G_Buffer* g_buffer, Camera* camera)
 {
 	vector2I g_buffer_size = g_buffer->getBufferSize();
@@ -162,6 +196,8 @@ void RenderingSystem::generateGBuffer(G_Buffer* g_buffer, Camera* camera)
 	glBindFramebuffer(GL_FRAMEBUFFER, g_buffer->getFBO());
 	glClearDepth(0.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	vector2I size = g_buffer->getBufferSize();
+	glViewport(0, 0, size.x, size.y);
 
 	if (this->skybox != nullptr)
 	{
@@ -222,6 +258,8 @@ void RenderingSystem::drawLights(GLuint render_target, G_Buffer* g_buffer, Camer
 {
 	Transform camera_transform = camera->parent_node->getGlobalTransform();
 
+	glBindFramebuffer(GL_FRAMEBUFFER, render_target);
+
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_ONE, GL_ONE);
 
@@ -245,11 +283,10 @@ void RenderingSystem::drawLights(GLuint render_target, G_Buffer* g_buffer, Camer
 	for (int i = 0; i < this->point_lights.size(); i++)
 	{
 		setPointLight("point_light", this->deferred_light_point, this->point_lights[i].first, this->point_lights[i].second, camera_transform.position);
-		this->full_screen_quad->draw(this->deferred_light_point);
+		//this->full_screen_quad->draw(this->deferred_light_point);
 	}
 	this->deferred_light_point->deactivateProgram();
 
-	this->deferred_light_directional->deactivateProgram();
 	this->deferred_light_spot->setActiveProgram();
 	this->deferred_light_spot->setUniform("gPosition", 0);
 	this->deferred_light_spot->setUniform("gNormal", 1);
@@ -257,10 +294,60 @@ void RenderingSystem::drawLights(GLuint render_target, G_Buffer* g_buffer, Camer
 	this->deferred_light_spot->setUniform("ambientLight", this->ambient_light);
 	for (int i = 0; i < this->spot_lights.size(); i++)
 	{
-		setSpotLight("spot_light", this->deferred_light_spot, this->spot_lights[i].first, this->spot_lights[i].second, camera_transform.position);
-		this->full_screen_quad->draw(this->deferred_light_spot);
+		if (true)
+		{
+			Camera light_camera;
+			light_camera.frame_of_view = glm::degrees(acos(this->spot_lights[i].first->getCutoff()));
+			vector2I size = this->shadow_map->getBufferSize();
+			matrix4 light_space_matrix = light_camera.getProjectionMatrix(size) * this->spot_lights[i].second.getViewMatrix(camera_transform.position);
+			this->drawShadowMap(this->shadow_map, camera_transform.position, light_space_matrix);
+
+			size = g_buffer->getBufferSize();
+			glViewport(0, 0, size.x, size.y); 
+
+			this->deferred_light_spot->setActiveProgram();
+			glBindFramebuffer(GL_FRAMEBUFFER, render_target);
+
+			glActiveTexture(GL_TEXTURE3);
+			glBindTexture(GL_TEXTURE_2D, this->shadow_map->getShadowTexture());
+			this->deferred_light_spot->setUniform("shadowMap", 0);
+			this->deferred_light_spot->setUniform("shadowMatrix", light_space_matrix);
+
+			setSpotLight("spot_light", this->deferred_light_spot, this->spot_lights[i].first, this->spot_lights[i].second, camera_transform.position);
+			this->full_screen_quad->draw(this->deferred_light_spot);
+		}
+		else
+		{
+			setSpotLight("spot_light", this->deferred_light_spot, this->spot_lights[i].first, this->spot_lights[i].second, camera_transform.position);
+			this->full_screen_quad->draw(this->deferred_light_spot);
+		}
 	}
 	this->deferred_light_spot->deactivateProgram();
 
 	glDisable(GL_BLEND);
+}
+
+void RenderingSystem::drawShadowMap(ShadowMap* target, vector3D& camera_position, matrix4& light_space_matrix)
+{
+	glBindFramebuffer(GL_FRAMEBUFFER, target->getFBO());
+	vector2I size = target->getBufferSize();
+	glViewport(0, 0, size.x, size.y);
+
+	glDepthMask(GL_TRUE);
+	glEnable(GL_DEPTH_TEST);
+	glDepthFunc(GL_GREATER);
+
+	target->clearBuffer();
+
+	//DRAW ALL MESHES
+	for (int i = 0; i < this->models.size(); i++)
+	{
+		Mesh* mesh = MeshPool::getInstance()->get(this->models[i].first->getMesh());
+		ShaderProgram* program = ShaderPool::getInstance()->get(this->models[i].first->getShadowShader());
+
+		this->RenderModelShadow(mesh, program, this->models[i].second, camera_position, light_space_matrix);
+	}
+
+	glDepthMask(GL_FALSE);
+	glDisable(GL_DEPTH_TEST);
 }

@@ -13,11 +13,11 @@ G_Buffer::G_Buffer(vector2I buffer_size, bool multisample, int number_of_samples
 
 	if (this->multisample == true)
 	{
-		//position color buffer + glow
-		glGenTextures(1, &this->position_texture);
-		glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, this->position_texture);
-		glTexImage2DMultisample(GL_TEXTURE_2D_MULTISAMPLE, this->number_of_samples, GL_RGB16F, this->size.x, this->size.y, true);
-		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D_MULTISAMPLE, this->position_texture, 0);
+		//color buffer
+		glGenTextures(1, &this->albedo_texture);
+		glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, this->albedo_texture);
+		glTexImage2DMultisample(GL_TEXTURE_2D_MULTISAMPLE, this->number_of_samples, GL_RGBA, this->size.x, this->size.y, true);
+		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D_MULTISAMPLE, this->albedo_texture, 0);
 
 		//normal color buffer
 		glGenTextures(1, &this->normal_texture);
@@ -25,11 +25,11 @@ G_Buffer::G_Buffer(vector2I buffer_size, bool multisample, int number_of_samples
 		glTexImage2DMultisample(GL_TEXTURE_2D_MULTISAMPLE, this->number_of_samples, GL_RGB16F, this->size.x, this->size.y, true);
 		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT1, GL_TEXTURE_2D_MULTISAMPLE, this->normal_texture, 0);
 
-		//color buffer
-		glGenTextures(1, &this->albedo_texture);
-		glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, this->albedo_texture);
-		glTexImage2DMultisample(GL_TEXTURE_2D_MULTISAMPLE, this->number_of_samples, GL_RGBA, this->size.x, this->size.y, true);
-		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT2, GL_TEXTURE_2D_MULTISAMPLE, this->albedo_texture, 0);
+		//position color buffer + glow
+		glGenTextures(1, &this->position_texture);
+		glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, this->position_texture);
+		glTexImage2DMultisample(GL_TEXTURE_2D_MULTISAMPLE, this->number_of_samples, GL_RGBA16F, this->size.x, this->size.y, true);
+		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT2, GL_TEXTURE_2D_MULTISAMPLE, this->position_texture, 0);
 
 		//Depth
 		glGenTextures(1, &this->depth_texture);
@@ -41,13 +41,13 @@ G_Buffer::G_Buffer(vector2I buffer_size, bool multisample, int number_of_samples
 	{
 		this->number_of_samples = 0;
 
-		//position color buffer + glow
-		glGenTextures(1, &this->position_texture);
-		glBindTexture(GL_TEXTURE_2D, this->position_texture);
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB16F, this->size.x, this->size.y, 0, GL_RGB, GL_FLOAT, NULL);
+		//color buffer
+		glGenTextures(1, &this->albedo_texture);
+		glBindTexture(GL_TEXTURE_2D, this->albedo_texture);
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, this->size.x, this->size.y, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, this->position_texture, 0);
+		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, this->albedo_texture, 0);
 
 		//normal color buffer
 		glGenTextures(1, &this->normal_texture);
@@ -57,13 +57,13 @@ G_Buffer::G_Buffer(vector2I buffer_size, bool multisample, int number_of_samples
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT1, GL_TEXTURE_2D, this->normal_texture, 0);
 
-		//color buffer
-		glGenTextures(1, &this->albedo_texture);
-		glBindTexture(GL_TEXTURE_2D, this->albedo_texture);
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, this->size.x, this->size.y, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
+		//position color buffer + glow
+		glGenTextures(1, &this->position_texture);
+		glBindTexture(GL_TEXTURE_2D, this->position_texture);
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA16F, this->size.x, this->size.y, 0, GL_RGBA, GL_FLOAT, NULL);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT2, GL_TEXTURE_2D, this->albedo_texture, 0);
+		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT2, GL_TEXTURE_2D, this->position_texture, 0);
 
 		//Depth
 		glGenTextures(1, &this->depth_texture);
