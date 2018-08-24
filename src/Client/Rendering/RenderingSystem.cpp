@@ -38,12 +38,16 @@ RenderingSystem::RenderingSystem()
 	this->full_screen_quad = new TexturedMesh(vertices, indices);
 
 	this->deferred_ambient = new ShaderProgram("res/shaders/Deferred.vs", "res/shaders/Deferred.fs");
+
 	this->deferred_light_directional = new ShaderProgram("res/shaders/Deferred.vs", "res/shaders/Deferred_Light_Directional.fs");
 	this->deferred_light_point = new ShaderProgram("res/shaders/Deferred.vs", "res/shaders/Deferred_Light_Point.fs");
-	//this->deferred_light_spot = new ShaderProgram("res/shaders/Deferred.vs", "res/shaders/Deferred_Light_Spot.fs");
-	this->deferred_light_spot = new ShaderProgram("res/shaders/Deferred.vs", "res/shaders/Deferred_Light_Spot_Shadow.fs");
+	this->deferred_light_spot = new ShaderProgram("res/shaders/Deferred.vs", "res/shaders/Deferred_Light_Spot.fs");
 
-	this->shadow_map = new ShadowMap(vector2I(1024));
+	this->deferred_light_directional_shadow = new ShaderProgram("res/shaders/Deferred.vs", "res/shaders/Deferred_Light_Directional_Shadow.fs");
+
+	this->deferred_light_spot_shadow = new ShaderProgram("res/shaders/Deferred.vs", "res/shaders/Deferred_Light_Spot_Shadow.fs");
+
+	this->shadow_map = new ShadowMap(vector2I(2048));
 }
 
 RenderingSystem::~RenderingSystem()
@@ -53,9 +57,14 @@ RenderingSystem::~RenderingSystem()
 
 	delete this->full_screen_quad;
 	delete this->deferred_ambient;
+
 	delete this->deferred_light_directional;
 	delete this->deferred_light_point;
 	delete this->deferred_light_spot;
+
+	delete this->deferred_light_directional_shadow;
+	//delete this->deferred_light_point_shadow;
+	delete this->deferred_light_spot_shadow;
 }
 
 void RenderingSystem::setBufferSize(vector2I size)
@@ -124,7 +133,14 @@ void RenderingSystem::addModel(Model* model, Transform global_transform)
 
 void RenderingSystem::addDirectionalLight(DirectionalLight* directional)
 {
-	this->directional_lights.push_back(directional);
+	/*if (directional->getCastsShadows())
+	{
+		this->directional_lights_shadow.push_back(directional);
+	}
+	else*/
+	{
+		this->directional_lights.push_back(directional);
+	}
 }
 
 void RenderingSystem::addPointLight(PointLight* point, Transform global_transform)
@@ -134,7 +150,14 @@ void RenderingSystem::addPointLight(PointLight* point, Transform global_transfor
 
 void RenderingSystem::addSpotLight(SpotLight* spot, Transform global_transform)
 {
-	this->spot_lights.push_back({ spot, global_transform });
+	if (spot->getCastsShadows())
+	{
+		this->spot_lights_shadow.push_back({ spot, global_transform });
+	}
+	else
+	{
+		this->spot_lights.push_back({ spot, global_transform });
+	}
 }
 
 void RenderingSystem::setSkybox(Skybox* box)
@@ -155,7 +178,9 @@ void RenderingSystem::clearScene()
 
 	this->directional_lights.clear();
 	this->point_lights.clear();
+
 	this->spot_lights.clear();
+	this->spot_lights_shadow.clear();
 }
 
 void RenderingSystem::RenderModel(Mesh* mesh, GLuint& texture, ShaderProgram* program, Transform& transform, Camera* camera, vector2I& screen_size)
@@ -201,7 +226,7 @@ void RenderingSystem::generateGBuffer(G_Buffer* g_buffer, Camera* camera)
 
 	if (this->skybox != nullptr)
 	{
-		//skybox->draw(camera, g_buffer_size.x, g_buffer_size.y);
+		skybox->draw(camera, g_buffer_size.x, g_buffer_size.y);
 
 		glClearDepth(0.0f);
 		glClear(GL_DEPTH_BUFFER_BIT);
@@ -228,19 +253,19 @@ void RenderingSystem::drawAmbient(GLuint render_target, G_Buffer* g_buffer, Came
 	glDisable(GL_DEPTH_TEST);
 
 	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, g_buffer->getPositionTexture());
+	glBindTexture(GL_TEXTURE_2D, g_buffer->getAlbedoTexture());
 	glActiveTexture(GL_TEXTURE1);
 	glBindTexture(GL_TEXTURE_2D, g_buffer->getNormalTexture());
 	glActiveTexture(GL_TEXTURE2);
-	glBindTexture(GL_TEXTURE_2D, g_buffer->getAlbedoTexture());
+	glBindTexture(GL_TEXTURE_2D, g_buffer->getPositionTexture());
 
 	this->deferred_ambient->setActiveProgram();
-	this->deferred_ambient->setUniform("gPosition", 0);
+	this->deferred_ambient->setUniform("gAlbedoSpec", 0);
 	this->deferred_ambient->setUniform("gNormal", 1);
-	this->deferred_ambient->setUniform("gAlbedoSpec", 2);
+	this->deferred_ambient->setUniform("gPosition", 2);
 	this->deferred_ambient->setUniform("ambientLight", this->ambient_light);
 
-	//this->full_screen_quad->draw(this->deferred_ambient);
+	this->full_screen_quad->draw(this->deferred_ambient);
 
 	this->deferred_ambient->deactivateProgram();
 
@@ -260,26 +285,48 @@ void RenderingSystem::drawLights(GLuint render_target, G_Buffer* g_buffer, Camer
 
 	glBindFramebuffer(GL_FRAMEBUFFER, render_target);
 
-	//glEnable(GL_BLEND);
-	//glBlendFunc(GL_ONE, GL_ONE);
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_ONE, GL_ONE);
 
 	this->deferred_light_directional->setActiveProgram();
-	this->deferred_light_directional->setUniform("gPosition", 0);
+	this->deferred_light_directional->setUniform("gAlbedoSpec", 0);
 	this->deferred_light_directional->setUniform("gNormal", 1);
-	this->deferred_light_directional->setUniform("gAlbedoSpec", 2);
-	this->deferred_light_directional->setUniform("ambientLight", this->ambient_light);
+	this->deferred_light_directional->setUniform("gPosition", 2);
 	for (int i = 0; i < this->directional_lights.size(); i++)
 	{
 		setDirectionalLight("directional_light", this->deferred_light_directional, directional_lights[i], camera_transform.position);
-		//this->full_screen_quad->draw(this->deferred_light_directional);
+		this->full_screen_quad->draw(this->deferred_light_directional);
 	}
 	this->deferred_light_point->deactivateProgram();
 	
+	/*this->deferred_light_directional_shadow->setActiveProgram();
+	this->deferred_light_directional_shadow->setUniform("gAlbedoSpec", 0);
+	this->deferred_light_directional_shadow->setUniform("gNormal", 1);
+	this->deferred_light_directional_shadow->setUniform("gPosition", 2);
+	for (int i = 0; i < this->directional_lights_shadow.size(); i++)
+	{
+		Camera light_camera;
+		vector2I size = this->shadow_map->getBufferSize();
+		matrix4 light_space_matrix = light_camera.getProjectionMatrix(size) * this->directional_lights_shadow[i].second.getViewMatrix(camera_transform.position);
+		this->drawShadowMap(this->shadow_map, camera_transform.position, light_space_matrix);
+		size = g_buffer->getBufferSize();
+		glViewport(0, 0, size.x, size.y);
+		this->deferred_light_directional_shadow->setActiveProgram();
+		glBindFramebuffer(GL_FRAMEBUFFER, render_target);
+		glActiveTexture(GL_TEXTURE3);
+		glBindTexture(GL_TEXTURE_2D, this->shadow_map->getShadowTexture());
+		this->deferred_light_directional_shadow->setUniform("shadowMap", 3);
+		this->deferred_light_directional_shadow->setUniform("shadowMatrix", light_space_matrix);
+
+		setSpotLight("spot_light", this->deferred_light_directional_shadow, this->spot_lights_shadow[i].first, this->spot_lights_shadow[i].second, camera_transform.position);
+		this->full_screen_quad->draw(this->deferred_light_directional_shadow);
+	}
+	this->deferred_light_directional_shadow->deactivateProgram();*/
+
 	this->deferred_light_point->setActiveProgram();
-	this->deferred_light_point->setUniform("gPosition", 0);
+	this->deferred_light_point->setUniform("gAlbedoSpec", 0);
 	this->deferred_light_point->setUniform("gNormal", 1);
-	this->deferred_light_point->setUniform("gAlbedoSpec", 2);
-	this->deferred_light_point->setUniform("ambientLight", this->ambient_light);
+	this->deferred_light_point->setUniform("gPosition", 2);
 	for (int i = 0; i < this->point_lights.size(); i++)
 	{
 		setPointLight("point_light", this->deferred_light_point, this->point_lights[i].first, this->point_lights[i].second, camera_transform.position);
@@ -288,41 +335,42 @@ void RenderingSystem::drawLights(GLuint render_target, G_Buffer* g_buffer, Camer
 	this->deferred_light_point->deactivateProgram();
 
 	this->deferred_light_spot->setActiveProgram();
-	this->deferred_light_spot->setUniform("gPosition", 0);
+	this->deferred_light_spot->setUniform("gAlbedoSpec", 0);
 	this->deferred_light_spot->setUniform("gNormal", 1);
-	this->deferred_light_spot->setUniform("gAlbedoSpec", 2);
-	this->deferred_light_spot->setUniform("ambientLight", this->ambient_light);
+	this->deferred_light_spot->setUniform("gPosition", 2);
 	for (int i = 0; i < this->spot_lights.size(); i++)
 	{
-		if (true)
-		{
-			Camera light_camera;
-			light_camera.frame_of_view = glm::degrees(acos(this->spot_lights[i].first->getCutoff()));
-			vector2I size = this->shadow_map->getBufferSize();
-			matrix4 light_space_matrix = light_camera.getProjectionMatrix(size) * this->spot_lights[i].second.getViewMatrix(camera_transform.position);
-			this->drawShadowMap(this->shadow_map, camera_transform.position, light_space_matrix);
-
-			size = g_buffer->getBufferSize();
-			glViewport(0, 0, size.x, size.y); 
-
-			this->deferred_light_spot->setActiveProgram();
-			glBindFramebuffer(GL_FRAMEBUFFER, render_target);
-
-			glActiveTexture(GL_TEXTURE3);
-			glBindTexture(GL_TEXTURE_2D, this->shadow_map->getShadowTexture());
-			this->deferred_light_spot->setUniform("shadowMap", 3);
-			this->deferred_light_spot->setUniform("shadowMatrix", light_space_matrix);
-
-			setSpotLight("spot_light", this->deferred_light_spot, this->spot_lights[i].first, this->spot_lights[i].second, camera_transform.position);
-			this->full_screen_quad->draw(this->deferred_light_spot);
-		}
-		else
-		{
-			setSpotLight("spot_light", this->deferred_light_spot, this->spot_lights[i].first, this->spot_lights[i].second, camera_transform.position);
-			this->full_screen_quad->draw(this->deferred_light_spot);
-		}
+		setSpotLight("spot_light", this->deferred_light_spot, this->spot_lights[i].first, this->spot_lights[i].second, camera_transform.position);
+		this->full_screen_quad->draw(this->deferred_light_spot);
 	}
 	this->deferred_light_spot->deactivateProgram();
+
+	this->deferred_light_spot_shadow->setActiveProgram();
+	this->deferred_light_spot_shadow->setUniform("gAlbedoSpec", 0);
+	this->deferred_light_spot_shadow->setUniform("gNormal", 1);
+	this->deferred_light_spot_shadow->setUniform("gPosition", 2);
+	for (int i = 0; i < this->spot_lights_shadow.size(); i++)
+	{
+		Camera light_camera;
+		light_camera.frame_of_view = glm::degrees(acos(this->spot_lights_shadow[i].first->getCutoff())) * 2.0;
+		vector2I size = this->shadow_map->getBufferSize();
+		matrix4 light_space_matrix = light_camera.getProjectionMatrix(size) * this->spot_lights_shadow[i].second.getViewMatrix(camera_transform.position);
+		this->drawShadowMap(this->shadow_map, camera_transform.position, light_space_matrix);
+		size = g_buffer->getBufferSize();
+		glViewport(0, 0, size.x, size.y);
+		this->deferred_light_spot_shadow->setActiveProgram();
+		glBindFramebuffer(GL_FRAMEBUFFER, render_target);
+		glActiveTexture(GL_TEXTURE3);
+		glBindTexture(GL_TEXTURE_2D, this->shadow_map->getShadowTexture());
+		this->deferred_light_spot_shadow->setUniform("shadowMap", 3);
+		this->deferred_light_spot_shadow->setUniform("shadowMatrix", light_space_matrix);
+
+		setSpotLight("spot_light", this->deferred_light_spot_shadow, this->spot_lights_shadow[i].first, this->spot_lights_shadow[i].second, camera_transform.position);
+		this->full_screen_quad->draw(this->deferred_light_spot_shadow);
+	}
+
+	this->deferred_light_spot_shadow->deactivateProgram();
+
 
 	glDisable(GL_BLEND);
 }
@@ -337,6 +385,8 @@ void RenderingSystem::drawShadowMap(ShadowMap* target, vector3D& camera_position
 	glEnable(GL_DEPTH_TEST);
 	glDepthFunc(GL_GREATER);
 
+	glDisable(GL_BLEND);
+
 	target->clearBuffer();
 
 	//DRAW ALL MESHES
@@ -350,4 +400,7 @@ void RenderingSystem::drawShadowMap(ShadowMap* target, vector3D& camera_position
 
 	glDepthMask(GL_FALSE);
 	glDisable(GL_DEPTH_TEST);
+
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_ONE, GL_ONE);
 }

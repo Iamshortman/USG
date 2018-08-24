@@ -16,8 +16,8 @@ public:
 	virtual ~GameState_Singleplayer();
 	virtual void update(Client* client, double delta_time);
 
-protected:
 	PlayerController player_controller;
+protected:
 
 	World* world = nullptr;
 

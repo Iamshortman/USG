@@ -10,6 +10,12 @@ public:
 
 	virtual void update(double delta_time);
 
+	virtual void addToEntity();
+	virtual void removeFromEntity();
+
+	bool fire_weapon = false;
+
+private:
 	double time_count = 0.0;
 };
 

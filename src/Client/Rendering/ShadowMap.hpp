@@ -17,8 +17,6 @@ public:
 
 	GLuint getShadowTexture() { return this->shadow_texture; };
 
-	GLuint temp;
-
 private:
 	GLuint frame_buffer;
 	GLuint shadow_texture;

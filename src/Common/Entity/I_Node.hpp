@@ -18,7 +18,7 @@ public:
 		{
 			delete componet.second;
 		}
-	}
+	};
 
 	void update(double delta_time)
 	{

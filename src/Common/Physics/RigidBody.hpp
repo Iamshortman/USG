@@ -22,12 +22,11 @@ public:
 	RigidBody(Entity* entity);
 	virtual ~RigidBody();
 
-	void setMass(double massToAdd);
+	void setMass(double mass);
 	double getMass();
 
 	void setInertiaTensor(vector3D inertia);
 	vector3D getInertiaTensor();
-	void calcInertiaTensorFromShape();
 
 	void Activate(bool activate);
 
@@ -51,6 +50,8 @@ public:
 
 	void setDampening(double linear, double angular);
 
+	bool isInWorld();
+
 	inline btRigidBody* getRigidBody() { return this->rigidBody; };
 
 	inline PhysicsWorld* getPhysicsWorld() { return this->physics_world; };
@@ -62,7 +63,6 @@ protected:
 	void setCollisionShape(btCollisionShape* shape);
 
 	double mass = 1.0;
-	vector3D inertia = vector3D(1.0);
 
 	btRigidBody* rigidBody = nullptr;
 

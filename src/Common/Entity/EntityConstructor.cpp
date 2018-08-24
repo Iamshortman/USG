@@ -8,7 +8,14 @@ using jsoncons::json;
 //Node Components
 #include "Common/Rendering/Model.hpp"
 #include "Common/Physics/CollisionShape.hpp"
+#include "Common/Component/Mass.hpp"
 #include "Common/Component/ProjectileLauncher.hpp"
+#include "Common/Component/SeatInteract.hpp"
+
+//Entity Componets
+#include "Common/Component/CharacterController.hpp"
+#include "Common/Component/ComponentShipFlight.hpp"
+#include "Common/Component/ShipController.hpp"
 
 Transform jsonTransform(json json_transform)
 {
@@ -41,6 +48,11 @@ void jsonNodeComponents(I_Node* node, json json_node_components)
 		node->addNodeComponent<Model>(file_path, texture, ambient_shader, shadow_shader);
 	}
 
+	if (json_node_components.has_member("mass"))
+	{
+		node->addNodeComponent<Mass>(json_node_components["mass"].as_double());
+	}
+
 	if (json_node_components.has_member("collision_shape"))
 	{
 		json json_shape = json_node_components["collision_shape"];
@@ -70,6 +82,29 @@ void jsonNodeComponents(I_Node* node, json json_node_components)
 	if (json_node_components.has_member("projectile_launcher"))
 	{
 		node->addNodeComponent<ProjectileLauncher>();
+	}
+
+	if (json_node_components.has_member("seat_interact"))
+	{
+		node->addNodeComponent<SeatInteract>();
+	}
+}
+
+void jsonEntityComponents(Entity* entity, json json_entity_components)
+{
+	if (json_entity_components.has_member("character_controller"))
+	{
+		entity->addComponent<CharacterController>();
+	}
+
+	if (json_entity_components.has_member("flight_controller"))
+	{
+		entity->addComponent<ShipFlightController>();
+	}
+
+	if (json_entity_components.has_member("ship_controller"))
+	{
+		entity->addComponent<ShipController>();
 	}
 }
 
@@ -158,9 +193,9 @@ Entity* EntityConstructor::buildEntityFromJson(string file_path)
 			jsonNodeComponents(entity, json_entity["node_components"]);
 		}
 
-		if (json_entity.has_member("components"))
+		if (json_entity.has_member("entity_components"))
 		{
-
+			jsonEntityComponents(entity, json_entity["entity_components"]);
 		}
 
 		if (entity->getType() == EntityType::NODE_ENTITY)

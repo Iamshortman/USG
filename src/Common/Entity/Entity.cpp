@@ -30,7 +30,7 @@ void Entity::setLocalTransform(Transform transform)
 {
 	this->local_transform = transform;
 
-	if (this->rigidBody != nullptr)
+	if (this->rigidBody != nullptr && this->rigidBody->isInWorld())
 	{
 		this->rigidBody->setWorldTransform(this->local_transform);
 	}
@@ -38,7 +38,7 @@ void Entity::setLocalTransform(Transform transform)
 
 Transform Entity::getLocalTransform()
 {
-	if (this->rigidBody != nullptr)
+	if (this->rigidBody != nullptr && this->rigidBody->isInWorld())
 	{
 		this->local_transform = this->rigidBody->getWorldTransform();
 	}
@@ -53,6 +53,11 @@ Transform Entity::getRelativeTransform()
 
 Transform Entity::getWorldTransform()
 {
+	/*if (this->parent_node != nullptr)
+	{
+		return this->getLocalTransform().transformBy(parent_node->getWorldTransform());
+	}*/
+
 	return this->getLocalTransform();
 }
 
@@ -60,10 +65,15 @@ Transform Entity::getGlobalTransform()
 {
 	Transform global_transform = this->getLocalTransform();
 
-	if (this->getWorld() != nullptr)
+	World* temp_world = this->getWorld();
+	if (temp_world != nullptr)
 	{
-		global_transform = global_transform.transformBy(world->getWorldOffset());
+		global_transform = global_transform.transformBy(temp_world->getWorldOffset());
 	}
+	/*else if(this->parent_node != nullptr)
+	{
+		global_transform = global_transform.transformBy(parent_node->getGlobalTransform());
+	}*/
 
 	return global_transform;
 }
@@ -104,6 +114,11 @@ void Entity::addToWorld(World* world)
 
 		this->world->addEntityToWorld(this);
 	}
+}
+
+World* Entity::getWorld()
+{
+	return this->world;
 }
 
 RigidBody* Entity::addRigidBody()

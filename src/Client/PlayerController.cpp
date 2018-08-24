@@ -2,6 +2,7 @@
 
 #include "Common/Component/ComponentShipFlight.hpp"
 #include "Common/Component/CharacterController.hpp"
+#include "Common/Component/ShipController.hpp"
 
 #include "Client/Input/InputManager.hpp"
 
@@ -54,6 +55,7 @@ void PlayerController::applyUserInput(double delta_time)
 			controller->angular_input.x = InputManager::getInstance()->getButtonAxisCombo("Debug_Pitch", "Debug_PitchUp", "Debug_PitchDown", false);
 			controller->angular_input.y = InputManager::getInstance()->getButtonAxisCombo("Debug_Yaw", "Debug_YawLeft", "Debug_YawRight", false);
 		}
+
 		if(entity->hasComponent<ShipFlightController>())
 		{
 			ShipFlightController* controller = entity->getComponent<ShipFlightController>();
@@ -67,6 +69,13 @@ void PlayerController::applyUserInput(double delta_time)
 			controller->angular_input.z = InputManager::getInstance()->getButtonAxisCombo("Debug_Roll", "Debug_RollLeft", "Debug_RollRight");
 
 			controller->flight_assist = InputManager::getInstance()->getButtonDown("Debug_FlightAssist");
+		}
+
+		if (entity->hasComponent<ShipController>())
+		{
+			ShipController* controller = entity->getComponent<ShipController>();
+
+			controller->fire_weapon = InputManager::getInstance()->getButtonDown("Flight_Shoot");
 		}
 	}
 }

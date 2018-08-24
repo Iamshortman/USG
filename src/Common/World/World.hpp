@@ -26,7 +26,7 @@ public:
 
 	void addEntityToWorld(Entity* entity);
 	void removeEntityFromWorld(Entity* entity);
-	std::set<Entity*>* getEntitiesInWorld();
+	vector<Entity*>& getEntitiesInWorld();
 
 	void addRigidBody(RigidBody* rigidBody);
 	void removeRigidBody(RigidBody* entity);
@@ -51,7 +51,8 @@ protected:
 	Entity* parent = nullptr;
 	World* parentWorld = nullptr;
 
-	std::set<Entity*> entitiesInWorld;
+	//std::set<Entity*> entitiesInWorld;
+	vector<Entity*> entitiesInWorld;
 };
 
 #endif //WORLD_HPP

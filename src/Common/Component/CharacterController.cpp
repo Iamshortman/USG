@@ -7,6 +7,8 @@
 
 #include "Common/Entity/NodeEntity.hpp"
 
+#include "Common/Component/SeatInteract.hpp"
+
 CharacterController::CharacterController(Entity* entity)
 	:ComponentEntity(entity)
 {
@@ -228,9 +230,11 @@ void CharacterController::doInteraction(double delta_time)
 			{
 				NodeEntity* node_entity = (NodeEntity*)result.entity;
 				Node* node = result.node;
-
 				
-
+				if (node->hasNodeComponent<SeatInteract>())
+				{
+					node->getNodeComponent<SeatInteract>()->EntityInteract(this->parent_entity);
+				}
 			}
 
 		}

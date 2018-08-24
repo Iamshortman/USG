@@ -10,9 +10,7 @@
 #include "Common/Component/TimeToLive.hpp"
 #include "Common/Component/Projectile.hpp"
 
-#ifdef CLIENT
-#include "Client/Input/InputManager.hpp"
-#endif // CLIENT
+#include "Common/Component/ShipController.hpp"
 
 ProjectileLauncher::ProjectileLauncher()
 {
@@ -20,15 +18,9 @@ ProjectileLauncher::ProjectileLauncher()
 
 void ProjectileLauncher::update(double delta_time)
 {
-	const double time_shoot = 1.0 / 5.0;
+	const double time_shoot = 1.0 / 20.0;
 
-	bool shoot = false;
-
-#ifdef CLIENT
-	//shoot = InputManager::getInstance()->getButtonDown("Flight_Shoot");
-#endif // CLIENT
-
-	if (shoot)
+	if (this->fire_weapon)
 	{
 		time_count += delta_time;
 
@@ -43,9 +35,9 @@ void ProjectileLauncher::update(double delta_time)
 			bullet->addToWorld(entity->getWorld());
 			bullet->setLocalTransform(transform);
 
-			bullet->addNodeComponent<Model>("res/models/bullet.obj", "res/textures/Blue.png", "res/shaders/Textured", "");
+			bullet->addNodeComponent<Model>("res/models/bullet.obj", "res/textures/White.png", "res/shaders/Textured_Glow", "res/shaders/Shadow");
 
-			bullet->addComponent<TimeToLive>(1.5);
+			bullet->addComponent<TimeToLive>(3.0);
 			bullet->addComponent<Projectile>((transform.getForward() * velocity) + entity->getRigidBody()->getLinearVelocity());
 			
 			time_count = 0.0;
@@ -54,5 +46,25 @@ void ProjectileLauncher::update(double delta_time)
 	else
 	{
 		time_count = 0.0;
+	}
+
+	this->fire_weapon = false;
+}
+
+void ProjectileLauncher::addToEntity()
+{
+	Entity* parent = this->parent_node->getEntity();
+	if (parent != nullptr && parent->hasComponent<ShipController>())
+	{
+		parent->getComponent<ShipController>()->addProjectileLauncher(this);
+	}
+}
+
+void ProjectileLauncher::removeFromEntity()
+{
+	Entity* parent = this->parent_node->getEntity();
+	if (parent != nullptr && parent->hasComponent<ShipController>())
+	{
+		parent->getComponent<ShipController>()->removeProjectileLauncher(this);
 	}
 }

@@ -20,6 +20,7 @@ public:
 	const bool getShouldClose();
 
 	void setGameState(GameState* state);
+	GameState* getGameState() { return this->currentState; };
 
 	Window* window;
 	RenderingManager* renderingManager;

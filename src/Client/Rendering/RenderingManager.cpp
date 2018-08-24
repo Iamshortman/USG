@@ -36,9 +36,13 @@ void RenderingManager::SubmitWorld(World* world)
 	}
 
 	auto entities = world->getEntitiesInWorld();
-	for (auto it = entities->begin(); it != entities->end(); it++)
+	for (int i = 0; i < entities.size(); i++)
 	{
-		Entity* entity = *it;
+		Entity* entity = entities[i];
+		if (entity == nullptr)
+		{
+			continue;
+		}
 
 		if (entity->hasSubWorld())
 		{
@@ -116,7 +120,7 @@ void RenderingManager::Render(World* world, Camera* camera)
 	DirectionalLight light = DirectionalLight(vector3F(0.1, -1.0, -0.25), vector3F(1.0), 0.4);
 
 	this->rendering_system->clearScene();
-	//this->rendering_system->addDirectionalLight(&light);
+	this->rendering_system->addDirectionalLight(&light);
 
 	vector2I window_size = this->window->getWindowSize();
 
@@ -133,7 +137,7 @@ void RenderingManager::Render(World* world, Camera* camera)
 	
 	this->rendering_system->setSkybox(this->skybox);
 
-	this->rendering_system->renderMS(0, camera);
+	this->rendering_system->render(0, camera);
 
 	this->window->updateBuffer();
 }

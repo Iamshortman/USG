@@ -8,5 +8,5 @@ uniform samplerCube skybox;
 void main()
 {    
     gAlbedoSpec = texture(skybox, TexCoords);
-	gPosition = vec4(0.0f, 0.0f, 0.0f, 0.0f);
+	gPosition = vec4(0.0f, 0.0f, 0.0f, 1.0f);
 }

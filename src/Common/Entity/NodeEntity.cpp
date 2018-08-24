@@ -10,7 +10,6 @@ NodeEntity::NodeEntity(EntityId objectId)
 
 }
 
-
 NodeEntity::~NodeEntity()
 {
 

@@ -20,17 +20,20 @@ public:
 	vector3F getColor();
 	float getIntensity();
 	bool getEnabled();
+	bool getCastsShadows();
 
 	void setColor(vector3F color);
 	void setIntensity(float intensity);
 	void setEnabled(bool enabled);
-	
+	void setCastsShadows(bool shadow);
+
 	virtual LightType getLightType() = 0;
 
 private:
 	vector3F color;
 	float intensity;
 	bool enabled;
+	bool casts_shadows;
 };
 
 class DirectionalLight : public BaseLight

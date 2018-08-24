@@ -81,7 +81,7 @@ public:
 	};
 
 	virtual void addToWorld(World* world);
-	inline World* getWorld() { return this->world; };
+	World* getWorld();
 
 	virtual RigidBody* addRigidBody();
 	virtual void removeRigidBody();

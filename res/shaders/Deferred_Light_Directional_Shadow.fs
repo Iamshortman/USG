@@ -12,7 +12,7 @@ uniform sampler2D gPosition;
 uniform sampler2D shadowMap;
 uniform mat4 shadowMatrix;
 
-uniform SpotLight spot_light;
+uniform DirectionalLight directional_light;
 
 void main(void) 
 {	
@@ -22,7 +22,7 @@ void main(void)
 	vec4 color = texture(gAlbedoSpec, out_TexCoord);
 		
 	vec4 world_space = shadowMatrix * vec4(position, 1.0);
-	color = color * CalcSpotLight(spot_light, normal, position) * CalcShadow(shadowMap, world_space);
+	color = color * CalcDirectionalLight(directional_light, normal, position) * CalcShadow(shadowMap, world_space);
 	color *= (1.0 - glow);
 	fragmentColor = color;	
 }

@@ -18,10 +18,10 @@ RigidBody::~RigidBody()
 	}
 }
 
-void RigidBody::setMass(double massToAdd)
+void RigidBody::setMass(double mass)
 {
-	this->mass = massToAdd;
-	this->rigidBody->setMassProps(this->mass, toBtVec3(this->inertia));
+	this->rigidBody->setMassProps(mass, this->rigidBody->getLocalInertia());
+	this->mass = mass;
 }
 
 double RigidBody::getMass()
@@ -29,25 +29,14 @@ double RigidBody::getMass()
 	return this->mass;
 }
 
-void RigidBody::setInertiaTensor(vector3D inertiaToSet)
+void RigidBody::setInertiaTensor(vector3D inertia)
 {
-	this->inertia = inertiaToSet;
-	this->rigidBody->setMassProps(this->mass, toBtVec3(this->inertia));
+	this->rigidBody->setMassProps(getMass(), toBtVec3(inertia));
 }
 
 vector3D RigidBody::getInertiaTensor()
 {
-	return this->inertia;
-}
-
-void RigidBody::calcInertiaTensorFromShape()
-{
-	if (this->mass > 0.0)
-	{
-		btVector3 inertia_tensor = btVector3(0.0, 0.0, 0.0);
-		this->rigidBody->getCollisionShape()->calculateLocalInertia(this->mass, inertia_tensor);
-		this->inertia = toVec3(inertia_tensor);
-	}
+	return toVec3(this->rigidBody->getLocalInertia());
 }
 
 void RigidBody::Activate(bool activate)
@@ -124,6 +113,16 @@ void RigidBody::applyTorqueImpulse(vector3D &torque)
 void RigidBody::setDampening(double linear, double angular)
 {
 	rigidBody->setDamping(linear, angular);
+}
+
+bool RigidBody::isInWorld()
+{
+	if (this->physics_world != nullptr)
+	{
+		return true;
+	}
+
+	return false;
 }
 
 void RigidBody::setCollisionShape(btCollisionShape* shape)

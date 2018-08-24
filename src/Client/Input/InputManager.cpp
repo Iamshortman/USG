@@ -322,9 +322,9 @@ void InputManager::loadJoystick(SDL_Joystick* joystick)
 	}
 	else if (device->name == "Logitech Extreme 3D")
 	{
-		device->addAxis("Debug_Pitch", JoystickAxis(1, 0.15, true));
+		device->addAxis("Debug_Pitch", JoystickAxis(1, 0.2, true));
 		device->addAxis("Debug_Yaw", JoystickAxis(2, 0.2, true));
-		device->addAxis("Debug_Roll", JoystickAxis(0, 0.15, true));
+		device->addAxis("Debug_Roll", JoystickAxis(0, 0.2, true));
 
 		device->addAxis("Debug_ForwardBackward", JoystickAxis(3, 0.1, true, JoystickAxisRange::FORWARD));
 
@@ -334,16 +334,18 @@ void InputManager::loadJoystick(SDL_Joystick* joystick)
 	}
 	else if (device->name == "DUALSHOCK®4 USB Wireless Adaptor")
 	{
-		device->addAxis("Debug_ForwardBackward", JoystickAxis(1, 0.1, true));
-		device->addAxis("Debug_LeftRight", JoystickAxis(0, 0.1, true));
+		device->addAxis("Debug_ForwardBackward", JoystickAxis(4, 0.01, false, JoystickAxisRange::FORWARD));
+		device->addButton("Debug_Backward", JoystickButton(6));
 
-		device->addAxis("Debug_Pitch", JoystickAxis(5, 0.1, false));
+		//device->addAxis("Debug_LeftRight", JoystickAxis(0, 0.1, true));
+
+		device->addAxis("Debug_Pitch", JoystickAxis(5, 0.1, true));
 		device->addAxis("Debug_Yaw", JoystickAxis(2, 0.1, true));
 
 		device->addButton("Debug_RollRight", JoystickButton(5));
 		device->addButton("Debug_RollLeft", JoystickButton(4));
 
-		device->addButton("DebugInteract", JoystickButton(0));
+		device->addButton("Flight_Shoot", JoystickButton(1));
 
 		device->addButton("Char_Jump", JoystickButton(1));
 	}

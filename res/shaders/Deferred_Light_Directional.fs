@@ -16,6 +16,7 @@ void main(void)
 	vec3 position = texture(gPosition, out_TexCoord).xyz;
 	vec3 normal = texture(gNormal, out_TexCoord).xyz;
 	vec4 color = texture(gAlbedoSpec, out_TexCoord);
+	float glow = texture(gPosition, out_TexCoord).w;
 	
-	fragmentColor = color * CalcDirectionalLight(directional_light, normal, position);
+	fragmentColor = color * CalcDirectionalLight(directional_light, normal, position) * (1.0 - glow);
 }

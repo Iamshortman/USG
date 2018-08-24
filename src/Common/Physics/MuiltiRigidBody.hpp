@@ -21,13 +21,9 @@ public:
 	virtual RigidBodyType getType() { return RigidBodyType::MULTI; };
 
 private:
-	struct ChildShape
-	{
-		CollisionShape* shape = nullptr;
-		int shape_index;
-	};
+	void recalculateMassProperties();
 
-	std::map<I_Node*, ChildShape> child_shapes;
+	std::map<I_Node*, CollisionShape*> child_shapes;
 
 	btCompoundShape* compound_shape = nullptr;
 

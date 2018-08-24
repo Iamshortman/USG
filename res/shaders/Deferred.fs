@@ -16,5 +16,4 @@ void main(void)
 	vec3 real_ambient = ambientLight + ((vec3(1.0f) - ambientLight) * glow);
 	
 	fragmentColor = color * vec4(real_ambient, 1.0);
-	//fragmentColor = texture(gPosition, out_TexCoord);
 }

@@ -14,5 +14,5 @@ void main(void)
 {
 	gAlbedoSpec = texture(texture1, out_TexCoord);
 	gNormal = normalize(out_Normal);
-	gPosition = vec4(out_FragPos, 0.0);
+	gPosition = vec4(out_FragPos, 1.0);
 }

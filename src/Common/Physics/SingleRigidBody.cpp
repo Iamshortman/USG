@@ -6,7 +6,7 @@ SingleRigidBody::SingleRigidBody(Entity* entity)
 	this->empty_shape = new btEmptyShape();
 
 	btDefaultMotionState* motionState = new btDefaultMotionState();
-	btRigidBody::btRigidBodyConstructionInfo boxRigidBodyCI(this->mass, motionState, this->empty_shape, toBtVec3(this->inertia));
+	btRigidBody::btRigidBodyConstructionInfo boxRigidBodyCI(this->mass, motionState, this->empty_shape, btVector3(1.0, 1.0, 1.0));
 	this->rigidBody = new btRigidBody(boxRigidBodyCI);
 
 	this->rigidBody->setUserPointer(this->parent);

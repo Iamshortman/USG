@@ -114,47 +114,74 @@ void ShipFlightController::UpdateLinearVelocity(double delta_time)
 	rigidBody->setLinearVelocity(linearVelocity);
 	
 	linearVelocity = rigidBody->getLinearVelocity();
+	double velocity = glm::length(linearVelocity);
+	if (abs(velocity) > 2.0)
+	{
+		printf("Speed: %f\n", velocity);
+	}
 }
 
 void ShipFlightController::UpdateAngularVelocity(double delta_time)
 {
-	/*vector3D thruster_torque = vector3D(100.0);
 	double angular_flight_assist = true;
 
 	Transform transform = this->parent_entity->getLocalTransform();
 	RigidBody* rigidBody = this->parent_entity->getRigidBody();
 
-
-	vector3D angular_velocity = rigidBody->getAngularVelocity();
-
-	double mass = rigidBody->getMass();
-
 	for (int i = 0; i < 3; i++)
 	{
 		vector3D direction = transform.getDirection(i);
-		double velocity = glm::dot(direction, angular_velocity);
+		if (i == 2)
+		{
+			direction *= -1.0;
+		}
 
 		if (this->angular_input[i] != 0.0)
 		{
-			double force = this->angular_input[i] * thruster_torque[i];
-			angular_velocity += (direction * force * delta_time);
+			double force = this->angular_input[i] * this->thruster_torque[i];
+			rigidBody->applyTorqueImpulse(direction * force);
 		}
-		else if (angular_flight_assist)
-		{
-			//Slow down force
-			//double force = this->angular_input[i] * thruster_torque[i];
-			//angular_velocity += (direction * (force / mass)  * delta_time);
-		}
-
-
 	}
 
-	rigidBody->setAngularVelocity(angular_velocity);*/
+	if (angular_flight_assist)
+	{
+		for (int i = 0; i < 3; i++)
+		{
+			if (this->angular_input[i] == 0.0)
+			{
+				vector3D direction = transform.getDirection(i);
+				if (i == 2)
+				{
+					direction *= -1.0;
+				}
 
-	Transform transform = this->parent_entity->getLocalTransform();
-	transform.orientation = glm::angleAxis(this->angular_input.x * this->max_angular_speed.x * (M_PI * 2.0) * delta_time, transform.getLeft()) * transform.orientation;
-	transform.orientation = glm::angleAxis(this->angular_input.y * this->max_angular_speed.y * (M_PI * 2.0) * delta_time, transform.getUp()) * transform.orientation;
-	transform.orientation = glm::angleAxis(this->angular_input.z * -this->max_angular_speed.z * (M_PI * 1.5)* delta_time, transform.getForward()) * transform.orientation;
+				double starting_velocity = glm::dot(direction, rigidBody->getAngularVelocity());
 
-	this->parent_entity->setLocalTransform(transform);
+				if (starting_velocity != 0.0)
+				{
+					if (starting_velocity > 0.0)
+					{
+						rigidBody->applyTorqueImpulse(direction * - this->thruster_torque[i]);
+						double new_velocity = glm::dot(direction, rigidBody->getAngularVelocity());
+
+						if (new_velocity < 0.0)
+						{
+							rigidBody->setAngularVelocity(rigidBody->getAngularVelocity() + (-direction * new_velocity));
+						}
+					}
+					else if (starting_velocity < 0.0)
+					{
+						rigidBody->applyTorqueImpulse(direction *  this->thruster_torque[i]);
+						double new_velocity = glm::dot(direction, rigidBody->getAngularVelocity());
+
+						if (new_velocity > 0.0)
+						{
+							rigidBody->setAngularVelocity(rigidBody->getAngularVelocity() - (direction * new_velocity));
+						}
+					}
+				}
+			}
+		}
+	}
+
 }

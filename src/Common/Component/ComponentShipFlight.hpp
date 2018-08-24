@@ -27,13 +27,10 @@ public:
 	vector3D angular_input = vector3D(0.0);
 	bool flight_assist = false;
 
-	vector3D max_angular_speed = vector3D(0.6);
-	vector3D angular_acceleration = vector3D(1.0);
-	vector3D angular_braking_acceleration = vector3D(3.0);
-
 	void UpdateLinearVelocity(double delta_time);
 	void UpdateAngularVelocity(double delta_time);
 
+	vector3D thruster_torque = vector3D(400.0);
 	double thruster_force[6] = { 20000.0, 20000.0, 20000.0, 20000.0, 60000.0, 30000.0 };
 };
 

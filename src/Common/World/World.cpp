@@ -16,7 +16,7 @@ void World::update(double deltaTime)
 {
 	physicsWorld->update(deltaTime);
 	
-	for (Entity* entity : this->entitiesInWorld)
+	/*for (Entity* entity : this->entitiesInWorld)
 	{
 		if (entity != nullptr)
 		{
@@ -29,29 +29,62 @@ void World::update(double deltaTime)
 				EntityManager::getInstance()->destroyEntity(entity->entityId);
 			}
 		}
+	}*/
+	for (int i = 0; i < this->entitiesInWorld.size(); i++)
+	{
+		Entity* entity = this->entitiesInWorld[i];
+		if (entity != nullptr)
+		{
+			if (entity->isAlive())
+			{
+				entity->update(deltaTime);
+			}
+			else
+			{
+				EntityManager::getInstance()->destroyEntity(entity->entityId);
+			}
+		}
 	}
-
 }
 
 void World::addEntityToWorld(Entity* entity)
 {
-	if (entitiesInWorld.find(entity) == entitiesInWorld.end())
+	/*if (entitiesInWorld.find(entity) == entitiesInWorld.end())
 	{
 		entitiesInWorld.insert(entity);
+	}*/
+	auto it = find(this->entitiesInWorld.begin(), this->entitiesInWorld.end(), entity);
+	if (it == this->entitiesInWorld.end())
+	{
+		for (int i = 0; i < this->entitiesInWorld.size(); i++)
+		{
+			if (this->entitiesInWorld[i] == nullptr)
+			{
+				this->entitiesInWorld[i] = entity;
+				return;
+			}
+		}
+
+		//No empty spots
+		this->entitiesInWorld.push_back(entity);
 	}
 }
 
 void World::removeEntityFromWorld(Entity* entity)
 {
-	if (entitiesInWorld.find(entity) != entitiesInWorld.end())
+	for (int i = 0; i < this->entitiesInWorld.size(); i++)
 	{
-		entitiesInWorld.erase(entity);
+		if (this->entitiesInWorld[i] == entity)
+		{
+			this->entitiesInWorld[i] = nullptr;
+			return;
+		}
 	}
 }
 
-std::set<Entity*>* World::getEntitiesInWorld()
+vector<Entity*>& World::getEntitiesInWorld()
 {
-	return &this->entitiesInWorld;
+	return this->entitiesInWorld;
 }
 
 void  World::addRigidBody(RigidBody* rigidBody)

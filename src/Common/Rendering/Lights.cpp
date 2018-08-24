@@ -5,6 +5,7 @@ BaseLight::BaseLight(vector3F color, float intensity)
 	this->setColor(color);
 	this->setIntensity(intensity);
 	this->setEnabled(true);
+	this->setCastsShadows(false);
 }
 
 vector3F BaseLight::getColor()
@@ -22,6 +23,11 @@ bool BaseLight::getEnabled()
 	return this->enabled;
 }
 
+bool BaseLight::getCastsShadows()
+{
+	return this->casts_shadows;
+}
+
 void BaseLight::setColor(vector3F color)
 { 
 	this->color = color;
@@ -35,6 +41,11 @@ void BaseLight::setIntensity(float intensity)
 void BaseLight::setEnabled(bool enabled)
 {
 	this->enabled = enabled;
+}
+
+void BaseLight::setCastsShadows(bool shadow)
+{
+	this->casts_shadows = shadow;
 }
 
 DirectionalLight::DirectionalLight(vector3F direction, vector3F color, float intensity)

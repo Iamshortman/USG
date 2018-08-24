@@ -13,14 +13,7 @@
         0
       ]
     },
-    "rigidBody": {
-      "mass": 4000,
-      "inertia_tensor": [
-        10000,
-        10000,
-        10000
-      ]
-    },
+    "rigidBody": {},
     "children": [
       {
         "node_components": {
@@ -32,14 +25,16 @@
           },
           "collision_shape": {
             "convex": "res/models/Cobra/Hull.obj"
-          }
+          },
+          "mass": 1500
         }
       },
       {
         "node_components": {
           "collision_shape": {
             "convex": "res/models/Cobra/Col_Hull_Nose.obj"
-          }
+          },
+          "mass": 500
         }
       },
       {
@@ -59,7 +54,8 @@
           },
           "collision_shape": {
             "convex": "res/models/Cobra/Engine_R.obj"
-          }
+          },
+          "mass": 500
         },
         "children": [
           {
@@ -79,7 +75,8 @@
               },
               "collision_shape": {
                 "convex": "res/models/Cobra/Wing_R.obj"
-              }
+              },
+              "mass": 500
             },
             "children": [
               {
@@ -115,7 +112,8 @@
           },
           "collision_shape": {
             "convex": "res/models/Cobra/Engine_L.obj"
-          }
+          },
+          "mass": 500
         },
         "children": [
           {
@@ -135,7 +133,8 @@
               },
               "collision_shape": {
                 "convex": "res/models/Cobra/Wing_L.obj"
-              }
+              },
+              "mass": 500
             },
             "children": [
               {
@@ -171,7 +170,8 @@
           },
           "collision_shape": {
             "convex": "res/models/Cobra/Canopy_Outside.obj"
-          }
+          },
+          "seat_interact": {}
         },
         "children": [
           {
@@ -196,6 +196,10 @@
           }
         }
       }
-    ]
+    ],
+    "entity_components": {
+      "flight_controller": {},
+      "ship_controller": {}
+    }
   }
 }

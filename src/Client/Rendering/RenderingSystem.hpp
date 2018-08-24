@@ -54,18 +54,19 @@ private:
 
 	ShadowMap* shadow_map = nullptr;
 
-
-
-	//std::map<Model, std::vector<Transform>> models;
 	std::vector<std::pair<Model*, Transform>> models;
+	//std::vector<std::pair<Model*, Transform>> transparent_models;
 
 	std::vector<DirectionalLight*> directional_lights;
-	std::vector<std::pair<PointLight*, Transform>> point_lights;
-	std::vector<std::pair<SpotLight*, Transform>> spot_lights;
+	std::vector<DirectionalLight*> directional_lights_shadow;
 
+	std::vector<std::pair<PointLight*, Transform>> point_lights;
+
+	std::vector<std::pair<SpotLight*, Transform>> spot_lights;
+	std::vector<std::pair<SpotLight*, Transform>> spot_lights_shadow;
 
 	Skybox* skybox = nullptr;
-	vector3F ambient_light = vector3F(0.5f);
+	vector3F ambient_light = vector3F(0.1f);
 
 	ShaderProgram* full_screen_quad_program = nullptr;
 	TexturedMesh* full_screen_quad = nullptr;
@@ -74,6 +75,9 @@ private:
 	ShaderProgram* deferred_light_directional = nullptr;
 	ShaderProgram* deferred_light_point = nullptr;
 	ShaderProgram* deferred_light_spot = nullptr;
+
+	ShaderProgram* deferred_light_directional_shadow = nullptr;
+	ShaderProgram* deferred_light_spot_shadow = nullptr;
 
 
 	//Render Settings
