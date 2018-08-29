@@ -1,8 +1,8 @@
-#include "ProjectileSystem.hpp"
+#include "Projectile.hpp"
 
 #include "Common/Transforms.hpp"
 #include "Common/Rendering/Model.hpp"
-#include "Common/TimeToLiveSystem.hpp"
+#include "Common/Component/TimeToLive.hpp"
 
 #ifdef CLIENT
 #include "Client/Input/InputManager.hpp"
@@ -21,25 +21,23 @@ void ProjectileSystem::update(EntityManager& es, EventManager& events, TimeDelta
 	{
 		if (shoot)
 		{
+			vector3D velocity = vector3D(0.0);
+
+			Entity parent = Transforms::getRootParentEntity(entity);
+			if (parent.has_component<RigidBody>())
+			{
+				velocity = parent.component<RigidBody>()->getLinearVelocity();
+			}
+
 			Transform worldTransform = Transforms::getWorldTransform(entity);
 			WorldId worldId = Transforms::getWorldId(entity);
 
-			int value = 4;
-
-			for (int x = -value; x < value + 1; x++)
-			{
-				for (int y = -value; y < value + 1; y++)
-				{
-					Entity projectile = es.create();
-					projectile.assign<Transform>(worldTransform);
-					projectile.component<Transform>()->position += (worldTransform.getLeft() * (double)x) + (worldTransform.getUp() * (double)y);
-					projectile.assign<World>(worldId);
-					projectile.assign<Projectile>()->velocity = worldTransform.getForward() * 100.0;
-					projectile.assign<Model>("res/models/bullet.obj", "res/textures/Red.png", "res/shaders/Textured", "");
-					projectile.assign<TimeToLive>(1.0);
-				}
-			}
-
+			Entity projectile = es.create();
+			projectile.assign<Transform>(worldTransform);
+			projectile.assign<World>(worldId);
+			projectile.assign<Projectile>()->velocity = velocity + (worldTransform.getForward() * 1000.0);
+			projectile.assign<Model>("res/models/bullet.obj", "res/textures/Red.png", "res/shaders/Textured", "res/shaders/Shadow");
+			//projectile.assign<TimeToLive>(1.0);
 		}
 	}
 

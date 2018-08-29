@@ -8,6 +8,11 @@ void NodeSystem::update(EntityManager& es, EventManager& events, TimeDelta dt)
 
 void NodeSystem::configure(entityx::EventManager& event_manager)
 {
+	event_manager.subscribe<ComponentAddedEvent<Node>>(*this);
+	event_manager.subscribe<ComponentRemovedEvent<Node>>(*this);
+
+	event_manager.subscribe<ComponentAddedEvent<NodeHost>>(*this);
+	event_manager.subscribe<ComponentRemovedEvent<NodeHost>>(*this);
 }
 
 void NodeSystem::receive(const ComponentAddedEvent<Node>& event)

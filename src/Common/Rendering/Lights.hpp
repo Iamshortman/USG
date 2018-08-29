@@ -18,17 +18,20 @@ public:
 	vector3F getColor();
 	float getIntensity();
 	bool getEnabled();
+	bool getCastsShadows();
 
 	void setColor(vector3F color);
 	void setIntensity(float intensity);
 	void setEnabled(bool enabled);
-	
+	void setCastsShadows(bool shadow);
+
 	virtual LightType getLightType() = 0;
 
 private:
-	vector3F m_color;
-	float m_intensity;
-	bool m_enabled;
+	vector3F color;
+	float intensity;
+	bool enabled;
+	bool casts_shadows;
 };
 
 class DirectionalLight : public BaseLight
@@ -43,7 +46,7 @@ public:
 	virtual LightType getLightType() { return LightType::Directional; };
 
 private:
-	vector3F m_direction;
+	vector3F direction;
 };
 
 class PointLight : public BaseLight
@@ -60,8 +63,8 @@ public:
 	virtual LightType getLightType() { return LightType::Point; };
 
 private:
-	float m_range;
-	vector3F m_attenuation;
+	float range;
+	vector3F attenuation;
 };
 
 class SpotLight : public PointLight
@@ -78,8 +81,8 @@ public:
 	virtual LightType getLightType() { return LightType::Spot; };
 
 private:
-	vector3F m_direction;
-	float m_cutoff;
+	vector3F direction;
+	float cutoff;
 };
 
 #endif //LIGHTS_HPP

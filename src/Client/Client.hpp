@@ -1,7 +1,7 @@
 #ifndef CLIENT_HPP
 #define CLIENT_HPP
 
-#include "Client/Rendering/RenderingManager.hpp"
+#include "Client/Rendering/RenderingEngine.hpp"
 #include "Client/Rendering/Window.hpp"
 
 #include "Client/GameState/GameState.hpp"
@@ -22,7 +22,7 @@ public:
 	void setGameState(GameState* state);
 
 	Window* window;
-	RenderingManager* renderingManager;
+	RenderingEngine* rendering_engine;
 
 private:
 	bool shouldClose = false;

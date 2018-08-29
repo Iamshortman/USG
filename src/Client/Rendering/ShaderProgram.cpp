@@ -130,7 +130,7 @@ GLuint ShaderProgram::buildShader(string location, GLuint type)
 		glGetShaderInfoLog(ShaderID, InfoLogLength, NULL, &ShaderErrorMessage[0]);
 		if (ShaderErrorMessage.size() > 2)
 		{
-			Logger::getInstance()->logError("shader: %s\n", &ShaderErrorMessage[0]);
+			Logger::getInstance()->logError("Shader: %s\n", &ShaderErrorMessage[0]);
 		}
 	}
 

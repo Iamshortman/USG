@@ -16,7 +16,9 @@ Client::Client()
 
 	this->window = new Window(1920, 1080, "USG");
 
-	this->renderingManager = new RenderingManager(this->window);
+	//this->renderingManager = new RenderingManager(this->window);
+	this->rendering_engine = new RenderingEngine();
+	this->rendering_engine->setBufferSize(this->window->getWindowSize());
 
 	this->setGameState(new GameState_Singleplayer());
 }
@@ -25,7 +27,7 @@ Client::~Client()
 {
 	delete this->currentState;
 	delete this->window;
-	delete this->renderingManager;
+	delete this->rendering_engine;
 }
 
 void Client::update(double deltaTime)

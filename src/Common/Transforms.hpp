@@ -4,9 +4,9 @@
 #include "Common/EntityX_Include.hpp"
 
 #include "Common/Transform.hpp"
-#include "Common/WorldSystem.hpp"
+#include "Common/World/WorldSystem.hpp"
 #include "Common/Physics/RigidBody.hpp"
-#include "Common/NodeSystem.hpp"
+#include "Common/World/NodeSystem.hpp"
 
 namespace Transforms
 {
@@ -62,10 +62,12 @@ namespace Transforms
 	{
 		if (entity.has_component<Node>())
 		{
-			return entity.component<Node>()->local_transform.transformBy(getParentRelativeTransform(entity.component<Node>()->parent_entity));
+			return entity.component<Node>()->local_transform.transformBy(getWorldTransform(entity.component<Node>()->parent_entity));
 		}
-
-		return getLocalTransform(entity);
+		else
+		{
+			return getLocalTransform(entity);
+		}
 	}
 
 	inline Transform getGlobalTransform(Entity entity)

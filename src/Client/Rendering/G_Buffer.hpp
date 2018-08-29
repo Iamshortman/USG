@@ -1,33 +1,33 @@
 #ifndef G_BUFFER_HPP
 #define G_BUFFER_HPP
 
+#include "Client/Rendering/FBO.hpp"
 #include "Client/Rendering/OpenGL_Include.hpp"
+#include "Common/GLM_Include.hpp"
 
-class G_Buffer
+class G_Buffer : public FBO
 {
 public:
-	G_Buffer(int width, int height, bool multisample = false, int number_of_samples = 0);
+	G_Buffer(vector2I buffer_size, bool multisample = false, int number_of_samples = 0);
 	~G_Buffer();
 
-	GLuint getFBO();
-	void getBufferSize(int &width, int &height);
+	virtual GLuint getFBO();
+	virtual vector2I getBufferSize();
+	virtual void clearBuffer();
 
-	void clearBuffer();
-
-	GLuint getPositionTexture() { return this->position_texture; };
-	GLuint getNormalTexture() { return this->normal_texture; };
 	GLuint getAlbedoTexture() { return this->albedo_texture; };
+	GLuint getNormalTexture() { return this->normal_texture; };
+	GLuint getPositionTexture() { return this->position_texture; };
 	GLuint getDepthTexture() { return this->depth_texture; };
 
 private:
 	GLuint frame_buffer;
-	GLuint position_texture;
-	GLuint normal_texture;
 	GLuint albedo_texture;
+	GLuint normal_texture;
+	GLuint position_texture;
 	GLuint depth_texture;
 
-	int width;
-	int height;
+	vector2I size;
 	bool multisample;
 	int number_of_samples;
 };

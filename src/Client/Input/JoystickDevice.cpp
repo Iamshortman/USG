@@ -80,24 +80,32 @@ AxisReturn JoystickDevice::getAxis(string name)
 			}
 		}
 
-		double range = 1.0 - axis.deadzone;
-
 		//Get between -1 and 1
 		double value = ((double)this->axis_values[axis.axisIndex].current_value) / 32767.0;
+
+		if (axis.inverted)
+		{
+			value *= -1.0;
+		}
+
+		if (axis.range == JoystickAxisRange::FORWARD)
+		{
+			value = (value / 2.0) + 0.5;
+		}
+		else if (axis.range == JoystickAxisRange::BACKWARD)
+		{
+			value = (value / 2.0) - 0.5;
+		}
 
 		//apply deadzone
 		if (fabs(value) > axis.deadzone)
 		{
+			double range = 1.0 - axis.deadzone;
 			double sign = value / fabs(value);
 			value = fabs(value) - axis.deadzone;
 			value /= range;
 
 			value *= sign;
-
-			if (axis.inverted)
-			{
-				value *= -1.0;
-			}
 
 			return AxisReturn(value, timestamp);
 		}

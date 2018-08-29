@@ -43,6 +43,13 @@
 		return positionMatrix * rotationMatrix * scaleMatrix;
 	}
 
+	matrix4 Transform::getViewMatrix(vector3D cameraPos) const
+	{
+		vector3F pos = (vector3F)(this->position - cameraPos);
+
+		return glm::lookAt(pos, (vector3F)this->getForward() + pos, (vector3F)this->getUp());
+	}
+
 	matrix4 Transform::getOriginViewMatrix() const
 	{
 		return glm::lookAt(vector3F(0.0), (vector3F)this->getForward(), (vector3F)this->getUp());

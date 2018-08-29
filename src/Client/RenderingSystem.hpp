@@ -16,6 +16,7 @@ private:
 
 RenderingSystem::RenderingSystem()
 {
+	Client::instance->rendering_engine->setSkybox(new Skybox("res/textures/Skybox/space", "res/shaders/Skybox"));
 }
 
 RenderingSystem::~RenderingSystem()
@@ -37,7 +38,7 @@ inline void RenderingSystem::update(EntityManager& es, EventManager& events, Tim
 			ComponentHandle<Model> model = entity.component<Model>();
 			Transform global_transform = Transforms::getGlobalTransform(entity);
 
-			Client::instance->renderingManager->addModel(model.get(), global_transform, world_id);
+			Client::instance->rendering_engine->addModel(model.get(), global_transform);
 		}
 	}
 
@@ -48,7 +49,13 @@ inline void RenderingSystem::update(EntityManager& es, EventManager& events, Tim
 
 		Transform global_transform = Transforms::getGlobalTransform(entity);
 
-		Client::instance->renderingManager->setCamera(*camera.get(), global_transform);
+		Client::instance->rendering_engine->setBufferSize(Client::instance->window->getWindowSize());
+
+		Client::instance->window->clearBuffer();
+		Client::instance->rendering_engine->render(0, camera.get(), global_transform);
+		Client::instance->window->updateBuffer();
+		Client::instance->rendering_engine->clearScene();
+
 
 		break; //Use the first camera right now.
 	}
