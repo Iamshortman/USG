@@ -68,7 +68,7 @@ void PlayerController::applyUserInput(double delta_time)
 			controller->angular_input.y = InputManager::getInstance()->getButtonAxisCombo("Debug_Yaw", "Debug_YawLeft", "Debug_YawRight");
 			controller->angular_input.z = InputManager::getInstance()->getButtonAxisCombo("Debug_Roll", "Debug_RollLeft", "Debug_RollRight");
 
-			controller->flight_assist = InputManager::getInstance()->getButtonDown("Debug_FlightAssist");
+			controller->flight_assist = !InputManager::getInstance()->getButtonDown("Debug_FlightAssist");
 		}
 
 		if (entity->hasComponent<ShipController>())

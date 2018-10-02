@@ -23,6 +23,7 @@ protected:
 
 	NodeEntity* character = nullptr;
 	NodeEntity* ship = nullptr;
+	NodeEntity* ai_ship = nullptr;
 };
 
 #endif //GAMESTATE_SINGLEPLAYER_HPP

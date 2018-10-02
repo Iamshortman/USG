@@ -45,6 +45,10 @@ ShipFlightController::~ShipFlightController()
 {
 }
 
+void ShipFlightController::setMassProps(double mass, matrix3 inv_world_tensor)
+{
+}
+
 void ShipFlightController::update(double delta_time)
 {
 	if (!this->enabled || this->parent_entity->getRigidBody() == nullptr)
@@ -112,13 +116,6 @@ void ShipFlightController::UpdateLinearVelocity(double delta_time)
 		}
 	}
 	rigidBody->setLinearVelocity(linearVelocity);
-	
-	linearVelocity = rigidBody->getLinearVelocity();
-	double velocity = glm::length(linearVelocity);
-	if (abs(velocity) > 2.0)
-	{
-		printf("Speed: %f\n", velocity);
-	}
 }
 
 void ShipFlightController::UpdateAngularVelocity(double delta_time)
@@ -139,11 +136,11 @@ void ShipFlightController::UpdateAngularVelocity(double delta_time)
 		if (this->angular_input[i] != 0.0)
 		{
 			double force = this->angular_input[i] * this->thruster_torque[i];
-			rigidBody->applyTorqueImpulse(direction * force);
+			rigidBody->applyTorqueImpulse(direction * force * delta_time);
 		}
 	}
 
-	if (angular_flight_assist)
+	if (angular_flight_assist && false)
 	{
 		for (int i = 0; i < 3; i++)
 		{
@@ -161,12 +158,12 @@ void ShipFlightController::UpdateAngularVelocity(double delta_time)
 				{
 					if (starting_velocity > 0.0)
 					{
-						rigidBody->applyTorqueImpulse(direction * - this->thruster_torque[i]);
+						rigidBody->applyTorqueImpulse(direction * - this->thruster_torque[i] * delta_time);
 						double new_velocity = glm::dot(direction, rigidBody->getAngularVelocity());
 
 						if (new_velocity < 0.0)
 						{
-							rigidBody->setAngularVelocity(rigidBody->getAngularVelocity() + (-direction * new_velocity));
+							rigidBody->setAngularVelocity(rigidBody->getAngularVelocity() + (-direction * new_velocity * delta_time));
 						}
 					}
 					else if (starting_velocity < 0.0)
@@ -176,7 +173,7 @@ void ShipFlightController::UpdateAngularVelocity(double delta_time)
 
 						if (new_velocity > 0.0)
 						{
-							rigidBody->setAngularVelocity(rigidBody->getAngularVelocity() - (direction * new_velocity));
+							rigidBody->setAngularVelocity(rigidBody->getAngularVelocity() - (direction * new_velocity) * delta_time);
 						}
 					}
 				}
@@ -184,4 +181,20 @@ void ShipFlightController::UpdateAngularVelocity(double delta_time)
 		}
 	}
 
+}
+
+double ShipFlightController::getAngularAcceleration(int axis, double input)
+{
+	RigidBody* rigidBody = this->parent_entity->getRigidBody();
+	double torque = this->thruster_torque[axis] * abs(input); 
+
+	vector3D tensor = toVec3(rigidBody->getRigidBody()->getInvInertiaDiagLocal());
+	torque *= tensor[axis];
+
+	return torque;
+}
+
+double ShipFlightController::getLinearAcceleration(int axis, double nput)
+{
+	return 0.0;
 }

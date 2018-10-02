@@ -32,6 +32,7 @@ double RigidBody::getMass()
 void RigidBody::setInertiaTensor(vector3D inertia)
 {
 	this->rigidBody->setMassProps(getMass(), toBtVec3(inertia));
+
 }
 
 vector3D RigidBody::getInertiaTensor()

@@ -24,6 +24,7 @@ public:
 	void setTransform(const Transform& transform);
 	void setPositionAndRotationFromTransform(const Transform& transform);
 	Transform transformBy(const Transform&  transform1) const;
+	Transform untransformBy(const Transform & transform1) const;
 
 	matrix4 getModleMatrix() const;
 	matrix4 getModleMatrix(vector3D cameraPos, double divisorPosScale = 1.0) const;

@@ -57,7 +57,7 @@
 
 	void Transform::setOrientation(const quaternionD& quat)
 	{ 
-		this->orientation = quat; 
+		this->orientation = glm::normalize(quat); 
 	}
 
 	void Transform::setTransform(const Transform& transform)
@@ -113,5 +113,13 @@
 		Transform result;
 		result.setOrientation(transform1.getOrientation() * this->getOrientation());
 		result.setPosition(transform1.getPosition() + (transform1.getOrientation() * this->getPosition()));
+		return result;
+	}
+
+	Transform Transform::untransformBy(const Transform& transform1) const
+	{
+		Transform result;
+		result.setOrientation(this->getOrientation() * glm::inverse(transform1.getOrientation()));
+		result.setPosition((this->getPosition() - transform1.getPosition()) * transform1.getOrientation());
 		return result;
 	}
