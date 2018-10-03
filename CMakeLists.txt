@@ -30,6 +30,8 @@ link_directories(lib/angelscript_2.31.2/sdk/angelscript/lib/)
 link_directories(lib/RakNet-master/build/Lib/DLL/Debug/)
 link_directories(lib/entityx-current/build/Debug)
 
+link_directories(lib/reactphysics3d-0.7.0/build/lib/Debug/)
+
 #Create Projects
 add_executable(Client ${CLIENT_SOURCES} ${CLIENT_HEADERS} ${COMMON_SOURCES} ${COMMON_HEADERS})
 add_executable(Server ${SERVER_SOURCES} ${SERVER_HEADERS} ${COMMON_SOURCES} ${COMMON_HEADERS})
@@ -90,3 +92,8 @@ target_link_libraries (Server RakNetDLL)
 include_directories(lib/entityx-current)
 target_link_libraries (Client entityx-d)
 target_link_libraries (Server entityx-d)
+
+#REACT_PHYSICS_3D
+include_directories(lib/reactphysics3d-0.7.0/src)
+target_link_libraries (Client reactphysics3d)
+target_link_libraries (Server reactphysics3d)

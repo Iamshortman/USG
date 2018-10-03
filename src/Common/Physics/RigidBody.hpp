@@ -19,7 +19,7 @@ public:
 
 	void setInertiaTensor(vector3D &inertia);
 	vector3D getInertiaTensor();
-	void calcInertiaTensorFromShape();
+	void calcInertiaTensorFromShape(); 
 
 	void Activate(bool activate);
 
