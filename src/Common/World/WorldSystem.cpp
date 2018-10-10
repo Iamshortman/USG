@@ -42,7 +42,6 @@ void WorldSystem::receive(const ComponentAddedEvent<WorldHost>& event)
 	}
 
 	WorldList::getInstance()->worlds[event.component->world_id] = entity;
-	entity.component<WorldHost>()->physics_world = new PhysicsWorld();
 }
 
 void WorldSystem::receive(const ComponentRemovedEvent<WorldHost>& event)
@@ -64,7 +63,6 @@ void WorldSystem::receive(const ComponentRemovedEvent<WorldHost>& event)
 	}
 
 	Entity entity = event.entity;
-	delete entity.component<WorldHost>()->physics_world;
 }
 
 void WorldSystem::receive(const ComponentAddedEvent<World>& event)

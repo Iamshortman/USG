@@ -1,34 +1,31 @@
-#ifndef COLLISIONSHAPE_HPP
-#define COLLISIONSHAPE_HPP
+#ifndef COLLISION_SHAPE_HPP
+#define COLLISION_SHAPE_HPP
 
-#include "Common/GLM_Include.hpp"
-
-#include "BulletCollision/CollisionShapes/btCollisionShape.h"
-
-#include "Common/Types.hpp"
-
-enum CollisionShapeType
-{
-	Box,
-	Capsule,
-	ConvexMesh,
-	ConcaveMesh,
-};
+#include "Common/Physics/ReactPhysics3D_Include.hpp"
 
 struct CollisionShape
 {
-	CollisionShape(btCollisionShape* shape, CollisionShapeType type) : shape(shape), type(type) {};
+	CollisionShape(reactphysics3d::CollisionShape* shape, double mass = 1.0)
+		:shape(shape), mass(mass){};
 
-	const btCollisionShape* shape;
-	const CollisionShapeType type;
+	~CollisionShape() 
+	{ 
+		if (this->proxy != nullptr)
+		{
+			this->proxy->getBody()->removeCollisionShape(this->proxy);
+		}
+
+		if (this->shape != nullptr)
+		{
+			delete this->shape;
+		}
+	};
+
+	reactphysics3d::CollisionShape* shape;
+	double mass;
+
+	Transform last_relative_transform;
+	reactphysics3d::ProxyShape* proxy = nullptr;
 };
 
-namespace CollisionShapes
-{
-	CollisionShape createBox(vector3D half_length);
-	CollisionShape createCapsule(double radius, double height);
-	CollisionShape createConvexMesh(string file_path);
-	CollisionShape createConcaveMesh(string file_path);
-};
-
-#endif //COLLISIONSHAPE_HPP
+#endif //COLLISION_SHAPE_HPP

@@ -57,6 +57,9 @@ void NodeSystem::receive(const ComponentRemovedEvent<NodeHost>& event)
 
 	for (Entity child : node_host->child_list)
 	{
-		child.destroy();
+		if (child.valid())
+		{
+			child.destroy();
+		}
 	}
 }

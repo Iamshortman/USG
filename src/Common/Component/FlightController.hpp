@@ -13,7 +13,7 @@ public:
 	bool flight_assist = false;
 
 	vector3D thruster_torque = vector3D(400.0);
-	double thruster_force[6] = { 20000.0, 20000.0, 20000.0, 20000.0, 600000.0, 30000.0 };
+	double thruster_force[6] = { 20000.0, 20000.0, 20000.0, 20000.0, 20000.0, 20000.0 };
 };
 
 class FlightControllerSystem : public System<FlightControllerSystem>
@@ -32,11 +32,6 @@ public:
 
 			this->UpdateAngularVelocity(delta_time, flight_controller.get(), rigid_body.get(), transform);
 			this->UpdateLinearVelocity(delta_time, flight_controller.get(), rigid_body.get(), transform);
-
-			if (rigid_body->getLinearVelocity() != vector3D(0.0) || rigid_body->getAngularVelocity() != vector3D(0.0))
-			{
-				rigid_body->Activate(true);
-			}
 		}
 	};
 
@@ -88,12 +83,12 @@ public:
 		}
 		rigid_body->setLinearVelocity(linearVelocity);
 
-		printf("Speed: %lf\n", glm::length(linearVelocity));
+		//printf("Speed: %lf\n", glm::length(linearVelocity));
 	};
 
 	void UpdateAngularVelocity(double delta_time, FlightController* flight_controller, RigidBody* rigid_body, Transform& transform)
 	{
-		bool angular_flight_assist = true;
+		/*bool angular_flight_assist = true;
 
 		for (int i = 0; i < 3; i++)
 		{
@@ -149,7 +144,7 @@ public:
 					}
 				}
 			}
-		}
+		}*/
 	};
 };
 

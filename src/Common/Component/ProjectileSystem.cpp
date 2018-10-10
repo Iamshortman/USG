@@ -4,6 +4,8 @@
 #include "Common/Rendering/Model.hpp"
 #include "Common/Component/TimeToLive.hpp"
 
+#include "Common/Physics/PhysicsSystem.hpp"
+
 #ifdef CLIENT
 #include "Client/Input/InputManager.hpp"
 #endif // CLIENT
@@ -37,7 +39,7 @@ void ProjectileSystem::update(EntityManager& es, EventManager& events, TimeDelta
 			projectile.assign<World>(worldId);
 			projectile.assign<Projectile>()->velocity = velocity + (worldTransform.getForward() * 1000.0);
 			projectile.assign<Model>("res/models/bullet.obj", "res/textures/Red.png", "res/shaders/Textured", "res/shaders/Shadow");
-			//projectile.assign<TimeToLive>(1.0);
+			projectile.assign<TimeToLive>(1.0);
 		}
 	}
 
@@ -54,13 +56,15 @@ void ProjectileSystem::update(EntityManager& es, EventManager& events, TimeDelta
 		transform.setPosition(end_pos);
 		Transforms::setLocalTransform(entity, transform);
 
-		Entity world_host = WorldList::getInstance()->getWorldHost(entity.component<World>()->world_id);
-		ComponentHandle<WorldHost> world = world_host.component<WorldHost>();
-		SingleRayTestResult result = world->physics_world->singleRayTest(start_pos, end_pos);
-
-		if (result.hasHit)
+		PhysicsWorld* physics_world = PhysicsWorldList::getInstance()->getPhysicsWorld(entity.component<World>()->world_id);
+		if (physics_world != nullptr)
 		{
-			entity.destroy();
+			SingleRaycastResult result = physics_world->SingleRaycast(start_pos, end_pos, es);
+
+			if (result.has_hit)
+			{
+				entity.destroy();
+			}
 		}
 	}
 }

@@ -19,7 +19,6 @@ protected:
 	virtual void unloadResource(GLuint texture);
 };
 
-
 unsigned char* load_png(char const *filename, int *x, int *y, int *comp, int req_comp);
 void unload_png(void *retval_from_stbi_load);
 

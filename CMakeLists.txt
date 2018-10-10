@@ -23,11 +23,10 @@ source_group("Server_Headers" FILES ${SERVER_HEADERS})
 #libs part 1
 link_directories(lib/SDL2-2.0.4/lib/x64/)
 link_directories(lib/glew-1.12.0/lib/Release/x64/)
-link_directories(lib/bullet3-2.86.1/build/lib/Debug/)
+
 link_directories(lib/assimp-3.3.1/build/code/Debug/)
 link_directories(lib/assimp-3.3.1/build/contrib/zlib/Debug/)
-link_directories(lib/angelscript_2.31.2/sdk/angelscript/lib/)
-link_directories(lib/RakNet-master/build/Lib/DLL/Debug/)
+
 link_directories(lib/entityx-current/build/Debug)
 
 link_directories(lib/reactphysics3d-0.7.0/build/lib/Debug/)
@@ -46,17 +45,6 @@ include_directories(lib/glm/)
 
 #jsoncons
 include_directories(lib/jsoncons-0.104.0/include)
-
-#Bullet
-include_directories(lib/bullet3-2.86.1/src/)
-target_link_libraries  (Client BulletCollision_Debug)
-target_link_libraries  (Client BulletDynamics_Debug)
-target_link_libraries  (Client LinearMath_Debug)
-target_link_libraries  (Server BulletCollision_Debug)
-target_link_libraries  (Server BulletDynamics_Debug)
-target_link_libraries  (Server LinearMath_Debug)
-target_compile_definitions(Client PUBLIC BT_USE_DOUBLE_PRECISION)
-target_compile_definitions(Server PUBLIC BT_USE_DOUBLE_PRECISION)
 
 #OPENGL
 target_link_libraries (Client opengl32)
@@ -78,16 +66,6 @@ target_link_libraries (Server zlibstaticd)
 target_link_libraries (Server assimp-vc140-mt)
 target_link_libraries (Client assimp-vc140-mt)
 
-#AngelScript
-#include_directories(lib/angelscript_2.31.2/sdk/angelscript/include/)
-#target_link_libraries (Client angelscript64d)
-#target_link_libraries (Server angelscript64d)
-
-#RakNet-master/build/Lib/DLL/Debug/
-include_directories(lib/RakNet-master/source/)
-target_link_libraries (Client RakNetDLL)
-target_link_libraries (Server RakNetDLL)
-
 #Entityx
 include_directories(lib/entityx-current)
 target_link_libraries (Client entityx-d)
@@ -97,3 +75,6 @@ target_link_libraries (Server entityx-d)
 include_directories(lib/reactphysics3d-0.7.0/src)
 target_link_libraries (Client reactphysics3d)
 target_link_libraries (Server reactphysics3d)
+target_compile_definitions(Client PUBLIC IS_DOUBLE_PRECISION_ENABLED)
+target_compile_definitions(Server PUBLIC IS_DOUBLE_PRECISION_ENABLED)
+

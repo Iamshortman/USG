@@ -84,11 +84,6 @@ void ShaderProgram::setUniform(string name, const matrix3& matrix)
 	glUniformMatrix3fv(glGetUniformLocation(programID, name.c_str()), 1, GL_FALSE, &matrix[0][0]);
 }
 
-void ShaderProgram::setUniform(string name, const vector4F& vec)
-{
-	glUniform4f(glGetUniformLocation(programID, name.c_str()), vec.x, vec.y, vec.z, vec.w);
-}
-
 void ShaderProgram::setUniform(string name, const vector3F& vec)
 {
 	glUniform3f(glGetUniformLocation(programID, name.c_str()), vec.x, vec.y, vec.z);
@@ -101,7 +96,7 @@ void ShaderProgram::setUniform(string name, const vector2F& vec)
 
 void ShaderProgram::setUniform(string name, const quaternionF& quat)
 {
-	//glUniform4f(glGetUniformLocation(programID, name.c_str()), quat.x, quat.y, quat.z);
+	glUniform4f(glGetUniformLocation(programID, name.c_str()), quat.w, quat.x, quat.y, quat.z);
 }
 
 GLuint ShaderProgram::buildShader(string location, GLuint type)

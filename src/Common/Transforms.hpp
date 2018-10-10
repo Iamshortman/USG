@@ -5,16 +5,17 @@
 
 #include "Common/Transform.hpp"
 #include "Common/World/WorldSystem.hpp"
-#include "Common/Physics/RigidBody.hpp"
 #include "Common/World/NodeSystem.hpp"
+#include "Common/Physics/RigidBody.hpp"
+#include "Common/Component/Seat.hpp"
 
 namespace Transforms
 {
 	inline void setLocalTransform(Entity entity, Transform& transform)
 	{
-		if (entity.has_component<RigidBody>())
+		if (entity.has_component<RigidBody>() && entity.component<RigidBody>()->isInWorld())
 		{
-			entity.component<RigidBody>().get()->setWorldTransform(transform);
+			entity.component<RigidBody>()->setTransform(transform);
 		}
 
 		if (entity.has_component<Transform>())
@@ -30,9 +31,9 @@ namespace Transforms
 
 	inline Transform getLocalTransform(Entity entity)
 	{
-		if (entity.has_component<RigidBody>())
+		if (entity.has_component<RigidBody>() && entity.component<RigidBody>()->isInWorld())
 		{
-			return entity.component<RigidBody>().get()->getWorldTransform();
+			return entity.component<RigidBody>()->getTransform();
 		}
 
 		if (entity.has_component<Transform>())
@@ -45,6 +46,7 @@ namespace Transforms
 			return entity.component<Node>()->local_transform;
 		}
 
+		//If is in Seat it's local transform is the orgin anyway
 		return Transform();
 	}
 
@@ -83,6 +85,10 @@ namespace Transforms
 		{
 			transform = transform.transformBy(getGlobalTransform(entity.component<Node>()->parent_entity));
 		}
+		else if (entity.has_component<SeatLink>())
+		{
+			transform = transform.transformBy(getGlobalTransform(entity.component<SeatLink>()->parent_entity));
+		}
 
 		return transform;
 	}
@@ -97,6 +103,11 @@ namespace Transforms
 		if (entity.has_component<Node>())
 		{
 			return getWorldId(entity.component<Node>()->parent_entity);
+		}
+
+		if (entity.has_component<SeatLink>())
+		{
+			return getWorldId(entity.component<SeatLink>()->parent_entity);
 		}
 
 		return INVALID_WORLD;

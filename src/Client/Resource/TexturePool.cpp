@@ -49,8 +49,10 @@ void TexturePool::unloadResource(GLuint texture)
 	glDeleteTextures(1, &texture);
 }
 
+#pragma warning(push, 0) 
 #define STB_IMAGE_IMPLEMENTATION
 #include "Client/Resource/stb_image.h"
+#pragma warning(pop)
 
 unsigned char* load_png(char const *filename, int *x, int *y, int *comp, int req_comp)
 {

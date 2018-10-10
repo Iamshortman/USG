@@ -14,11 +14,12 @@ typedef uint32_t WorldId;
 
 struct WorldChangeEvent
 {
-	WorldChangeEvent(Entity entity, WorldId old_world, WorldId new_world) : entity(entity), old_world(old_world), new_world(new_world) {}
+	WorldChangeEvent(Entity entity, WorldId old_world, WorldId new_world, Transform transform = Transform()) : entity(entity), old_world(old_world), new_world(new_world), new_transform(transform) {};
 
 	Entity entity;
 	WorldId old_world;
 	WorldId new_world;
+	Transform new_transform;
 };
 
 struct World
@@ -33,7 +34,6 @@ struct WorldHost
 	const WorldId world_id;
 
 	std::set<Entity> entity_list;
-	PhysicsWorld* physics_world;
 };
 
 class WorldSystem : public System<WorldSystem>, public Receiver<WorldSystem>

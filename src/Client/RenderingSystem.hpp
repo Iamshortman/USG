@@ -52,10 +52,9 @@ inline void RenderingSystem::update(EntityManager& es, EventManager& events, Tim
 		Client::instance->rendering_engine->setBufferSize(Client::instance->window->getWindowSize());
 
 		Client::instance->window->clearBuffer();
-		Client::instance->rendering_engine->render(0, camera.get(), global_transform);
+		Client::instance->rendering_engine->renderMS(0, camera.get(), global_transform);
 		Client::instance->window->updateBuffer();
 		Client::instance->rendering_engine->clearScene();
-
 
 		break; //Use the first camera right now.
 	}

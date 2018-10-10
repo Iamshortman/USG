@@ -27,7 +27,6 @@ public:
 	void setUniform(string name, const float& value);
 	void setUniform(string name, const matrix4& matrix);
 	void setUniform(string name, const matrix3& matrix);
-	void setUniform(string name, const vector4F& vec);
 	void setUniform(string name, const vector3F& vec);
 	void setUniform(string name, const vector2F& vec);
 	void setUniform(string name, const quaternionF& quat);

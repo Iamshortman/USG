@@ -1,17 +1,47 @@
-#ifndef PHYSICSWORLD_HPP
-#define PHYSICSWORLD_HPP
+#ifndef PHYSICS_WORLD_HPP
+#define PHYSICS_WORLD_HPP
 
-#include "Common/Physics/Bullet_Include.hpp"
+#include "Common/EntityX_Include.hpp"
+#include "Common/Physics/ReactPhysics3D_Include.hpp"
 #include "Common/Physics/RigidBody.hpp"
 
-#include <set>
-
-struct SingleRayTestResult
+class SingleRayCallback: public reactphysics3d::RaycastCallback
 {
-	bool hasHit = false;
+public:
+	bool has_hit = false;
 
-	vector3D hitPosition;
-	vector3D hitNormal;
+	reactphysics3d::decimal smallest_hit_fraction = 1.1;
+	reactphysics3d::CollisionBody* hit_body = nullptr;
+	reactphysics3d::ProxyShape* hit_shape = nullptr;
+	reactphysics3d::Vector3 world_point;
+	reactphysics3d::Vector3 world_normal;
+
+	reactphysics3d::decimal notifyRaycastHit(const  reactphysics3d::RaycastInfo& raycastInfo)
+	{
+		if (raycastInfo.hitFraction < this->smallest_hit_fraction)
+		{
+			this->has_hit = true;
+			this->hit_body = raycastInfo.body;
+			this->hit_shape = raycastInfo.proxyShape;
+			this->world_point = raycastInfo.worldPoint;
+			this->world_normal = raycastInfo.worldNormal;
+			this->smallest_hit_fraction = raycastInfo.hitFraction;
+		}
+
+		return 1.0;
+	};
+};
+
+
+struct SingleRaycastResult
+{
+	bool has_hit = false;
+
+	Entity hit_entity;
+	Entity hit_entity_root;
+
+	vector3D world_point;
+	vector3D world_normal;
 };
 
 class PhysicsWorld
@@ -21,20 +51,16 @@ public:
 	PhysicsWorld();
 	virtual ~PhysicsWorld();
 
-	virtual void update(double delta_time);
+	void update(double delta_time);
 
-	void addRigidBody(RigidBody* rigidBody);
-	void removeRigidBody(RigidBody* rigidBody);
+	SingleRaycastResult SingleRaycast(vector3D& start, vector3D& end, EntityManager& es);
 
-	SingleRayTestResult singleRayTest(vector3D startPos, vector3D endPos);
-	btDiscreteDynamicsWorld* dynamicsWorld = nullptr;
+	void addRigidBody(RigidBody* rigid_body, Transform transform);
+	void removeRigidBody(RigidBody* rigid_body);
 
 protected:
-
-	btBroadphaseInterface* broadphase = nullptr;
-	btDefaultCollisionConfiguration* collisionConfiguration = nullptr;
-	btCollisionDispatcher* dispatcher = nullptr;
-	btSequentialImpulseConstraintSolver* solver = nullptr;
+	std::set<RigidBody*> rigid_bodies;
+	reactphysics3d::DynamicsWorld* dynamics_world = nullptr;
 };
 
-#endif //PHYSICSWORLD_HPP
+#endif //PHYSICS_WORLD_HPP

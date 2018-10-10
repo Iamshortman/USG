@@ -1,162 +1,206 @@
-#include "Common/Physics/RigidBody.hpp"
-
-#include "Common/Physics/PhysicsWorld.hpp"
+#include "RigidBody.hpp"
 
 #include "Common/Logger/Logger.hpp"
+#include "Common/Physics/PhysicsWorld.hpp"
 
 RigidBody::RigidBody()
 {
-	this->empty_shape = new btEmptyShape();
 
-	btDefaultMotionState* motionState = new btDefaultMotionState();
-	btRigidBody::btRigidBodyConstructionInfo boxRigidBodyCI(this->mass, motionState, this->empty_shape, toBtVec3(this->inertia));
-	this->rigidBody = new btRigidBody(boxRigidBodyCI);
 }
 
 RigidBody::~RigidBody()
 {
-	delete this->empty_shape;
-
-	if (this->physics_world != nullptr)
+	if (this->rigid_body != nullptr)
 	{
-		this->physics_world->removeRigidBody(this);
-		this->physics_world = nullptr;
-	}
-
-	if (this->rigidBody != nullptr)
-	{
-		delete this->rigidBody;
+		this->destroyRigidBody();
 	}
 }
 
-void RigidBody::setMass(double massToAdd)
+bool RigidBody::isInWorld()
 {
-	this->mass = massToAdd;
-	this->rigidBody->setMassProps(this->mass, toBtVec3(this->inertia));
+	return this->rigid_body != nullptr;
+}
+
+void RigidBody::createRigidBody(PhysicsWorld* world, const Transform& transform, Entity::Id id)
+{
+	if (this->rigid_body != nullptr)
+	{
+		Logger::getInstance()->logError("RigidBody already exists\n");
+		return;
+	}
+
+	this->world = world;
+	this->world->addRigidBody(this, transform);
+	this->rigid_body->setUserData(new Entity::Id(id));
+
+	for (auto shape : this->shapes)
+	{
+		this->addShapeInternal(shape.first, shape.second);
+	}
+
+	this->rigid_body->recomputeMassInformation();
+}
+
+void RigidBody::destroyRigidBody()
+{
+	if (this->rigid_body == nullptr)
+	{
+		Logger::getInstance()->logError("RigidBody doesn't exist\n");
+		return;
+	}
+
+	for (auto shape : this->shapes)
+	{
+		this->removeShapeInternal(shape.first);
+	}
+
+	delete this->rigid_body->getUserData();
+	this->world->removeRigidBody(this);
+
+	this->rigid_body = nullptr;
+	this->world = nullptr;
+
+	for (auto shape : this->shapes)
+	{
+		shape.first->proxy = nullptr;
+	}
+}
+
+void RigidBody::setTransform(const Transform& transform)
+{
+	if (this->rigid_body != nullptr)
+	{
+		this->rigid_body->setTransform(toRecTrans(transform));
+	}
+}
+
+Transform RigidBody::getTransform()
+{
+	if (this->rigid_body != nullptr)
+	{
+		return toGlmTrans(this->rigid_body->getTransform());
+	}
+
+	return Transform();
+}
+
+void RigidBody::setLinearVelocity(const vector3D& velocity)
+{
+	if (this->rigid_body != nullptr)
+	{
+		this->rigid_body->setLinearVelocity(toRecVec3(velocity));
+	}
+}
+
+vector3D RigidBody::getLinearVelocity()
+{
+	if (this->rigid_body != nullptr)
+	{
+		return toGlmVec3(this->rigid_body->getLinearVelocity());
+	}
+
+	return vector3D();
+}
+
+void RigidBody::setAngularVelocity(const vector3D& velocity)
+{
+	if (this->rigid_body != nullptr)
+	{
+		this->rigid_body->setAngularVelocity(toRecVec3(velocity));
+	}
+}
+
+vector3D RigidBody::getAngularVelocity()
+{
+	if (this->rigid_body != nullptr)
+	{
+		return toGlmVec3(this->rigid_body->getAngularVelocity());
+	}
+
+	return vector3D();
+}
+
+void RigidBody::setGravityEnabled(bool enabled)
+{
+	if (this->rigid_body != nullptr)
+	{
+		this->rigid_body->enableGravity(enabled);
+	}
+}
+
+bool RigidBody::getGravityEnabled()
+{
+	if (this->rigid_body != nullptr)
+	{
+		return this->rigid_body->isGravityEnabled();
+	}
+
+	return false;
+}
+
+void RigidBody::applyCenteredForce(vector3D force)
+{
+	if (this->rigid_body != nullptr)
+	{
+		this->rigid_body->applyForceToCenterOfMass(toRecVec3(force));
+	}
+}
+
+void RigidBody::applyForce(vector3D world_position, vector3D force)
+{
+	if (this->rigid_body != nullptr)
+	{
+		this->rigid_body->applyForce(toRecVec3(world_position), toRecVec3(force));
+	}
+}
+
+void RigidBody::applyTorque(vector3D torque)
+{
+	if (this->rigid_body != nullptr)
+	{
+		this->rigid_body->applyTorque(toRecVec3(torque));
+	}
+}
+
+void RigidBody::addShape(CollisionShape* shape, Entity::Id id)
+{
+	this->shapes[shape] = id;
+
+	this->addShapeInternal(shape, id);
+}
+
+void RigidBody::removeShape(CollisionShape* shape)
+{
+	this->shapes.erase(shape);
+
+	this->removeShapeInternal(shape);
 }
 
 double RigidBody::getMass()
 {
-	return this->mass;
-}
-
-void RigidBody::setInertiaTensor(vector3D &inertiaToSet)
-{
-	this->inertia = inertiaToSet;
-	this->rigidBody->setMassProps(this->mass, toBtVec3(this->inertia));
-}
-
-vector3D RigidBody::getInertiaTensor()
-{
-	return this->inertia;
-}
-
-void RigidBody::calcInertiaTensorFromShape()
-{
-	if (this->mass > 0.0)
+	if (this->rigid_body != nullptr)
 	{
-		btVector3 inertia_tensor = btVector3(0.0, 0.0, 0.0);
-		this->rigidBody->getCollisionShape()->calculateLocalInertia(this->mass, inertia_tensor);
-		this->inertia = toVec3(inertia_tensor);
+		return this->rigid_body->getMass();
+	}
+
+	return 0.0;
+}
+
+void RigidBody::addShapeInternal(CollisionShape* shape, Entity::Id id)
+{
+	if (this->rigid_body != nullptr)
+	{
+		shape->proxy = this->rigid_body->addCollisionShape(shape->shape, toRecTrans(shape->last_relative_transform), shape->mass);
+		shape->proxy->setUserData(new Entity::Id(id));
 	}
 }
 
-void RigidBody::Activate(bool activate)
+void RigidBody::removeShapeInternal(CollisionShape* shape)
 {
-	this->rigidBody->activate(activate);
-}
-
-Transform RigidBody::getWorldTransform()
-{
-	return toTransform(this->rigidBody->getWorldTransform());
-}
-
-void RigidBody::setWorldTransform(Transform &transform)
-{
-	this->rigidBody->setCenterOfMassTransform(toBtTransform(transform));
-}
-
-vector3D RigidBody::getLinearVelocity() const
-{
-	return toVec3(this->rigidBody->getLinearVelocity());
-}
-
-void RigidBody::setLinearVelocity(vector3D &velocity)
-{
-	this->rigidBody->setLinearVelocity(toBtVec3(velocity));
-}
-
-vector3D RigidBody::getAngularVelocity() const
-{
-	return toVec3(this->rigidBody->getAngularVelocity());
-}
-
-void RigidBody::setAngularVelocity(vector3D &velocity)
-{
-	this->rigidBody->setAngularVelocity(toBtVec3(velocity));
-}
-
-void RigidBody::applyForce(vector3D &force, vector3D &localPos)
-{
-	this->rigidBody->applyForce(toBtVec3(force), toBtVec3(localPos));
-}
-
-void RigidBody::applyImpulse(vector3D &impulse, vector3D &localPos)
-{
-	this->rigidBody->applyImpulse(toBtVec3(impulse), toBtVec3(localPos));
-}
-
-void RigidBody::applyCentralForce(vector3D &force)
-{
-	this->rigidBody->applyCentralForce(toBtVec3(force));
-}
-
-void RigidBody::applyCentralImpulse(vector3D &impulse)
-{
-	this->rigidBody->applyCentralImpulse(toBtVec3(impulse));
-}
-
-void RigidBody::applyTorque(vector3D &torque)
-{
-	this->rigidBody->applyTorque(toBtVec3(torque));
-}
-
-void RigidBody::applyTorqueImpulse(vector3D &torque)
-{
-	this->rigidBody->applyTorqueImpulse(toBtVec3(torque));
-}
-
-void RigidBody::setDampening(double linear, double angular)
-{
-	rigidBody->setDamping(linear, angular);
-}
-
-void RigidBody::setCollisionShape(btCollisionShape* shape)
-{
-	if (this->physics_world != nullptr)
+	if (this->rigid_body != nullptr)
 	{
-		PhysicsWorld* world = this->physics_world;
-		this->physics_world->removeRigidBody(this);
-
-		if (shape != nullptr)
-		{
-			this->rigidBody->setCollisionShape(shape);
-		}
-		else
-		{
-			this->rigidBody->setCollisionShape(this->empty_shape);
-		}
-		world->addRigidBody(this);
-	}
-	else
-	{
-		if (shape != nullptr)
-		{
-			this->rigidBody->setCollisionShape(shape);
-		}
-		else
-		{
-			this->rigidBody->setCollisionShape(this->empty_shape);
-		}
+		delete shape->proxy->getUserData();
+		this->rigid_body->removeCollisionShape(shape->proxy);
 	}
 }
+
