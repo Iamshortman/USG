@@ -63,7 +63,8 @@ void ProjectileSystem::update(EntityManager& es, EventManager& events, TimeDelta
 
 			if (result.has_hit)
 			{
-				entity.destroy();
+				//entity.destroy();
+				EntityDestroyer::destroyEntity(entity);
 			}
 		}
 	}

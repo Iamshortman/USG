@@ -199,8 +199,11 @@ void RigidBody::removeShapeInternal(CollisionShape* shape)
 {
 	if (this->rigid_body != nullptr)
 	{
-		delete shape->proxy->getUserData();
-		this->rigid_body->removeCollisionShape(shape->proxy);
+		if (shape->proxy != nullptr)
+		{
+			delete shape->proxy->getUserData();
+			this->rigid_body->removeCollisionShape(shape->proxy);
+		}
 	}
 }
 

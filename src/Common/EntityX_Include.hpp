@@ -5,4 +5,6 @@
 
 using namespace entityx;
 
+#include "Common/EntityDestroyer.hpp"
+
 #endif //ENTITYX_INCLUDE_HPP

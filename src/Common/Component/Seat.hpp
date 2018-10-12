@@ -49,10 +49,9 @@ struct AddToSeatEvent
 
 struct RemoveFromSeatEvent
 {
-	RemoveFromSeatEvent(Entity entity_to_remove, Entity seat_entity, WorldId destination_world, Transform destionation_transform)
-		: entity_to_remove(entity_to_remove), seat_entity(seat_entity), destination_world(destination_world), destionation_transform(destionation_transform) {};
+	RemoveFromSeatEvent(Entity entity_to_remove, WorldId destination_world, Transform destionation_transform)
+		: entity_to_remove(entity_to_remove), destination_world(destination_world), destionation_transform(destionation_transform) {};
 	Entity entity_to_remove;
-	Entity seat_entity;
 
 	WorldId destination_world;
 	Transform destionation_transform;
@@ -106,8 +105,13 @@ public:
 
 	void receive(const AddToSeatEvent& event)
 	{
-		Entity seat_entity = lookForSeat(event.root_seat_entity, event.seat_name);
 		Entity entity_to_seat = event.entity_to_add;
+		if (entity_to_seat.has_component<SeatLink>())
+		{
+			return;
+		}
+
+		Entity seat_entity = lookForSeat(event.root_seat_entity, event.seat_name);
 
 		if (seat_entity.has_component<Seat>())
 		{
@@ -139,12 +143,30 @@ public:
 	};
 	void receive(const RemoveFromSeatEvent& event)
 	{
+		Entity entity_to_remove = event.entity_to_remove;
 
+		if (entity_to_remove.has_component<SeatLink>())
+		{
+			Entity seat = entity_to_remove.component<SeatLink>()->parent_entity;
+			if (seat.has_component<Seat>())
+			{
+				seat.component<Seat>()->seated_entity = Entity();
+			}
+
+			entity_to_remove.remove<SeatLink>();
+			entity_to_remove.assign<Transform>(event.destionation_transform);
+			entity_to_remove.assign<World>(event.destination_world);
+		}
 	};
 
 	void receive(const ComponentRemovedEvent<Seat>& event)
 	{
-
+		ComponentHandle<Seat> seat = event.component;
+		//Kill the entity in the seat
+		if (seat->hasSeatedEntity())
+		{
+			EntityDestroyer::destroyEntity(seat->seated_entity);
+		}
 	};
 
 private:

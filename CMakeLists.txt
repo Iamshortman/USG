@@ -29,7 +29,7 @@ link_directories(lib/assimp-3.3.1/build/contrib/zlib/Debug/)
 
 link_directories(lib/entityx-current/build/Debug)
 
-link_directories(lib/reactphysics3d-0.7.0/build/lib/Debug/)
+link_directories(lib/reactphysics3d-master/build/lib/Debug/)
 
 #Create Projects
 add_executable(Client ${CLIENT_SOURCES} ${CLIENT_HEADERS} ${COMMON_SOURCES} ${COMMON_HEADERS})
@@ -72,7 +72,7 @@ target_link_libraries (Client entityx-d)
 target_link_libraries (Server entityx-d)
 
 #REACT_PHYSICS_3D
-include_directories(lib/reactphysics3d-0.7.0/src)
+include_directories(lib/reactphysics3d-master/src)
 target_link_libraries (Client reactphysics3d)
 target_link_libraries (Server reactphysics3d)
 target_compile_definitions(Client PUBLIC IS_DOUBLE_PRECISION_ENABLED)

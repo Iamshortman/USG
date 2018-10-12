@@ -42,6 +42,8 @@ InputManager::InputManager()
 	keyboardMouse->addButton("Debug_RollRight", KeyboardMouseButton(KEYBOARD, SDL_SCANCODE_E));
 
 	keyboardMouse->addButton("Debug_FlightAssist", KeyboardMouseButton(KEYBOARD, SDL_SCANCODE_F));
+	keyboardMouse->addButton("Debug_R", KeyboardMouseButton(KEYBOARD, SDL_SCANCODE_R));
+
 
 	keyboardMouse->addButton("Flight_Shoot", KeyboardMouseButton(MOUSE, SDL_BUTTON_LEFT));
 

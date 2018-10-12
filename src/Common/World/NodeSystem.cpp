@@ -39,10 +39,13 @@ void NodeSystem::receive(const ComponentRemovedEvent<Node>& event)
 	ComponentHandle<Node> node = event.component;
 	Entity parent = node->parent_entity;
 
-	if (parent.has_component<NodeHost>())
+	if (parent.valid())
 	{
-		ComponentHandle<NodeHost> node_host = parent.component<NodeHost>();
-		node_host->child_list.erase(entity);
+		if (parent.has_component<NodeHost>())
+		{
+			ComponentHandle<NodeHost> node_host = parent.component<NodeHost>();
+			node_host->child_list.erase(entity);
+		}
 	}
 }
 
@@ -59,7 +62,7 @@ void NodeSystem::receive(const ComponentRemovedEvent<NodeHost>& event)
 	{
 		if (child.valid())
 		{
-			child.destroy();
+			EntityDestroyer::destroyEntity(child);
 		}
 	}
 }

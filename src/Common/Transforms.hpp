@@ -66,6 +66,10 @@ namespace Transforms
 		{
 			return entity.component<Node>()->local_transform.transformBy(getWorldTransform(entity.component<Node>()->parent_entity));
 		}
+		if (entity.has_component<SeatLink>())
+		{
+			return getWorldTransform(entity.component<SeatLink>()->parent_entity);
+		}
 		else
 		{
 			return getLocalTransform(entity);

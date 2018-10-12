@@ -30,8 +30,6 @@ GameState_Singleplayer::GameState_Singleplayer()
 	this->ecs_system.systems.add<RenderingSystem>();
 	this->ecs_system.systems.configure();
 
-
-
 	Entity root = this->ecs_system.entities.create();
 	root.assign<WorldHost>(1);
 
@@ -71,7 +69,7 @@ GameState_Singleplayer::~GameState_Singleplayer()
 
 void GameState_Singleplayer::update(Client* client, double delta_time)
 {
-	if (entity.has_component<FlightController>())
+	/*if (entity.has_component<FlightController>())
 	{
 		ComponentHandle<FlightController> flight_controller = entity.component<FlightController>();
 
@@ -84,13 +82,10 @@ void GameState_Singleplayer::update(Client* client, double delta_time)
 		flight_controller->angular_input.z = InputManager::getInstance()->getButtonAxisCombo("Debug_Roll", "Debug_RollLeft", "Debug_RollRight");
 
 		flight_controller->flight_assist = InputManager::getInstance()->getButtonDown("Debug_FlightAssist");
-	}
-
-	if (InputManager::getInstance()->getButtonPressed("Debug_FlightAssist"))
-	{
-		this->ecs_system.events.emit<AddToSeatEvent>(this->entity, this->entity_with_seat, "seat");
-	}
+	}*/
 
 	this->ecs_system.systems.update_all((entityx::TimeDelta) delta_time);
+	EntityDestroyer::getInstance()->update(this->ecs_system);
+
 	//client->renderingManager->renderScene();
 }

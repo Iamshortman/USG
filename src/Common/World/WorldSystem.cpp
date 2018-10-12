@@ -59,7 +59,8 @@ void WorldSystem::receive(const ComponentRemovedEvent<WorldHost>& event)
 	//Destory all entities
 	for (Entity child : event.component->entity_list)
 	{
-		child.destroy();
+		//child.destroy();
+		EntityDestroyer::destroyEntity(child);
 	}
 
 	Entity entity = event.entity;

@@ -24,7 +24,8 @@ public:
 
 			if (time->timeToLive <= 0)
 			{
-				entity.destroy();
+				//entity.destroy();
+				EntityDestroyer::destroyEntity(entity);
 			}
 		}
 	};
