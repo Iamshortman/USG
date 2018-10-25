@@ -117,7 +117,7 @@ void RenderingManager::SubmitWorld(World* world)
 
 void RenderingManager::Render(World* world, Camera* camera)
 {
-	DirectionalLight light = DirectionalLight(vector3F(0.1, -1.0, -0.25), vector3F(1.0), 0.4);
+	DirectionalLight light = DirectionalLight(vector3F(0.1f, -1.0f, -0.25f), vector3F(1.0f), 0.4f);
 
 	this->rendering_system->clearScene();
 	this->rendering_system->addDirectionalLight(&light);

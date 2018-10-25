@@ -352,7 +352,7 @@ void RenderingSystem::drawLights(GLuint render_target, G_Buffer* g_buffer, Camer
 	for (int i = 0; i < this->spot_lights_shadow.size(); i++)
 	{
 		Camera light_camera;
-		light_camera.frame_of_view = glm::degrees(acos(this->spot_lights_shadow[i].first->getCutoff())) * 2.0;
+		light_camera.frame_of_view = glm::degrees(acos(this->spot_lights_shadow[i].first->getCutoff())) * 2.0f;
 		vector2I size = this->shadow_map->getBufferSize();
 		matrix4 light_space_matrix = light_camera.getProjectionMatrix(size) * this->spot_lights_shadow[i].second.getViewMatrix(camera_transform.position);
 		this->drawShadowMap(this->shadow_map, camera_transform.position, light_space_matrix);

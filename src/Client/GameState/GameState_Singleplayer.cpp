@@ -247,7 +247,7 @@ void GameState_Singleplayer::update(Client* client, double delta_time)
 	this->player_controller.applyUserInput(delta_time);
 
 	//AI: AIM AT TARGET
-	rotateTowards(this->ai_ship, this->ship->getWorldTransform(), delta_time);
+	//rotateTowards(this->ai_ship, this->ship->getWorldTransform(), delta_time);
 
 	WorldManager::getInstance()->update(delta_time);
 	EntityManager::getInstance()->update();
