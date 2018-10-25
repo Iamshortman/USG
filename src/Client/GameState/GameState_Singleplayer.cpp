@@ -39,18 +39,30 @@ GameState_Singleplayer::GameState_Singleplayer()
 	camera.assign<Camera>();
 	camera.assign<DebugCamera>(15.0, 0.5);
 
-	this->entity_with_seat = this->ecs_system.entities.create();
-	this->entity_with_seat.assign<Transform>();
-	this->entity_with_seat.assign<World>(1);
-	this->entity_with_seat.assign<NodeHost>();
-	this->entity_with_seat.assign<Model>("res/models/cube.obj", "res/textures/Red.png", "res/shaders/Textured", "res/shaders/Shadow");
-	this->entity_with_seat.assign<RigidBody>();
-	this->entity_with_seat.assign<CollisionShape>(new reactphysics3d::BoxShape(reactphysics3d::Vector3(0.5, 0.5, 0.5)), 10000.0);
-	this->entity_with_seat.assign<ProjectileLauncher>();
+	/*for (int i = -5; i <= 5; i++)
+	{
+		Entity cube = this->ecs_system.entities.create();
+		cube.assign<Transform>(vector3D(i * 2.0, 0.0, 0.0));
+		cube.assign<World>(1);
+		cube.assign<NodeHost>();
+		cube.assign<Model>("res/models/cube.obj", "res/textures/Red.png", "res/shaders/Textured", "res/shaders/Shadow");
+		cube.assign<ProjectileLauncher>();
+	}*/
+	TexturePool::getInstance()->setUsing("res/textures/Red.png");
+	for (size_t i = 0; i < 10; i++)
+	{
+		for (size_t j = 0; j < 10; j++)
+		{
+			for (size_t k = 0; k < 10; k++)
+			{
+				Entity projectile = this->ecs_system.entities.create();
+				projectile.assign<Transform>(vector3D(i, j, k));
+				projectile.assign<World>(1);
+				projectile.assign<InstancedModel>("");
+			}
+		}
+	}
 
-	Entity seat = this->ecs_system.entities.create();
-	seat.assign<Seat>("seat");
-	seat.assign<Node>(this->entity_with_seat, Transform(vector3D(0.0, 1.0, 0.0)));
 
 	this->entity = this->ecs_system.entities.create();
 	this->entity.assign<Transform>(vector3D(0.0, 10.0, 0.0));

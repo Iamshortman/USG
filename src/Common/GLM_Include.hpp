@@ -33,6 +33,7 @@ typedef glm::i32vec3 vector3I;
 typedef glm::vec2 vector2F;
 typedef glm::vec3 vector3F;
 typedef glm::quat quaternionF;
+typedef glm::vec4 vector4F;
 
 typedef glm::f64vec2 vector2D;
 typedef glm::f64vec3 vector3D;

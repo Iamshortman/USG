@@ -19,8 +19,9 @@ Client::Client()
 	//this->renderingManager = new RenderingManager(this->window);
 	this->rendering_engine = new RenderingEngine();
 	this->rendering_engine->setBufferSize(this->window->getWindowSize());
-
 	this->setGameState(new GameState_Singleplayer());
+
+	this->window->setVsync(0);
 }
 
 Client::~Client()

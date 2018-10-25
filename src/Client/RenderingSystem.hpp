@@ -25,6 +25,7 @@ RenderingSystem::~RenderingSystem()
 
 #include "Client/Client.hpp"
 #include "Common/Rendering/Model.hpp"
+#include "Common/Rendering/InstancedModel.hpp"
 #include "Common/Transforms.hpp"
 
 inline void RenderingSystem::update(EntityManager& es, EventManager& events, TimeDelta delta_time)
@@ -41,6 +42,25 @@ inline void RenderingSystem::update(EntityManager& es, EventManager& events, Tim
 			Client::instance->rendering_engine->addModel(model.get(), global_transform);
 		}
 	}
+
+	static bool some = true;
+	if (some)
+	{
+		ComponentHandle<InstancedModel> instanced_model_pattern;
+		for (Entity entity : es.entities_with_components(instanced_model_pattern))
+		{
+			WorldId world_id = Transforms::getWorldId(entity);
+			if (world_id != INVALID_WORLD)
+			{
+				ComponentHandle<InstancedModel> model = entity.component<InstancedModel>();
+				//Transform global_transform = Transforms::getGlobalTransform(entity);
+
+				Client::instance->rendering_engine->addInstancedModel(Transform());
+			}
+		}
+		some = false;
+	}
+
 
 	ComponentHandle<Camera> camera_pattern;
 	for (Entity entity : es.entities_with_components(camera_pattern))

@@ -11,6 +11,8 @@
 #include "Client/Rendering/Skybox.hpp"
 
 #include "Common/Resource/Mesh.hpp"
+#include "Client/Resource/TexturedMeshInstanced.hpp"
+
 #include "Common/GLM_Include.hpp"
 
 #include "Common/Transform.hpp"
@@ -33,6 +35,8 @@ public:
 	void render(GLuint render_target, Camera* camera, Transform& camera_transform);
 
 	void addModel(Model* model, Transform global_transform);
+	void addInstancedModel(Transform global_transform);
+
 	void addDirectionalLight(DirectionalLight* directional);
 	void addPointLight(PointLight* point, Transform global_transform);
 	void addSpotLight(SpotLight* spot, Transform global_transform);
@@ -43,8 +47,13 @@ public:
 	void clearScene();
 
 private:
+	TexturedMeshInstanced* instanced_mesh;
+	ShaderProgram* instanced_program;
+
 	void RenderModel(Mesh* mesh, GLuint& texture, ShaderProgram* program, Transform& transform, Camera* camera, Transform& camera_transform, vector2I& screen_size);
 	void RenderModelShadow(Mesh* mesh, ShaderProgram* program, Transform& transform, vector3D& camera_position, matrix4& light_space_matrix);
+
+	void RenderInstancedModels(TexturedMeshInstanced* mesh, GLuint& texture, ShaderProgram* program, vector<Transform> transforms, Camera* camera, Transform& camera_transform, vector2I& screen_size);
 
 	void generateGBuffer(G_Buffer* g_buffer, Camera* camera, Transform& camera_transform);
 	void drawAmbient(GLuint render_target, G_Buffer* g_buffer, Camera* camera, Transform& camera_transform);
@@ -57,7 +66,7 @@ private:
 	ShadowMap* shadow_map = nullptr;
 
 	std::vector<std::pair<Model*, Transform>> models;
-	//std::vector<std::pair<Model*, Transform>> transparent_models;
+	std::vector<Transform> instanced_models;
 
 	std::vector<DirectionalLight*> directional_lights;
 	std::vector<DirectionalLight*> directional_lights_shadow;
@@ -80,7 +89,6 @@ private:
 
 	ShaderProgram* deferred_light_directional_shadow = nullptr;
 	ShaderProgram* deferred_light_spot_shadow = nullptr;
-
 
 	//Render Settings
 	bool use_lighting = true;

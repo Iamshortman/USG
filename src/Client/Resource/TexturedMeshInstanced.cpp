@@ -1,39 +1,44 @@
-#include "Client/Resource/TexturedMesh.hpp"
+#include "TexturedMeshInstanced.hpp"
 
 #include "Client/Rendering/ShaderProgram.hpp"
 #include "Common/Resource/Assimp_Include.hpp"
 #include "Common/Logger/Logger.hpp"
 
-TexturedMesh::TexturedMesh(std::vector<TexturedVertex>& vertices, std::vector<unsigned int>& indices)
+TexturedMeshInstanced::TexturedMeshInstanced(std::vector<TexturedVertex>& vertices, std::vector<unsigned int>& indices)
+	: TexturedMesh(vertices, indices)
 {
-	size = (int)indices.size();
 
-	//GenBuffers
-	glGenBuffers(1, &vbo);
-	glGenBuffers(1, &ibo);
-
-	//Adds the data to the buffer
-	glBindBuffer(GL_ARRAY_BUFFER, vbo);
-	glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(TexturedVertex), &vertices[0], GL_STATIC_DRAW);
-
-	//Adds the indices to the buffer.
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, size * sizeof(unsigned int), &indices[0], GL_STATIC_DRAW);
 }
 
-TexturedMesh::~TexturedMesh()
+TexturedMeshInstanced::~TexturedMeshInstanced()
 {
-	glDeleteBuffers(1, &vbo);
-	glDeleteBuffers(1, &ibo);
+	
 }
 
-void TexturedMesh::draw(ShaderProgram* program)
+void TexturedMeshInstanced::draw(std::vector<matrix4> model_matrices)
 {
-	if (size == 0)
-	{
-		return;
-	}
+	GLuint matrices_buffer;
+	glGenBuffers(1, &matrices_buffer);
+	glBindBuffer(GL_ARRAY_BUFFER, matrices_buffer);
+	glBufferData(GL_ARRAY_BUFFER, model_matrices.size() * sizeof(glm::mat4), &model_matrices[0], GL_STATIC_DRAW);
 
+	//Enable Attributes
+	glEnableVertexAttribArray(3); //ModelMatrix1
+	glEnableVertexAttribArray(4); //ModelMatrix2
+	glEnableVertexAttribArray(5); //ModelMatrix3
+	glEnableVertexAttribArray(6); //ModelMatrix4
+	glVertexAttribPointer(3, 4, GL_FLOAT, GL_FALSE, 4 * sizeof(vector4F), (void*)0);
+	glEnableVertexAttribArray(4);
+	glVertexAttribPointer(4, 4, GL_FLOAT, GL_FALSE, 4 * sizeof(vector4F), (void*)(sizeof(vector4F)));
+	glEnableVertexAttribArray(5);
+	glVertexAttribPointer(5, 4, GL_FLOAT, GL_FALSE, 4 * sizeof(vector4F), (void*)(2 * sizeof(vector4F)));
+	glEnableVertexAttribArray(6);
+	glVertexAttribPointer(6, 4, GL_FLOAT, GL_FALSE, 4 * sizeof(vector4F), (void*)(3 * sizeof(vector4F)));
+	glVertexAttribDivisor(3, 1);
+	glVertexAttribDivisor(4, 1);
+	glVertexAttribDivisor(5, 1);
+	glVertexAttribDivisor(6, 1);
+	
 	//Enable Attributes
 	glEnableVertexAttribArray(0); //Position
 	glEnableVertexAttribArray(1); //Normal
@@ -50,7 +55,7 @@ void TexturedMesh::draw(ShaderProgram* program)
 		GL_FALSE,           // normalized?
 		sizeof(TexturedVertex),     // stride
 		(void*)0            // array buffer offset
-		);
+	);
 
 	//Normal
 	glVertexAttribPointer(
@@ -60,7 +65,7 @@ void TexturedMesh::draw(ShaderProgram* program)
 		GL_TRUE,           // normalized?
 		sizeof(TexturedVertex),     // stride
 		(void*)offsetof(TexturedVertex, normal) // array buffer offset
-		);
+	);
 
 	//UV
 	glVertexAttribPointer(
@@ -70,21 +75,27 @@ void TexturedMesh::draw(ShaderProgram* program)
 		GL_FALSE,           // normalized?
 		sizeof(TexturedVertex),     // stride
 		(void*)offsetof(TexturedVertex, uv) // array buffer offset
-		);
+	);
 
 	//Draw the mesh
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
-	glDrawElements(GL_TRIANGLES, size, GL_UNSIGNED_INT, 0);
+	glDrawElementsInstanced(GL_TRIANGLES, size, GL_UNSIGNED_INT, 0, model_matrices.size());
 
 	//Disable Attributes
 	glDisableVertexAttribArray(0);
 	glDisableVertexAttribArray(1);
 	glDisableVertexAttribArray(2);
+	glDisableVertexAttribArray(3);
+	glDisableVertexAttribArray(4);
+	glDisableVertexAttribArray(5);
+	glDisableVertexAttribArray(6);
+
+	glDeleteBuffers(1, &matrices_buffer);
 }
 
-TexturedMesh* TexturedMesh::loadObj(std::string file_name)
+TexturedMeshInstanced* TexturedMeshInstanced::loadObj(std::string file_name)
 {
-	TexturedMesh* texture_mesh = nullptr;
+	TexturedMeshInstanced* texture_mesh = nullptr;
 
 	Assimp::Importer import;
 	const aiScene *scene = import.ReadFile(file_name, aiProcess_Triangulate | aiProcess_FlipUVs);
@@ -108,7 +119,6 @@ TexturedMesh* TexturedMesh::loadObj(std::string file_name)
 			{
 				TexturedVertex vertex;
 
-				//Need to swap Y and Z while loading
 				vertex.pos.x = mesh->mVertices[i].x;
 				vertex.pos.y = mesh->mVertices[i].y;
 				vertex.pos.z = mesh->mVertices[i].z;
@@ -130,7 +140,7 @@ TexturedMesh* TexturedMesh::loadObj(std::string file_name)
 				vertices.push_back(vertex);
 			}
 
-			unsigned int indicesOffset = (unsigned int) indices.size();
+			unsigned int indicesOffset = (unsigned int)indices.size();
 
 			for (unsigned int i = 0; i < mesh->mNumFaces; i++)
 			{
@@ -140,7 +150,7 @@ TexturedMesh* TexturedMesh::loadObj(std::string file_name)
 			}
 		}
 
-		texture_mesh = new TexturedMesh(vertices, indices);
+		texture_mesh = new TexturedMeshInstanced(vertices, indices);
 	}
 
 	import.FreeScene();

@@ -4,29 +4,16 @@
 #include "Common/Transform.hpp"
 #include "Common/Types.hpp"
 
-class Model
+class InstancedModel
 {
 public:
-	Model(string mesh, string texture, string ambient_shader, string shadow_shader);
-	virtual ~Model();
+	InstancedModel(string instanced_model_name);
+	virtual ~InstancedModel();
 
-	string getMesh() const { return this->mesh_file_path; };
-	string getTexture() const { return this->texture_name; };
-
-	string getAmbientShader() const { return this->ambient_shader_name; };
-	string getShadowShader() const { return this->shadow_shader_name; };
-
-	void setCastShadows(bool cast_shadow) { this->cast_shadows = cast_shadow; };
-	bool castShadows() const { return this->cast_shadows; };
+	string getInstancedModel() const { return this->instanced_model_name; };
 
 protected:
-	bool cast_shadows = true;
-
-	string mesh_file_path;
-	string texture_name;
-
-	string ambient_shader_name;
-	string shadow_shader_name;
+	string instanced_model_name;
 };
 
 #endif //INSTANCED_MODEL_HPP

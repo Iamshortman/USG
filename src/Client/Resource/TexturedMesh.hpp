@@ -1,5 +1,5 @@
-#ifndef TEXTUREDMESH_HPP
-#define TEXTUREDMESH_HPP
+#ifndef TEXTURED_MESH_HPP
+#define TEXTURED_MESH_HPP
 
 #include "Client/Rendering/OpenGL_Include.hpp"
 #include "Common/GLM_Include.hpp"
@@ -21,13 +21,13 @@ public:
 
 	virtual void draw(ShaderProgram* program);
 
-	static TexturedMesh* loadObj(std::string filename);
+	static TexturedMesh* loadObj(std::string file_name);
 
-private:
+protected:
 	GLuint vbo;
 	GLuint ibo;
 
 	int size;
 };
 
-#endif //TEXTUREDMESH_HPP
+#endif //TEXTURED_MESH_HPP

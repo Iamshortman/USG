@@ -48,6 +48,9 @@ RenderingEngine::RenderingEngine()
 	this->deferred_light_spot_shadow = new ShaderProgram("res/shaders/Deferred.vs", "res/shaders/Deferred_Light_Spot_Shadow.fs");
 
 	this->shadow_map = new ShadowMap(vector2I(2048));
+
+	this->instanced_mesh = TexturedMeshInstanced::loadObj("res/models/bullet.obj");
+	this->instanced_program = new ShaderProgram("res/shaders/Textured_Instanced.vs", "res/shaders/Textured_Instanced.fs");
 }
 
 RenderingEngine::~RenderingEngine()
@@ -131,6 +134,11 @@ void RenderingEngine::addModel(Model* model, Transform global_transform)
 	this->models.push_back({model, global_transform});
 }
 
+void RenderingEngine::addInstancedModel(Transform global_transform)
+{
+	this->instanced_models.push_back(global_transform);
+}
+
 void RenderingEngine::addDirectionalLight(DirectionalLight* directional)
 {
 	/*if (directional->getCastsShadows())
@@ -173,6 +181,8 @@ void RenderingEngine::setAmbientLight(vector3F ambient_light)
 void RenderingEngine::clearScene()
 {
 	this->models.clear();
+	//this->instanced_models.clear();
+
 
 	this->directional_lights.clear();
 	this->point_lights.clear();
@@ -183,16 +193,15 @@ void RenderingEngine::clearScene()
 
 void RenderingEngine::RenderModel(Mesh* mesh, GLuint& texture, ShaderProgram* program, Transform& transform, Camera* camera, Transform& camera_transform, vector2I& screen_size)
 {
-	matrix4 modelMatrix = transform.getModleMatrix(camera_transform.getPosition());
-	matrix4 mvp = camera->getProjectionMatrix(screen_size.x, screen_size.y) * camera_transform.getOriginViewMatrix() * modelMatrix;
+	matrix4 model_matrix = transform.getModleMatrix(camera_transform.getPosition());
+	matrix4 mvp = camera->getProjectionMatrix(screen_size.x, screen_size.y) * camera_transform.getOriginViewMatrix() * model_matrix;
 
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, texture);
 
 	program->setActiveProgram();
 	program->setUniform("MVP", mvp);
-	program->setUniform("modelMatrix", modelMatrix);
-	program->setUniform("normalMatrix", transform.getNormalMatrix());
+	program->setUniform("model_matrix", model_matrix);
 
 	mesh->draw(program);
 
@@ -202,10 +211,32 @@ void RenderingEngine::RenderModel(Mesh* mesh, GLuint& texture, ShaderProgram* pr
 void RenderingEngine::RenderModelShadow(Mesh* mesh, ShaderProgram* program, Transform& transform, vector3D& camera_position, matrix4& light_space_matrix)
 {
 	program->setActiveProgram();
-	program->setUniform("LightMatrix", light_space_matrix);
-	program->setUniform("ModelMatrix", transform.getModleMatrix(camera_position));
+	program->setUniform("light_matrix", light_space_matrix);
+	program->setUniform("model_matrix", transform.getModleMatrix(camera_position));
 
 	mesh->draw(program);
+
+	program->deactivateProgram();
+}
+
+void RenderingEngine::RenderInstancedModels(TexturedMeshInstanced* mesh, GLuint& texture, ShaderProgram* program, vector<Transform> transforms, Camera* camera, Transform& camera_transform, vector2I& screen_size)
+{
+	vector<matrix4> model_matrices;
+	model_matrices.resize(transforms.size());
+	for (int i = 0; i < transforms.size(); i++)
+	{
+		model_matrices[i] = transforms[i].getModleMatrix(camera_transform.getPosition()); //Taking too Long!!!!!! Way too long
+	}
+
+	matrix4 view_projection = camera->getProjectionMatrix(screen_size.x, screen_size.y) * camera_transform.getOriginViewMatrix();
+
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, texture);
+
+	program->setActiveProgram();
+	program->setUniform("view_proejction_matrix", view_projection);
+
+	mesh->draw(model_matrices);
 
 	program->deactivateProgram();
 }
@@ -237,6 +268,12 @@ void RenderingEngine::generateGBuffer(G_Buffer* g_buffer, Camera* camera, Transf
 		ShaderProgram* program = ShaderPool::getInstance()->get(this->models[i].first->getAmbientShader());
 
 		this->RenderModel(mesh, texture, program, this->models[i].second, camera, camera_transform, g_buffer_size);
+	}
+
+	if (!this->instanced_models.empty())
+	{
+		GLuint texture = TexturePool::getInstance()->get("res/textures/Red.png");
+		this->RenderInstancedModels(this->instanced_mesh, texture, this->instanced_program, this->instanced_models, camera, camera_transform, g_buffer_size);
 	}
 }
 
