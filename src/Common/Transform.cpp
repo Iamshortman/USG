@@ -72,22 +72,14 @@
 		this->setOrientation(getOrientation());
 	}
 
-	matrix4 Transform::getModleMatrix() const
+	matrix4 Transform::getModelMatrix(vector3D cameraPos)
 	{
-		return glm::translate(matrix4(1.0F), (vector3F)this->position) * glm::toMat4((quaternionF)this->orientation);
-	}
+		matrix4 model_matrix = glm::toMat4((quaternionF)this->orientation);
 
-	matrix4 Transform::getModleMatrix(vector3D cameraPos, double divisorPosScale) const
-	{
-		matrix4 positionMatrix = matrix4();
-		matrix4 rotationMatrix = matrix4();
-		matrix4 scaleMatrix = matrix4();
+		vector4F render_postion = vector4F((vector3F)((this->position - cameraPos)), 1.0f);
+		model_matrix[3] = render_postion;
 
-		positionMatrix = glm::translate(matrix4(1.0F), (vector3F)((this->position - cameraPos) / divisorPosScale));
-		rotationMatrix = glm::toMat4((quaternionF)this->orientation);
-		scaleMatrix = glm::scale(matrix4(1.0F), vector3F((float)(1.0 / divisorPosScale)));
-
-		return positionMatrix * rotationMatrix * scaleMatrix;
+		return model_matrix;
 	}
 
 	matrix4 Transform::getViewMatrix(vector3D cameraPos) const

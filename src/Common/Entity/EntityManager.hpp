@@ -6,7 +6,6 @@
 #include <unordered_map>
 #include <algorithm>
 #include "Common/Entity/Entity.hpp"
-#include "Common/Entity/NodeEntity.hpp"
 #include "Common/Types.hpp"
 
 class EntityManager
@@ -17,7 +16,6 @@ public:
 	void update();
 
 	Entity* createEntity();
-	NodeEntity* createNodeEntity();
 	Entity* getEntity(EntityId id);
 	void destroyEntity(EntityId id);
 

@@ -1,7 +1,6 @@
 #ifndef CLIENT_HPP
 #define CLIENT_HPP
 
-#include "Client/Rendering/RenderingManager.hpp"
 #include "Client/Rendering/Window.hpp"
 
 #include "Client/GameState/GameState.hpp"
@@ -23,7 +22,6 @@ public:
 	GameState* getGameState() { return this->currentState; };
 
 	Window* window;
-	RenderingManager* renderingManager;
 
 private:
 	bool shouldClose = false;

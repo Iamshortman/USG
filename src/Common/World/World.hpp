@@ -9,7 +9,6 @@ class World;
 #include <algorithm>
 
 #include "Common/Entity/Entity.hpp"
-#include "Common/Physics/PhysicsWorld.hpp"
 
 typedef uint32_t WorldId;
 
@@ -26,16 +25,7 @@ public:
 
 	void addEntityToWorld(Entity* entity);
 	void removeEntityFromWorld(Entity* entity);
-	vector<Entity*>& getEntitiesInWorld();
-
-	void addRigidBody(RigidBody* rigidBody);
-	void removeRigidBody(RigidBody* entity);
-
-	vector3D getGravity();
-	void setGravity(vector3D gravity);
-
-	SingleRayTestResult singleRayTest(vector3D startPos, vector3D endPos);
-	SingleRayTestResult singleRayTestNotMe(vector3D startPos, vector3D endPos, Entity* me);
+	std::vector<Entity*>& getEntitiesInWorld() { return this->entitiesInWorld; };
 
 	void setParent(Entity* entity);
 	Entity* getParent();
@@ -46,13 +36,10 @@ public:
 	Transform getWorldOffset();
 
 protected:
-	PhysicsWorld* physicsWorld = nullptr;
-
 	Entity* parent = nullptr;
 	World* parentWorld = nullptr;
 
-	//std::set<Entity*> entitiesInWorld;
-	vector<Entity*> entitiesInWorld;
+	std::vector<Entity*> entitiesInWorld;
 };
 
 #endif //WORLD_HPP

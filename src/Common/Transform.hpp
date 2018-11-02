@@ -26,8 +26,7 @@ public:
 	Transform transformBy(const Transform&  transform1) const;
 	Transform untransformBy(const Transform & transform1) const;
 
-	matrix4 getModleMatrix() const;
-	matrix4 getModleMatrix(vector3D cameraPos, double divisorPosScale = 1.0) const;
+	matrix4 getModelMatrix(vector3D cameraPos);
 	matrix4 getViewMatrix(vector3D cameraPos) const;
 	matrix4 getOriginViewMatrix() const;
 	matrix3 getNormalMatrix() const;

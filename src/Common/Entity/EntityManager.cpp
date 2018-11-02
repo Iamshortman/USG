@@ -1,11 +1,6 @@
 #include "Common/Entity/EntityManager.hpp"
 
 #include "Common/Rendering/Model.hpp"
-#include "Common/Physics/RigidBody.hpp"
-#include "Common/Component/ComponentShipFlight.hpp"
-
-#include "jsoncons/json.hpp"
-using jsoncons::json;
 
 EntityManager* EntityManager::instance = nullptr;
 
@@ -59,15 +54,6 @@ Entity* EntityManager::createEntity()
 	EntityId entity_id = this->getNextId();
 
 	Entity* game_object = new Entity(entity_id);
-	this->game_objects[entity_id] = game_object;
-	return game_object;
-}
-
-NodeEntity* EntityManager::createNodeEntity()
-{
-	EntityId entity_id = this->getNextId();
-
-	NodeEntity* game_object = new NodeEntity(entity_id);
 	this->game_objects[entity_id] = game_object;
 	return game_object;
 }

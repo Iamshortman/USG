@@ -1,20 +1,22 @@
 #include "Common/World/World.hpp"
 #include "Common/Entity/EntityManager.hpp"
 
+#include <algorithm>
+
 World::World(WorldId id)
 :worldId(id)
 {
-	physicsWorld = new PhysicsWorld();
+
 }
 
 World::~World()
 {
-	delete physicsWorld;
+
 }
 
 void World::update(double deltaTime)
 {
-	physicsWorld->update(deltaTime);
+
 	
 	/*for (Entity* entity : this->entitiesInWorld)
 	{
@@ -49,10 +51,6 @@ void World::update(double deltaTime)
 
 void World::addEntityToWorld(Entity* entity)
 {
-	/*if (entitiesInWorld.find(entity) == entitiesInWorld.end())
-	{
-		entitiesInWorld.insert(entity);
-	}*/
 	auto it = find(this->entitiesInWorld.begin(), this->entitiesInWorld.end(), entity);
 	if (it == this->entitiesInWorld.end())
 	{
@@ -80,41 +78,6 @@ void World::removeEntityFromWorld(Entity* entity)
 			return;
 		}
 	}
-}
-
-vector<Entity*>& World::getEntitiesInWorld()
-{
-	return this->entitiesInWorld;
-}
-
-void  World::addRigidBody(RigidBody* rigidBody)
-{
-	this->physicsWorld->addRigidBody(rigidBody);
-}
-
-void  World::removeRigidBody(RigidBody* rigidBody)
-{
-	this->physicsWorld->removeRigidBody(rigidBody);
-}
-
-vector3D World::getGravity()
-{
-	return toVec3(this->physicsWorld->dynamicsWorld->getGravity());
-}
-
-void World::setGravity(vector3D gravity)
-{
-	this->physicsWorld->dynamicsWorld->setGravity(toBtVec3(gravity));
-}
-
-SingleRayTestResult World::singleRayTest(vector3D startPos, vector3D endPos)
-{
-	return this->physicsWorld->singleRayTest(startPos, endPos);
-}
-
-SingleRayTestResult World::singleRayTestNotMe(vector3D startPos, vector3D endPos, Entity* me)
-{
-	return this->physicsWorld->singleRayTestNotMe(startPos, endPos, me);
 }
 
 void World::setParent(Entity* entity)

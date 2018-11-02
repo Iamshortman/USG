@@ -6,11 +6,40 @@
 
 #include "Common/Logger/Logger.hpp"
 
+#include "Common/GLM_Include.hpp"
+
+#include "tbb/tbb.h"
+#include "tbb/parallel_for.h"
+#include "tbb/blocked_range.h"
+
+const int number_of_transforms = 10000;
+Transform transforms[number_of_transforms] = { Transform() };
+matrix4 matrices[number_of_transforms];
+
 int main()
 {
 	Logger::getInstance()->openLogFile("Log.txt");
 
 	SDL_Init(SDL_INIT_EVERYTHING);
+	Logger::getInstance()->log("Platform: %s\n", SDL_GetPlatform());
+	Logger::getInstance()->log("CPU Cores: %d\n", SDL_GetCPUCount());
+	Logger::getInstance()->log("Memory: %d MB\n", SDL_GetSystemRAM());
+
+
+	tbb::task_scheduler_init task_schedular(tbb::task_scheduler_init::automatic);
+	
+	vector3D eye_pos = vector3D(1.0, 2.0, 3.0);
+
+	Uint32 start = SDL_GetTicks();
+	tbb::parallel_for(0, number_of_transforms, [=](size_t i)
+		{
+			matrices[i] = transforms[i].getModelMatrix(eye_pos);
+		}
+	);
+	Uint32 end = SDL_GetTicks();
+	Logger::getInstance()->log("Took %dms to process %d items\n", end - start, number_of_transforms);
+
+
 
 	Client* game = new Client();
 
@@ -42,6 +71,12 @@ int main()
 		deltaTime = ((double)delta) / 1000.0;
 
 		game->update(deltaTime);
+		tbb::parallel_for(0, number_of_transforms, [=](size_t i)
+		{
+			matrices[i] = transforms[i].getModelMatrix(eye_pos);
+		}
+		);
+		game->window->updateBuffer();
 	}
 
 	delete game;

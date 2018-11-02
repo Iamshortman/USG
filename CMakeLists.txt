@@ -23,9 +23,11 @@ source_group("Server_Headers" FILES ${SERVER_HEADERS})
 #libs part 1
 link_directories(lib/SDL2-2.0.4/lib/x64/)
 link_directories(lib/glew-1.12.0/lib/Release/x64/)
-link_directories(lib/bullet3-2.86.1/build/lib/Debug/)
 link_directories(lib/assimp-3.3.1/build/code/Debug/)
 link_directories(lib/assimp-3.3.1/build/contrib/zlib/Debug/)
+
+link_directories(lib/TBB/lib/intel64/vc14)
+
 
 #Create Projects
 add_executable(Client ${CLIENT_SOURCES} ${CLIENT_HEADERS} ${COMMON_SOURCES} ${COMMON_HEADERS})
@@ -38,21 +40,6 @@ target_compile_definitions(Server PUBLIC SERVER)
 
 #GLM
 include_directories(lib/glm/)
-
-#jsoncons
-include_directories(lib/jsoncons-0.104.0/include)
-
-#Bullet
-include_directories(lib/bullet3-2.86.1/src/)
-target_link_libraries  (Client BulletCollision_Debug)
-
-target_link_libraries  (Client BulletDynamics_Debug)
-target_link_libraries  (Client LinearMath_Debug)
-target_link_libraries  (Server BulletCollision_Debug)
-target_link_libraries  (Server BulletDynamics_Debug)
-target_link_libraries  (Server LinearMath_Debug)
-target_compile_definitions(Client PUBLIC BT_USE_DOUBLE_PRECISION)
-target_compile_definitions(Server PUBLIC BT_USE_DOUBLE_PRECISION)
 
 #OPENGL
 target_link_libraries (Client opengl32)
@@ -70,6 +57,12 @@ target_link_libraries (Client glew32)
 include_directories(lib/assimp-3.3.1/include/)
 target_link_libraries (Client zlibstaticd)
 target_link_libraries (Server zlibstaticd)
+
+#Intel TBB
+include_directories(lib/TBB/include/)
+include_directories(lib/TBB_PSTL/include/)
+target_link_libraries (Client tbb_debug)
+target_link_libraries (Server tbb_debug)
 
 target_link_libraries (Server assimp-vc140-mt)
 target_link_libraries (Client assimp-vc140-mt)
