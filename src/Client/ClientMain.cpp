@@ -41,6 +41,11 @@ int main()
 
 		deltaTime = ((double)delta) / 1000.0;
 
+		if (deltaTime == 0)
+		{
+			deltaTime = 1.0 / 60.0;
+		}
+
 		game->update(deltaTime);
 	}
 

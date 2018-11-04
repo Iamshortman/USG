@@ -9,6 +9,8 @@
 
 #include "Client/PlayerController.hpp"
 
+#include "Common/AI/QuaternionPidController.hpp"
+
 class GameState_Singleplayer : public GameState
 {
 public:
@@ -21,9 +23,11 @@ protected:
 
 	World* world = nullptr;
 
-	NodeEntity* character = nullptr;
+	Entity* character = nullptr;
 	NodeEntity* ship = nullptr;
+	
 	NodeEntity* ai_ship = nullptr;
+	QuaternionPidController* pid = nullptr;
 };
 
 #endif //GAMESTATE_SINGLEPLAYER_HPP

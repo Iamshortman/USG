@@ -172,7 +172,7 @@ void CharacterController::doRotation(double delta_time)
 	this->parent_entity->setLocalTransform(transform);
 }
 
-double clamp(double value, double min, double max)
+double clamp_value(double value, double min, double max)
 {
 	if (value < min)
 	{
@@ -195,7 +195,7 @@ void CharacterController::doHeadRotation(double delta_time)
 		Transform head_transform = this->head_node->getLocalTransform();
 
 		this->head_rotation += turn_speed * this->angular_input.x * (M_PI * 2.0) * delta_time;
-		this->head_rotation = clamp(this->head_rotation, -(M_PI / 2.0), (M_PI / 2.0));
+		this->head_rotation = clamp_value(this->head_rotation, -(M_PI / 2.0), (M_PI / 2.0));
 
 		head_transform.setOrientation(glm::angleAxis(this->head_rotation, head_transform.getLeft()));
 		this->head_node->setLocalTransform(head_transform);

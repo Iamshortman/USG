@@ -73,45 +73,12 @@ GameState_Singleplayer::GameState_Singleplayer()
 {
 	this->world = WorldManager::getInstance()->createWorld();
 
-	if (false)
-	{
-		NodeEntity* big_ship = build_big_ship();
-		big_ship->addToWorld(this->world);
-		big_ship->setLocalTransform(Transform(vector3D(0.0, 0.0, 50.0), quaternionD(0.793353, 0.0, -0.608761, 0.0)));
-		//big_ship->addComponent<ShipFlightController>();
-
-		this->character = EntityManager::getInstance()->createNodeEntity();
-		this->character->addToWorld(big_ship->getSubWorld());
-		this->character->addRigidBody();
-		this->character->getRigidBody()->getRigidBody()->forceActivationState(DISABLE_DEACTIVATION);
-		this->character->addComponent<CharacterController>();
-		this->character->setLocalTransform(Transform(vector3D(0.0, 0.0, 10.0)));
-		Node* body = new Node();
-		this->character->addChild(body);
-		body->addNodeComponent<Model>("res/models/capsule.obj", "res/textures/Purple.png", "res/shaders/Textured", "res/shaders/Shadow");
-		body->addNodeComponent<Mass>(200.0);
-		body->addNodeComponent<CollisionShape>(CollisionShapeType::Capsule, vector2D(0.25, 1.0));
-		Node* head = new Node();
-		this->character->addChild(head);
-		this->character->getComponent<CharacterController>()->setHead(head);
-		head->setLocalTransform(vector3D(0.0, 0.5, 0.0));
-		this->character->active_camera = head->addNodeComponent<Camera>();
-		this->character->getRigidBody()->setInertiaTensor(vector3D(0.0));
-
-		NodeEntity* json_entity = (NodeEntity*)EntityConstructor::buildEntityFromJson("res/json/Ship.json");
-		json_entity->addToWorld(big_ship->getSubWorld());
-		json_entity->setLocalTransform(Transform(vector3D(0.0, 0.0, 20.0)));
-
-		Entity* entity = EntityManager::getInstance()->createEntity();
-		entity->setLocalTransform(Transform(vector3D(0.0, 5.0, 20.0), quaternionD(0.707107, 0.707107, 0.0, 0.0)));
-		entity->addNodeComponent<SpotLight>(vector3F(0.0, 0.0, 1.0), 0.5f, 1000.0f, vector3F(0.0f, 0.01f, 0.0f), vector3F(1.0f), 0.1f)->setCastsShadows(true);
-		entity->addToWorld(big_ship->getSubWorld());
-	}
-
 	ai_ship = (NodeEntity*)EntityConstructor::buildEntityFromJson("res/json/Ship.json");
 	ai_ship->addToWorld(this->world);
 	ai_ship->setLocalTransform(Transform(vector3D(0.0, 0.0, 0.0)));
-	
+	pid = new QuaternionPidController(M_PI / 8.0, 0.0, 10.0, -1.0, 1.0, 1.0);
+	ai_ship->getRigidBody()->setAngularVelocity(vector3D(0.0, 0.6, 0.0));
+
 	this->ship = (NodeEntity*)EntityConstructor::buildEntityFromJson("res/json/Ship.json");
 	this->ship->addToWorld(this->world);
 	this->ship->setLocalTransform(Transform(vector3D(0.0, 0.0, -50.0)));
@@ -122,23 +89,33 @@ GameState_Singleplayer::GameState_Singleplayer()
 	head->setLocalTransform(vector3D(0.0, 1.1, -2.0));
 
 
-	Entity* debug = EntityManager::getInstance()->createEntity();
-	debug->active_camera = debug->addNodeComponent<Camera>();
-	debug->addComponent<DebugCamera>(5.0, 0.5);
-	debug->addToWorld(this->world);
-	debug->setLocalTransform(Transform(vector3D(5.0, 0.0, 0.0), quaternionD(0.0, 0.0, 1.0, 0.0)));
+	character = EntityManager::getInstance()->createEntity();
+	character->active_camera = character->addNodeComponent<Camera>();
+	character->addComponent<DebugCamera>(5.0, 0.5);
+	character->addToWorld(this->world);
+	character->setLocalTransform(Transform(vector3D(5.0, 0.0, 0.0), quaternionD(0.0, 0.0, 1.0, 0.0)));
 
-	this->player_controller.setPlayerEntity(ship);
+	this->player_controller.setPlayerEntity(character);
+
+	int count = 100;
+	double step = (M_PI * 2.0) / count;
+	for (int i = 0; i < count; i++)
+	{
+		quaternionD quat = glm::angleAxis(((double) i) * step, vector3D(0.0, -1.0, 0.0));
+		vector3D vec = glm::eulerAngles(quat);
+		printf("Angle: %lf Euler: %lf\n", ((double)i) * step, glm::yaw(quat));
+	}
 }
 
 GameState_Singleplayer::~GameState_Singleplayer()
 {
 	WorldManager::getInstance()->destroyWorld(this->world->worldId);
+	delete pid;
 }
 
-void rotateTowards(NodeEntity* entity, Transform target, double delta_time)
+void rotateTowards(NodeEntity* entity, QuaternionPidController* pid, Transform target, double delta_time)
 {
-	const double input = 1.0;
+	/*const double input = 1.0;
 
 	if (entity->hasComponent<ShipFlightController>())
 	{
@@ -208,7 +185,7 @@ void rotateTowards(NodeEntity* entity, Transform target, double delta_time)
 				//Consts
 				double proptional_const = 10.0; //Proptional Constant
 				double intergral_const = 0.0; //Integral Constant
-				double derivative_const = 23.0; //Derivative Constant
+				double derivative_const = 60.0; //Derivative Constant
 				double error = 0.0 - angle;
 
 				//TODO not statics
@@ -236,9 +213,22 @@ void rotateTowards(NodeEntity* entity, Transform target, double delta_time)
 				prev_error = error;
 			}
 
-			controller->angular_input.z = output;
+			controller->angular_input.y = -output;
 		}
 
+	}*/
+
+	Transform transform = entity->getWorldTransform();
+	quaternionD current_orientation = transform.getOrientation();
+	quaternionD desired_orientation = glm::quatLookAt(glm::normalize(transform.position - target.position), transform.getUp());
+
+	vector3D input = pid->calculate(current_orientation, desired_orientation, delta_time);
+	if (entity->hasComponent<ShipFlightController>() && false)
+	{
+		ShipFlightController* controller = entity->getComponent<ShipFlightController>();
+		controller->angular_input = input;
+		controller->angular_input.x = 0.0;
+		controller->angular_input.z = 0.0;
 	}
 }
 
@@ -247,7 +237,7 @@ void GameState_Singleplayer::update(Client* client, double delta_time)
 	this->player_controller.applyUserInput(delta_time);
 
 	//AI: AIM AT TARGET
-	//rotateTowards(this->ai_ship, this->ship->getWorldTransform(), delta_time);
+	rotateTowards(this->ai_ship, this->pid, this->character->getWorldTransform(), delta_time);
 
 	WorldManager::getInstance()->update(delta_time);
 	EntityManager::getInstance()->update();

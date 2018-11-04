@@ -14,7 +14,23 @@ Client::Client()
 {
 	Client::instance = this;
 
-	this->window = new Window(2560, 1440, "USG");
+	//Adjust resolution for screen size
+	SDL_DisplayMode dm;
+	SDL_GetDesktopDisplayMode(0, &dm);
+	if (dm.w > 1920 && dm.h > 1080)
+	{
+		this->window = new Window(2560, 1440, "USG");
+	}
+	else if (dm.w > 1600 && dm.h > 900)
+	{
+		this->window = new Window(1600, 900, "USG");
+	}
+	else
+	{
+		this->window = new Window(800, 400, "USG");
+	}
+
+
 
 	this->renderingManager = new RenderingManager(this->window);
 
