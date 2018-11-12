@@ -29,10 +29,10 @@ link_directories(lib/assimp-3.3.1/build/contrib/zlib/Debug/)
 
 #Create Projects
 add_executable(Client ${CLIENT_SOURCES} ${CLIENT_HEADERS} ${COMMON_SOURCES} ${COMMON_HEADERS})
-add_executable(Server ${SERVER_SOURCES} ${SERVER_HEADERS} ${COMMON_SOURCES} ${COMMON_HEADERS})
+#add_executable(Server ${SERVER_SOURCES} ${SERVER_HEADERS} ${COMMON_SOURCES} ${COMMON_HEADERS})
 set_target_properties(Client PROPERTIES VS_DEBUGGER_WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}")
 target_compile_definitions(Client PUBLIC CLIENT)
-target_compile_definitions(Server PUBLIC SERVER)
+#target_compile_definitions(Server PUBLIC SERVER)
 
 #libs part 2
 
@@ -48,11 +48,11 @@ target_link_libraries  (Client BulletCollision_Debug)
 
 target_link_libraries  (Client BulletDynamics_Debug)
 target_link_libraries  (Client LinearMath_Debug)
-target_link_libraries  (Server BulletCollision_Debug)
-target_link_libraries  (Server BulletDynamics_Debug)
-target_link_libraries  (Server LinearMath_Debug)
+#target_link_libraries  (Server BulletCollision_Debug)
+#target_link_libraries  (Server BulletDynamics_Debug)
+#target_link_libraries  (Server LinearMath_Debug)
 target_compile_definitions(Client PUBLIC BT_USE_DOUBLE_PRECISION)
-target_compile_definitions(Server PUBLIC BT_USE_DOUBLE_PRECISION)
+#target_compile_definitions(Server PUBLIC BT_USE_DOUBLE_PRECISION)
 
 #OPENGL
 target_link_libraries (Client opengl32)
@@ -69,7 +69,7 @@ target_link_libraries (Client glew32)
 #ASSIMP
 include_directories(lib/assimp-3.3.1/include/)
 target_link_libraries (Client zlibstaticd)
-target_link_libraries (Server zlibstaticd)
+#target_link_libraries (Server zlibstaticd)
 
-target_link_libraries (Server assimp-vc140-mt)
 target_link_libraries (Client assimp-vc140-mt)
+#target_link_libraries (Server assimp-vc140-mt)

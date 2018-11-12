@@ -71,13 +71,14 @@ NodeEntity* build_big_ship()
 
 GameState_Singleplayer::GameState_Singleplayer()
 {
+	this->pid = new QuaternionPidController(16.0, 0.0, 0.0, -1.0, 1.0, 1.0);
+
 	this->world = WorldManager::getInstance()->createWorld();
 
 	ai_ship = (NodeEntity*)EntityConstructor::buildEntityFromJson("res/json/Ship.json");
 	ai_ship->addToWorld(this->world);
 	ai_ship->setLocalTransform(Transform(vector3D(0.0, 0.0, 0.0)));
-	pid = new QuaternionPidController(M_PI / 8.0, 0.0, 10.0, -1.0, 1.0, 1.0);
-	ai_ship->getRigidBody()->setAngularVelocity(vector3D(0.0, 0.6, 0.0));
+	ai_ship->removeComponent<ShipFlightController>();
 
 	this->ship = (NodeEntity*)EntityConstructor::buildEntityFromJson("res/json/Ship.json");
 	this->ship->addToWorld(this->world);
@@ -96,15 +97,6 @@ GameState_Singleplayer::GameState_Singleplayer()
 	character->setLocalTransform(Transform(vector3D(5.0, 0.0, 0.0), quaternionD(0.0, 0.0, 1.0, 0.0)));
 
 	this->player_controller.setPlayerEntity(character);
-
-	int count = 100;
-	double step = (M_PI * 2.0) / count;
-	for (int i = 0; i < count; i++)
-	{
-		quaternionD quat = glm::angleAxis(((double) i) * step, vector3D(0.0, -1.0, 0.0));
-		vector3D vec = glm::eulerAngles(quat);
-		printf("Angle: %lf Euler: %lf\n", ((double)i) * step, glm::yaw(quat));
-	}
 }
 
 GameState_Singleplayer::~GameState_Singleplayer()
@@ -222,14 +214,16 @@ void rotateTowards(NodeEntity* entity, QuaternionPidController* pid, Transform t
 	quaternionD current_orientation = transform.getOrientation();
 	quaternionD desired_orientation = glm::quatLookAt(glm::normalize(transform.position - target.position), transform.getUp());
 
-	vector3D input = pid->calculate(current_orientation, desired_orientation, delta_time);
-	if (entity->hasComponent<ShipFlightController>() && false)
+	RigidBody* rigid_body = entity->getRigidBody();
+	vector3D input = pid->calculate(current_orientation, desired_orientation, rigid_body->getAngularVelocity(), delta_time);
+	rigid_body->applyTorqueImpulse(input);
+	printf("Input: %lf \n", input.y);
+
+	/*if (entity->hasComponent<ShipFlightController>())
 	{
 		ShipFlightController* controller = entity->getComponent<ShipFlightController>();
 		controller->angular_input = input;
-		controller->angular_input.x = 0.0;
-		controller->angular_input.z = 0.0;
-	}
+	}*/
 }
 
 void GameState_Singleplayer::update(Client* client, double delta_time)
