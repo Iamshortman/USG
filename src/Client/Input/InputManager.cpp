@@ -42,13 +42,11 @@ InputManager::InputManager()
 	keyboardMouse->addButton("Debug_RollRight", KeyboardMouseButton(KEYBOARD, SDL_SCANCODE_E));
 
 	keyboardMouse->addButton("Debug_FlightAssist", KeyboardMouseButton(KEYBOARD, SDL_SCANCODE_F));
-
 	keyboardMouse->addButton("Flight_Shoot", KeyboardMouseButton(MOUSE, SDL_BUTTON_LEFT));
-
-
 	keyboardMouse->addButton("Debug_Interact", KeyboardMouseButton(MOUSE, SDL_BUTTON_LEFT));
 
-	keyboardMouse->addButton("Char_Jump", KeyboardMouseButton(KEYBOARD, SDL_SCANCODE_SPACE));
+	keyboardMouse->addButton("Left", KeyboardMouseButton(KEYBOARD, SDL_SCANCODE_LEFT));
+	keyboardMouse->addButton("Right", KeyboardMouseButton(KEYBOARD, SDL_SCANCODE_RIGHT));
 }
 
 InputManager::~InputManager()

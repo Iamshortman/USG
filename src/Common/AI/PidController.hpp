@@ -9,10 +9,9 @@ class PidController
 public:
 	PidController(double proptional, double intergral, double derivative, double min, double max, double i_max);
 
-	double calculate(double error, double delta_time);
+	double calculate(double error, double delta, double delta_time);
 
 	void clear();
-
 
 private:
 	double proptional_const; //Proptional Constant
@@ -23,7 +22,6 @@ private:
 	double intergral_max;
 
 	double intergral_error = 0.0;
-	double prev_error = 0.0;
 };
 
 #endif //PID_CONTROLLER_HPP

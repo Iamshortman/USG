@@ -14,7 +14,6 @@ vector3D QuaternionPidController::calculate(quaternionD current_orientation, qua
 	quaternionD required_rotation = this->RequiredRotation(current_orientation, desired_orientation);
 	//printf("Required: %s\n", glm::to_string(required_rotation).c_str());
 
-
 	quaternionD identity(1.0, 0.0, 0.0, 0.0);
 
 	quaternionD error = this->subtract(identity, required_rotation);
@@ -29,7 +28,7 @@ vector3D QuaternionPidController::calculate(quaternionD current_orientation, qua
 	//printf("delta: %s\n", glm::to_string(delta).c_str());
 
 
-	quaternionD result = calculatePidQuaternion(error, delta_time);
+	quaternionD result = calculatePidQuaternion(error, delta, delta_time);
 	//printf("result: %s\n", glm::to_string(result).c_str());
 
 	matrix4D orthogonalize_matrix;
@@ -50,9 +49,9 @@ vector3D QuaternionPidController::calculate(quaternionD current_orientation, qua
 	orthogonalize_matrix[3][2] = -required_rotation.y * required_rotation.z + required_rotation.x * required_rotation.w + required_rotation.w * -required_rotation.x;
 	orthogonalize_matrix[3][3] = -required_rotation.y * -required_rotation.y + required_rotation.x * required_rotation.x + required_rotation.w * required_rotation.w;
 
-	vector4D vec4 = vector4D(result.x, result.y, result.z, result.w);
+	vector4D vec4 = vector4D(result.w, result.x, result.y, result.z);
 	vec4 = orthogonalize_matrix * vec4;
-	result = quaternionD(vec4.w, vec4.x, vec4.y, vec4.z);
+	result = quaternionD(vec4.x, vec4.y, vec4.z, vec4.w);
 	//printf("result1: %s\n", glm::to_string(result).c_str());
 
 	quaternionD double_negative = result * -2.0;
@@ -64,12 +63,12 @@ vector3D QuaternionPidController::calculate(quaternionD current_orientation, qua
 	return vector3D(result.x, result.y, result.z);
 }
 
-quaternionD QuaternionPidController::calculatePidQuaternion(quaternionD error, double delta_time)
+quaternionD QuaternionPidController::calculatePidQuaternion(quaternionD error, quaternionD delta, double delta_time)
 {
-	double w = this->pid_w.calculate(error.w, delta_time);
-	double x = this->pid_x.calculate(error.x, delta_time);
-	double y = this->pid_y.calculate(error.y, delta_time);
-	double z = this->pid_z.calculate(error.z, delta_time);
+	double w = this->pid_w.calculate(error.w, delta.w, delta_time);
+	double x = this->pid_x.calculate(error.x, delta.x, delta_time);
+	double y = this->pid_y.calculate(error.y, delta.y, delta_time);
+	double z = this->pid_z.calculate(error.z, delta.z, delta_time);
 
 	return quaternionD
 	(
@@ -86,13 +85,13 @@ quaternionD QuaternionPidController::RequiredRotation(quaternionD from, quaterni
 
 	// Flip the sign if w is negative.
 	// This makes sure we always rotate the shortest angle to match the desired rotation.
-	if (required_rotation.w < 0.0f)
+	/*if (required_rotation.w < 0.0f)
 	{
 		required_rotation.x *= -1.0f;
 		required_rotation.y *= -1.0f;
 		required_rotation.z *= -1.0f;
 		required_rotation.w *= -1.0f;
-	}
+	}*/
 
 	return glm::normalize(required_rotation);
 }

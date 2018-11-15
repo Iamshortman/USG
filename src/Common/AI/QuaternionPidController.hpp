@@ -12,7 +12,7 @@ public:
 	vector3D calculate(quaternionD current_orientation, quaternionD desired_orientation, vector3D angular_velocity, double delta_time);
 
 private:
-	quaternionD calculatePidQuaternion(quaternionD error, double delta_time);
+	quaternionD calculatePidQuaternion(quaternionD error, quaternionD delta, double delta_time);
 	quaternionD RequiredRotation(quaternionD from, quaternionD to);
 	quaternionD subtract(quaternionD a, quaternionD b);
 
