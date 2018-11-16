@@ -147,10 +147,6 @@ void ShipFlightController::UpdateAngularVelocity(double delta_time)
 			if (this->angular_input[i] == 0.0)
 			{
 				vector3D direction = transform.getDirection(i);
-				if (i == 2)
-				{
-					direction *= -1.0;
-				}
 
 				double starting_velocity = glm::dot(direction, rigidBody->getAngularVelocity());
 

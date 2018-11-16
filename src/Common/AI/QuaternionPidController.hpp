@@ -13,8 +13,6 @@ public:
 
 private:
 	quaternionD calculatePidQuaternion(quaternionD error, quaternionD delta, double delta_time);
-	quaternionD RequiredRotation(quaternionD from, quaternionD to);
-	quaternionD subtract(quaternionD a, quaternionD b);
 
 	PidController pid_w;
 	PidController pid_x;

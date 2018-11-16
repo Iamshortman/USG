@@ -34,7 +34,7 @@ double PidController::calculate(double error, double delta, double delta_time)
 
 	double output = (this->proptional_const * error) + (this->intergral_const * this->intergral_error) + (this->derivative_const * derivative_error);
 
-	return output;//clamp(output, this->output_max, this->output_min);
+	return clamp(output, this->output_max, this->output_min);
 }
 
 void PidController::clear()

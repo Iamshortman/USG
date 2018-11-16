@@ -71,22 +71,16 @@ NodeEntity* build_big_ship()
 
 GameState_Singleplayer::GameState_Singleplayer()
 {
-	this->pid = new QuaternionPidController(60.0, 0.0, 1.0, -1.0, 1.0, 1.0);
-
-	/*quaternionD start = glm::angleAxis(M_PI, vector3D(0.0, 1.0, 0.0));
-	quaternionD end = glm::angleAxis(0.0, vector3D(0.0, 1.0, 0.0));
-	vector3D angular_velocity = vector3D(0.0);
-
-	vector3D input = this->pid->calculate(end, start, angular_velocity, 1.0/60.0);*/
+	this->pid = new QuaternionPidController(1.0, 0.0, -0.075, -1.0, 1.0, 1.0);
 
 	this->world = WorldManager::getInstance()->createWorld();
 
 	ai_ship = (NodeEntity*)EntityConstructor::buildEntityFromJson("res/json/Ship.json");
-	ai_ship->getRigidBody()->setInertiaTensor(vector3D(100.0));
+	ai_ship->getRigidBody()->setInertiaTensor(vector3D(100000.0));
 
 	ai_ship->addToWorld(this->world);
 	ai_ship->setLocalTransform(Transform(vector3D(0.0, 0.0, 0.0)));
-	ai_ship->removeComponent<ShipFlightController>();
+	//ai_ship->removeComponent<ShipFlightController>();
 
 	this->ship = (NodeEntity*)EntityConstructor::buildEntityFromJson("res/json/Ship.json");
 	this->ship->addToWorld(this->world);
@@ -224,14 +218,13 @@ void rotateTowards(NodeEntity* entity, QuaternionPidController* pid, Transform t
 
 	RigidBody* rigid_body = entity->getRigidBody();
 	vector3D input = pid->calculate(current_orientation, desired_orientation, rigid_body->getAngularVelocity(), delta_time);
-	rigid_body->applyTorqueImpulse(input);
-	//printf("Input: %lf \n", input.y);
+	//rigid_body->applyTorqueImpulse(input);
+	printf("Input: %s\n", glm::to_string(input).c_str());
 
-	/*if (entity->hasComponent<ShipFlightController>())
+	if (entity->hasComponent<ShipFlightController>())
 	{
-		ShipFlightController* controller = entity->getComponent<ShipFlightController>();
-		controller->angular_input = input;
-	}*/
+		entity->getComponent<ShipFlightController>()->angular_input = input;
+	}
 }
 
 void GameState_Singleplayer::update(Client* client, double delta_time)
