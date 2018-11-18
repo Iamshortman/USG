@@ -23,8 +23,7 @@ quaternionD subtract(quaternionD a, quaternionD b)
 }
 
 QuaternionPidController::QuaternionPidController(double proptional, double intergral, double derivative, double min, double max, double i_max)
-	:pid_w(proptional, intergral, derivative, min, max, i_max),
-	pid_x(proptional, intergral, derivative, min, max, i_max),
+	:pid_x(proptional, intergral, derivative, min, max, i_max),
 	pid_y(proptional, intergral, derivative, min, max, i_max),
 	pid_z(proptional, intergral, derivative, min, max, i_max)
 {
@@ -72,23 +71,7 @@ vector3D QuaternionPidController::calculate(quaternionD current_orientation, qua
 
 	double x = this->pid_x.calculate(local_input.x, local_velocity.x, delta_time);
 	double y = this->pid_y.calculate(local_input.y, local_velocity.y, delta_time);
-	double z = -this->pid_z.calculate(local_input.z, local_velocity.z, delta_time);
+	double z = this->pid_z.calculate(local_input.z, local_velocity.z, delta_time);
 
 	return vector3D(x, y, z);
-}
-
-quaternionD QuaternionPidController::calculatePidQuaternion(quaternionD error, quaternionD delta, double delta_time)
-{
-	double w = this->pid_w.calculate(error.w, delta.w, delta_time);
-	double x = this->pid_x.calculate(error.x, delta.x, delta_time);
-	double y = this->pid_y.calculate(error.y, delta.y, delta_time);
-	double z = this->pid_z.calculate(error.z, delta.z, delta_time);
-
-	return quaternionD
-	(
-		w,
-		x,
-		y,
-		z
-	);
 }

@@ -38,7 +38,6 @@ void DebugCamera::update(double delta_time)
 		//TEMP CODE
 		if (InputManager::getInstance()->getButtonPressed("Debug_Interact"))
 		{
-			printf("Try: ");
 			World* world = this->parent_entity->getWorld();
 
 			double rayDistance = 10.0;
@@ -73,8 +72,6 @@ void DebugCamera::update(double delta_time)
 
 				}
 			}
-
-			printf("\n");
 		}
 
 	}

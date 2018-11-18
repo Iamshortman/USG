@@ -322,11 +322,11 @@ void InputManager::loadJoystick(SDL_Joystick* joystick)
 	{
 		device->addAxis("Debug_Pitch", JoystickAxis(1, 0.2, true));
 		device->addAxis("Debug_Yaw", JoystickAxis(2, 0.2, true));
-		device->addAxis("Debug_Roll", JoystickAxis(0, 0.2, true));
+		device->addAxis("Debug_Roll", JoystickAxis(0, 0.2, false));
 
 		device->addAxis("Debug_ForwardBackward", JoystickAxis(3, 0.1, true, JoystickAxisRange::FORWARD));
 
-		device->addButton("Debug_FlightAssist", JoystickButton(6));
+		device->addButton("Debug_Retro", JoystickButton(2));
 
 		device->addButton("Flight_Shoot", JoystickButton(0));
 	}

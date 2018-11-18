@@ -4,6 +4,7 @@
 #include "Common/Component/CharacterController.hpp"
 #include "Common/Component/ShipController.hpp"
 
+#include "Client/Component/PlayerShipController.hpp"
 #include "Client/Input/InputManager.hpp"
 
 void PlayerController::setPlayerEntity(Entity* entity)
@@ -56,19 +57,19 @@ void PlayerController::applyUserInput(double delta_time)
 			controller->angular_input.y = InputManager::getInstance()->getButtonAxisCombo("Debug_Yaw", "Debug_YawLeft", "Debug_YawRight", false);
 		}
 
-		if(entity->hasComponent<ShipFlightController>())
+		if(entity->hasComponent<PlayerShipController>())
 		{
-			ShipFlightController* controller = entity->getComponent<ShipFlightController>();
+			PlayerShipController* controller = entity->getComponent<PlayerShipController>();
 
-			controller->linear_input.x = InputManager::getInstance()->getButtonAxisCombo("Debug_LeftRight", "Debug_Left", "Debug_Right");
-			controller->linear_input.y = InputManager::getInstance()->getButtonAxisCombo("Debug_UpDown", "Debug_Up", "Debug_Down");
-			controller->linear_input.z = InputManager::getInstance()->getButtonAxisCombo("Debug_ForwardBackward", "Debug_Forward", "Debug_Backward");
+			controller->player_input_linear.x = InputManager::getInstance()->getButtonAxisCombo("Debug_LeftRight", "Debug_Left", "Debug_Right");
+			controller->player_input_linear.y = InputManager::getInstance()->getButtonAxisCombo("Debug_UpDown", "Debug_Up", "Debug_Down");
+			controller->player_input_linear.z = InputManager::getInstance()->getButtonAxisCombo("Debug_ForwardBackward", "Debug_Forward", "Debug_Backward");
 
-			controller->angular_input.x = InputManager::getInstance()->getButtonAxisCombo("Debug_Pitch", "Debug_PitchUp", "Debug_PitchDown");
-			controller->angular_input.y = InputManager::getInstance()->getButtonAxisCombo("Debug_Yaw", "Debug_YawLeft", "Debug_YawRight");
-			controller->angular_input.z = InputManager::getInstance()->getButtonAxisCombo("Debug_Roll", "Debug_RollLeft", "Debug_RollRight");
+			controller->player_input_angular.x = InputManager::getInstance()->getButtonAxisCombo("Debug_Pitch", "Debug_PitchUp", "Debug_PitchDown");
+			controller->player_input_angular.y = InputManager::getInstance()->getButtonAxisCombo("Debug_Yaw", "Debug_YawLeft", "Debug_YawRight");
+			controller->player_input_angular.z = InputManager::getInstance()->getButtonAxisCombo("Debug_Roll", "Debug_RollLeft", "Debug_RollRight");
 
-			controller->flight_assist = !InputManager::getInstance()->getButtonDown("Debug_FlightAssist");
+			controller->retro_burn_mode_input = InputManager::getInstance()->getButtonPressed("Debug_Retro");
 		}
 
 		if (entity->hasComponent<ShipController>())

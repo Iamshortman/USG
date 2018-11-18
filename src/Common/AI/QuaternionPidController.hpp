@@ -1,5 +1,4 @@
-#ifndef QUATERNION_PID_CONTROLLER_HPP
-#define QUATERNION_PID_CONTROLLER_HPP
+#pragma once
 
 #include "Common/AI/PidController.hpp"
 #include "Common/GLM_Include.hpp"
@@ -12,12 +11,7 @@ public:
 	vector3D calculate(quaternionD current_orientation, quaternionD desired_orientation, vector3D angular_velocity, double delta_time);
 
 private:
-	quaternionD calculatePidQuaternion(quaternionD error, quaternionD delta, double delta_time);
-
-	PidController pid_w;
 	PidController pid_x;
 	PidController pid_y;
 	PidController pid_z;
 };
-
-#endif //QUATERNION_PID_CONTROLLER_HPP

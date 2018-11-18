@@ -1,5 +1,4 @@
-#ifndef COMPONENT_SHIP_FLIGHT_HPP
-#define COMPONENT_SHIP_FLIGHT_HPP
+#pragma once
 
 #include "Common/Component/ComponentEntity.hpp"
 
@@ -32,12 +31,9 @@ public:
 	void UpdateLinearVelocity(double delta_time);
 	void UpdateAngularVelocity(double delta_time);
 
-	vector3D thruster_torque = vector3D(8000.0);
+	vector3D thruster_torque = vector3D(16000.0);
 	double thruster_force[6] = { 20000.0, 20000.0, 20000.0, 20000.0, 60000.0, 30000.0 };
 
 	double getAngularAcceleration(int axis, double input);
 	double getLinearAcceleration(int axis, double nput);
 };
-
-
-#endif // COMPONENT_SHIP_FLIGHT_HPP
