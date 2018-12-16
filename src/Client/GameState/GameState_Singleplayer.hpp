@@ -23,7 +23,7 @@ protected:
 
 	World* world = nullptr;
 
-	Entity* character = nullptr;
+	Entity* missle = nullptr;
 	NodeEntity* ship = nullptr;
 	
 	NodeEntity* ai_ship = nullptr;
